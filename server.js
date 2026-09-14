@@ -11,13 +11,16 @@ const { userRouter } = require("./routes/users.route");
 const { patientRouter } = require("./routes/patient.route");
 const { notificationRouter } = require("./routes/notifications.route");
 const { doctorRouter } = require("./routes/doctors.route");
+const paymentRouter = require("./routes/payment.route");
+const reviewRouter = require("./routes/review.route");
+
 
 const app = express();
 
 app.use(express.json());
 
 // Users route
-app.use("/users", userRouter);
+app.use("/api/users", userRouter);
 
 // Medicine routes
 app.use("/api/medicines", midicineRouter);
@@ -29,13 +32,19 @@ app.use("/api/medicalReports", medicalReportsRouter);
 app.use("/api/appointments", appointmentRoutes);
 
 // Patient route
-app.use("/patients", patientRouter);
+app.use("/api/patients", patientRouter);
 
 // Notifications route
 app.use("/api/notifications", notificationRouter);
 
 // Doctors route
-app.use("/doctors", doctorRouter);
+app.use("/api/doctors", doctorRouter);
+
+// Payments route
+app.use("/api/payments", paymentRouter);
+
+// Reviews route
+app.use("/api/reviews", reviewRouter);
 
 mongoose
   .connect(process.env.DB_LINK)

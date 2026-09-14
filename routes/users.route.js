@@ -30,7 +30,7 @@ userRouter.post("/login", userLogin);
 userRouter.get("/:id", authenticate, getUserById);
 
 // Register / Add user (public - always creates role "user")
-userRouter.post("/", registerValidationRules, validate, addUser);
+userRouter.post("/register", registerValidationRules, validate, addUser);
 
 // Create doctor/admin account - admin only
 userRouter.post("/staff", authenticate, authorize("admin"), createStaffAccount);

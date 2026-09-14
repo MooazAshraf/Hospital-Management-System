@@ -6,6 +6,7 @@ const {
   createReview,
   getAllReviews,
   updateReview,
+  deleteReview,
 } = require("../controllers/review.controller");
 
 router
@@ -15,7 +16,7 @@ router
 
 router
   .route("/:id")
-  .put(updateReview);
+  .put(updateReview)
+  .delete(deleteReview);
 
 module.exports = router;
-

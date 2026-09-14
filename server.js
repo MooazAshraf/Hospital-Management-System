@@ -11,6 +11,8 @@ const { userRouter } = require("./routes/users.route");
 const { patientRouter } = require("./routes/patient.route");
 const { notificationRouter } = require("./routes/notifications.route");
 const { doctorRouter } = require("./routes/doctors.route");
+const reviewRouter = require("./routes/review.route");
+const paymentRouter = require("./routes/payment.route");
 
 const app = express();
 
@@ -36,6 +38,12 @@ app.use("/api/notifications", notificationRouter);
 
 // Doctors route
 app.use("/doctors", doctorRouter);
+
+// Reviews route
+app.use("/reviews", reviewRouter);
+
+// payments route
+app.use("/payments", paymentRouter);
 
 mongoose
   .connect(process.env.DB_LINK)

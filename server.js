@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
+var cors = require("cors");
 
 // Routes
 const { midicineRouter } = require("./routes/midicine.route");
@@ -14,8 +15,15 @@ const { doctorRouter } = require("./routes/doctors.route");
 const reviewRouter = require("./routes/review.route");
 const paymentRouter = require("./routes/payment.route");
 
-
 const app = express();
+
+app.use(
+  cors({
+    origin: "*",
+  }),
+);
+
+app.options(/.*/, cors());
 
 app.use(express.json());
 

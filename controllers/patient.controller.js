@@ -36,7 +36,8 @@ const getPatientById = async (req, res) => {
     }
 
     const isOwner = patient.user._id.toString() === req.user.userId;
-    const isDoctorOrAdmin = req.user.role === "doctor" || req.user.role === "admin";
+    const isDoctorOrAdmin =
+      req.user.role === "doctor" || req.user.role === "admin";
 
     if (!isOwner && !isDoctorOrAdmin) {
       return res.status(403).json({
@@ -121,7 +122,6 @@ const addPatient = async (req, res) => {
   }
 };
 
-
 // Update a patient - accessible to the patient themselves, or a doctor/admin
 const updatePatient = async (req, res) => {
   try {
@@ -134,7 +134,8 @@ const updatePatient = async (req, res) => {
     }
 
     const isOwner = patient.user.toString() === req.user.userId;
-    const isDoctorOrAdmin = req.user.role === "doctor" || req.user.role === "admin";
+    const isDoctorOrAdmin =
+      req.user.role === "doctor" || req.user.role === "admin";
     if (!isOwner && !isDoctorOrAdmin) {
       return res.status(403).json({
         message: "You are not allowed to update this patient record",
@@ -190,10 +191,36 @@ const deletePatient = async (req, res) => {
   }
 };
 
+const getMyPatientProfile = async (req, res) => {
+  try {
+    const patient = await patientModel
+      .findOne({ user: req.user.userId })
+      .populate("user", "name email role")
+      .populate("primaryDoctor", "name email");
+
+    if (!patient) {
+      return res.status(404).json({
+        message: "Patient profile not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Patient profile fetched successfully",
+      patient,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getPatients,
   getPatientById,
   addPatient,
   updatePatient,
   deletePatient,
+  getMyPatientProfile,
 };

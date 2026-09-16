@@ -47,12 +47,11 @@ const getUserById = async (req, res) => {
   }
 };
 
-// ==========================
 // Add User / Register
-// ==========================
+
 const addUser = async (req, res) => {
   try {
-    const { name, email, password, phone} = req.body;
+    const { name, email, password, phone } = req.body;
 
     // Check if email already exists
     const existingUser = await userModel.findOne({ email });

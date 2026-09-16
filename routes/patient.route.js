@@ -6,6 +6,7 @@ const { authorize } = require("../middlewares/authorize");
 const {
   getPatients,
   getPatientById,
+  getMyPatientProfile,
   addPatient,
   updatePatient,
   deletePatient,
@@ -14,20 +15,28 @@ const {
 const patientRouter = express.Router();
 
 // Get all patients - doctors only
+// Get all patients - doctors and admins only
 patientRouter.get("/", authenticate, authorize("doctor", "admin"), getPatients);
 
-// Get a single patient - the patient themselves, or a doctor and admin
+// Get logged-in user's patient profile
+patientRouter.get("/me", authenticate, getMyPatientProfile);
+
+// Get a single patient
 patientRouter.get("/:id", authenticate, getPatientById);
 
-// Create a patient profile - any logged-in user (for their own account)
+// Create patient profile
 patientRouter.post("/", authenticate, addPatient);
 
-// Update a patient - owner or a doctor
+// Update patient
 patientRouter.put("/:id", authenticate, updatePatient);
 
-// Delete a patient - doctors only
-patientRouter.delete("/:id", authenticate, authorize("doctor", "admin"), deletePatient);
-
+// Delete patient
+patientRouter.delete(
+  "/:id",
+  authenticate,
+  authorize("doctor", "admin"),
+  deletePatient,
+);
 module.exports = {
   patientRouter,
 };

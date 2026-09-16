@@ -1,0 +1,118 @@
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
+  <div class="wrap flex items-center justify-between h-[76px]">
+    <!-- Logo -->
+    <a
+      routerLink="/"
+      class="flex items-center gap-2 font-heading font-extrabold text-xl text-green-900"
+    >
+      <span
+        class="w-7 h-7 rounded-md bg-green-900 flex items-center justify-center text-mint font-bold"
+      >
+        +
+      </span>
+
+      urCare
+    </a>
+
+    <!-- Navigation -->
+    <nav class="hidden md:flex items-center gap-9 text-[15px] font-medium">
+      <a routerLink="/departments" class="hover:text-green-900"> Departments </a>
+
+      <a routerLink="/doctors" class="hover:text-green-900"> Doctors </a>
+
+      <a routerLink="/about" class="hover:text-green-900"> About </a>
+
+      <a routerLink="/contact" class="hover:text-green-900"> Contact </a>
+    </nav>
+
+    <!-- Right Side -->
+    <div class="hidden md:flex items-center gap-3">
+      <!-- Not Logged In -->
+      <ng-container *ngIf="!user">
+        <a routerLink="/login" class="btn btn-ghost"> Log in </a>
+      </ng-container>
+
+      <!-- Logged In -->
+      <div *ngIf="user" class="relative">
+        <!-- User Button -->
+        <button
+          type="button"
+          (click)="toggleDropdown()"
+          class="flex items-center gap-2 hover:text-green-900 transition"
+        >
+          <!-- Person Icon -->
+          <span
+            class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+          </span>
+
+          <!-- User Name -->
+          <span class="text-sm font-medium">
+            {{ user.name }}
+          </span>
+
+          <!-- Arrow -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            [class.rotate-180]="dropdownOpen"
+            class="transition-transform"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+
+        <!-- Dropdown -->
+        <div
+          *ngIf="dropdownOpen"
+          class="absolute right-0 top-12 w-44 bg-white border border-gray-100 rounded-xl shadow-lg py-2"
+        >
+          <!-- Profile -->
+          <button
+            type="button"
+            (click)="goToProfile()"
+            class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition"
+          >
+            Profile
+          </button>
+
+          <!-- Logout -->
+          <button
+            type="button"
+            (click)="logout()"
+            class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Book Appointment -->
+      <a routerLink="/book-appointment" class="btn btn-primary"> Book appointment </a>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button class="md:hidden" aria-label="Open menu" (click)="mobileOpen = !mobileOpen">☰</button>
+  </div>
+</header>

@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-mint: #A8D5BA;
+  --color-mint-deep: #7FB89A;
+  --color-green-900: #1F3A26;
+  --color-green-700: #2F5233;
+  --color-charcoal: #2B2E2C;
+  --color-gray-600: #5C645F;
+  --color-gray-100: #F5F8F6;
+  --color-gray-050: #FBFCFB;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #2B2E2C;
+  background: #fff;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Libre Franklin', sans-serif;
+  color: #1F3A26;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold text-sm transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-green-900 text-white hover:bg-green-700;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-green-900 border border-green-900 hover:bg-green-900 hover:text-white;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-green-900 px-1 py-3 hover:underline;
+  }
+
+  .btn-on-mint {
+    @apply bg-green-900 text-white hover:bg-[#16281B];
+  }
+
+  .wrap {
+    @apply max-w-[1180px] mx-auto px-8;
+  }
+
+  .section-head {
+    @apply flex justify-between items-end flex-wrap gap-6 mb-11;
+  }
+}

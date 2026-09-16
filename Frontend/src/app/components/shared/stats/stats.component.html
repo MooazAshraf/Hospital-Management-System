@@ -1,0 +1,8 @@
+<section class="bg-green-900 py-16">
+  <div class="wrap grid grid-cols-2 md:grid-cols-4 gap-7">
+    <div *ngFor="let s of stats">
+      <span class="block font-heading font-extrabold text-4xl text-mint mb-1.5">{{ s.value }}</span>
+      <span class="text-sm text-[#C9D8CC]">{{ s.label }}</span>
+    </div>
+  </div>
+</section>

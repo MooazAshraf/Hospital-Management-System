@@ -1,0 +1,38 @@
+<footer class="bg-green-900 text-[#D6E3D9] pt-16 pb-8">
+  <div class="wrap">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+      <div>
+        <div class="font-heading font-extrabold text-white text-lg mb-3">urCare</div>
+        <p class="text-sm text-[#AEC4B3] max-w-[280px]">A general hospital in Cairo built around same-week care and one shared patient record.</p>
+      </div>
+      <div>
+        <h5 class="text-white text-sm font-semibold mb-4">Explore</h5>
+        <ul class="flex flex-col gap-2.5 text-sm text-[#AEC4B3]">
+          <li><a routerLink="/departments" class="hover:text-white">Departments</a></li>
+          <li><a routerLink="/doctors" class="hover:text-white">Doctors</a></li>
+          <li><a routerLink="/about" class="hover:text-white">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="text-white text-sm font-semibold mb-4">Patients</h5>
+        <ul class="flex flex-col gap-2.5 text-sm text-[#AEC4B3]">
+          <li><a routerLink="/book-appointment" class="hover:text-white">Book appointment</a></li>
+          <li><a routerLink="/login" class="hover:text-white">Patient login</a></li>
+          <li><a routerLink="/register" class="hover:text-white">Register</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="text-white text-sm font-semibold mb-4">Contact</h5>
+        <ul class="flex flex-col gap-2.5 text-sm text-[#AEC4B3]">
+          <li><a routerLink="/contact" class="hover:text-white">Location</a></li>
+          <li><a href="tel:+20800123456" class="hover:text-white">Emergency line</a></li>
+          <li><a href="mailto:info@urcare.com" class="hover:text-white">info&#64;urcare.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-[#2E4A35] pt-6 flex justify-between flex-wrap gap-3 text-xs text-[#8FA893]">
+      <span>&#169; {{ year }} urCare Hospital. All rights reserved.</span>
+      <span>Privacy Policy · Terms of Service</span>
+    </div>
+  </div>
+</footer>

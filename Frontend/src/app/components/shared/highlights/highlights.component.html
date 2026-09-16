@@ -1,0 +1,8 @@
+<section class="py-16 border-b border-gray-100">
+  <div class="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-0">
+    <div class="md:px-7 md:border-l md:first:border-l-0 md:first:pl-0 border-gray-100" *ngFor="let h of highlights">
+      <h3 class="text-lg mb-2">{{ h.title }}</h3>
+      <p class="text-sm text-gray-600">{{ h.desc }}</p>
+    </div>
+  </div>
+</section>

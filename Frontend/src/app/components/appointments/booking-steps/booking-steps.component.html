@@ -1,0 +1,10 @@
+<section class="wrap py-20">
+  <div class="section-head"><h2 class="text-3xl md:text-4xl">Booking an appointment takes four steps</h2></div>
+  <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="relative pt-9" *ngFor="let s of steps; let i = index">
+      <div class="absolute top-0 left-0 w-[30px] h-[30px] rounded-full border border-green-700 text-green-700 font-heading font-extrabold text-sm flex items-center justify-center">{{ i + 1 }}</div>
+      <h4 class="text-base mb-2">{{ s.title }}</h4>
+      <p class="text-sm text-gray-600">{{ s.desc }}</p>
+    </div>
+  </div>
+</section>

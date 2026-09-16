@@ -1,0 +1,21 @@
+<div class="border border-gray-200 rounded-xl overflow-hidden">
+  <div class="h-[190px] bg-gray-200"></div>
+  <div class="p-5">
+    <h3 class="text-base mb-0.5">{{ doctor.name }}</h3>
+    <div class="text-sm text-green-700 font-semibold mb-2">{{ doctor.specialty }}</div>
+    <div class="text-sm text-gray-600 mb-4">{{ doctor.experienceYears }} years experience</div>
+    <div class="flex gap-2">
+      <a
+        [routerLink]="['/doctors', doctor.name]"
+        class="btn btn-outline flex-1 !px-3 !py-2.5 text-sm"
+        >Profile</a
+      >
+      <a
+        routerLink="/book-appointment"
+        [queryParams]="{ doctor: doctor.name }"
+        class="btn btn-primary flex-1 !px-3 !py-2.5 text-sm"
+        >Book</a
+      >
+    </div>
+  </div>
+</div>

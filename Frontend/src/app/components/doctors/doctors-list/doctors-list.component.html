@@ -1,0 +1,11 @@
+<section class="bg-gray-100 py-20" id="doctors">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="text-3xl md:text-4xl max-w-lg">Doctors patients ask for by name</h2>
+      <p class="text-gray-600 max-w-sm text-[15px]">Every profile shows real availability, so you can book directly with the specialist you want.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
+      <app-doctor-card *ngFor="let d of doctors" [doctor]="d"></app-doctor-card>
+    </div>
+  </div>
+</section>

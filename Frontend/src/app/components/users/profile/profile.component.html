@@ -1,0 +1,118 @@
+<app-navbar></app-navbar>
+
+<section class="min-h-screen bg-gray-50 py-12 px-4">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <!-- Header -->
+      <div class="bg-green-900 px-8 py-8">
+        <div class="flex items-center gap-5">
+          <div
+            class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-green-900 text-2xl font-bold"
+          >
+            {{ user?.name?.charAt(0)?.toUpperCase() }}
+          </div>
+
+          <div>
+            <h1 class="!text-white text-2xl font-semibold">
+              {{ user?.name }}
+            </h1>
+
+            <p class="!text-green-100 text-sm mt-1">Personal Information</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="p-8">
+        <!-- View Mode -->
+        <div *ngIf="!editMode" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div class="border border-gray-200 rounded-xl p-5">
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Full Name</p>
+
+            <p class="text-gray-900 font-medium mt-2">
+              {{ user?.name }}
+            </p>
+          </div>
+
+          <div class="border border-gray-200 rounded-xl p-5">
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Email Address</p>
+
+            <p class="text-gray-900 font-medium mt-2 break-all">
+              {{ user?.email }}
+            </p>
+          </div>
+
+          <div class="border border-gray-200 rounded-xl p-5 sm:col-span-2">
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Phone Number</p>
+
+            <p class="text-gray-900 font-medium mt-2">
+              {{ user?.phone }}
+            </p>
+          </div>
+
+          <div class="sm:col-span-2 flex justify-end mt-3">
+            <button
+              type="button"
+              (click)="toggleEdit()"
+              class="bg-green-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-green-800 transition"
+            >
+              Edit Profile
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div *ngIf="editMode" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"> Full Name </label>
+
+            <input
+              type="text"
+              [value]="user?.name"
+              class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"> Email Address </label>
+
+            <input
+              type="email"
+              [value]="user?.email"
+              class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"> Phone Number </label>
+
+            <input
+              type="text"
+              [value]="user?.phone"
+              class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
+            />
+          </div>
+
+          <div class="flex justify-end gap-3 pt-3">
+            <button
+              type="button"
+              (click)="toggleEdit()"
+              class="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              class="bg-green-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-green-800 transition"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

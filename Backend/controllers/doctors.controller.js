@@ -1,17 +1,24 @@
 const doctorModel = require("../models/doctors.model");
 const userModel = require("../models/users.model");
 
-// Get all doctors - any authenticated user (patients need to browse doctors too)
+
+// ==========================================
+// Get all doctors
+// ==========================================
+
 const getDoctors = async (req, res) => {
   try {
     const doctors = await doctorModel
       .find()
-      .populate("user", "name email role");
+      .populate("user", "name email role")
+      .populate("department", "name");
 
     res.status(200).json({
       message: "Doctors fetched successfully",
+      count: doctors.length,
       doctors,
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Server error",
@@ -20,12 +27,17 @@ const getDoctors = async (req, res) => {
   }
 };
 
-// Get a single doctor by ID - any authenticated user
+
+// ==========================================
+// Get doctor by ID
+// ==========================================
+
 const getDoctorById = async (req, res) => {
   try {
     const doctor = await doctorModel
       .findById(req.params.id)
-      .populate("user", "name email role");
+      .populate("user", "name email role")
+      .populate("department", "name");
 
     if (!doctor) {
       return res.status(404).json({
@@ -37,6 +49,7 @@ const getDoctorById = async (req, res) => {
       message: "Doctor fetched successfully",
       doctor,
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Server error",
@@ -45,10 +58,49 @@ const getDoctorById = async (req, res) => {
   }
 };
 
-// Create a doctor profile - the doctor themselves, or an admin on their behalf
+
+// ==========================================
+// Get logged-in doctor's own profile
+// ==========================================
+
+const getMyDoctorProfile = async (req, res) => {
+  try {
+
+    const doctor = await doctorModel
+      .findOne({ user: req.user.userId })
+      .populate("user", "name email role")
+      .populate("department", "name");
+
+    if (!doctor) {
+      return res.status(404).json({
+        message: "Doctor profile not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Doctor profile fetched successfully",
+      doctor,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+// ==========================================
+// Create doctor profile
+// ==========================================
+
 const addDoctor = async (req, res) => {
   try {
+
     const {
+      user,
       name,
       specialty,
       department,
@@ -62,47 +114,59 @@ const addDoctor = async (req, res) => {
       isAvailable,
       availability,
       image,
-      user, // only used when an admin creates the profile
     } = req.body;
 
-    const isAdmin = req.user.role === "admin";
+    // Doctors link to their own account; admins can link any doctor account
+    const targetUserId =
+      req.user.role === "admin" && user
+        ? user
+        : req.user.userId;
 
-    // A doctor creates their own profile; an admin must specify which user account
-    const targetUserId = isAdmin ? user : req.user.userId;
-
-    if (!targetUserId) {
-      return res.status(400).json({
-        message: "user id is required when an admin creates a doctor profile",
-      });
-    }
-
-    // Make sure the target account actually has the "doctor" role
+    // Check user account
     const targetUser = await userModel.findById(targetUserId);
-    if (!targetUser || targetUser.role !== "doctor") {
-      return res.status(400).json({
-        message: "The linked account must be a registered doctor account",
+
+    if (!targetUser) {
+      return res.status(404).json({
+        message: "User account not found",
       });
     }
 
-    // One doctor profile per user account
-    const existingDoctorForUser = await doctorModel.findOne({
-      user: targetUserId,
-    });
+
+    // User must have doctor role
+    if (targetUser.role !== "doctor") {
+      return res.status(400).json({
+        message:
+          "The linked account must be a registered doctor account",
+      });
+    }
+
+
+    // One profile per user
+    const existingDoctorForUser =
+      await doctorModel.findOne({
+        user: targetUserId,
+      });
 
     if (existingDoctorForUser) {
       return res.status(409).json({
-        message: "This account already has a doctor profile",
+        message:
+          "This account already has a doctor profile",
       });
     }
 
-    // Check if email already exists
-    const existingEmail = await doctorModel.findOne({ email });
+
+    // Email must be unique
+    const existingEmail =
+      await doctorModel.findOne({
+        email: email.toLowerCase(),
+      });
 
     if (existingEmail) {
       return res.status(409).json({
         message: "Email already exists",
       });
     }
+
 
     const newDoctor = await doctorModel.create({
       user: targetUserId,
@@ -121,15 +185,27 @@ const addDoctor = async (req, res) => {
       image,
     });
 
+
     const doctor = await doctorModel
       .findById(newDoctor._id)
-      .populate("user", "name email role");
+      .populate("user", "name email role")
+      .populate("department", "name");
+
 
     res.status(201).json({
       message: "Doctor profile created successfully",
       doctor,
     });
+
   } catch (error) {
+
+    // Duplicate key
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "A doctor with this information already exists",
+      });
+    }
+
     res.status(500).json({
       message: "Server error",
       error: error.message,
@@ -137,10 +213,15 @@ const addDoctor = async (req, res) => {
   }
 };
 
-// Update a doctor - the doctor themselves, or an admin
+
+// ==========================================
+// Update doctor
+// ==========================================
+
 const updateDoctor = async (req, res) => {
   try {
-    const doctor = await doctorModel.findById(req.params.id);
+    const doctor =
+      await doctorModel.findById(req.params.id);
 
     if (!doctor) {
       return res.status(404).json({
@@ -148,33 +229,113 @@ const updateDoctor = async (req, res) => {
       });
     }
 
-    const isOwner = doctor.user.toString() === req.user.userId;
-    const isAdmin = req.user.role === "admin";
+
+    const isOwner =
+      doctor.user.toString() === req.user.userId;
+
+    const isAdmin =
+      req.user.role === "admin";
+
 
     if (!isOwner && !isAdmin) {
       return res.status(403).json({
-        message: "You are not allowed to update this doctor record",
+        message:
+          "You are not allowed to update this doctor record",
       });
     }
 
-    // Only an admin can move a doctor profile to a different user account
-    const updateData = { ...req.body };
+
+    const updateData = {
+      ...req.body,
+    };
+
+
+    // Doctor cannot change linked user
     if (!isAdmin) {
       delete updateData.user;
     }
 
-    const updatedDoctor = await doctorModel
-      .findByIdAndUpdate(req.params.id, updateData, {
-        new: true,
-        runValidators: true,
-      })
-      .populate("user", "name email role");
+
+    // Admin changing linked user
+    if (isAdmin && updateData.user) {
+
+      const targetUser =
+        await userModel.findById(updateData.user);
+
+      if (!targetUser) {
+        return res.status(404).json({
+          message: "Target user account not found",
+        });
+      }
+
+
+      if (targetUser.role !== "doctor") {
+        return res.status(400).json({
+          message:
+            "The linked account must have doctor role",
+        });
+      }
+
+
+      const existingProfile =
+        await doctorModel.findOne({
+          user: updateData.user,
+          _id: { $ne: doctor._id },
+        });
+
+      if (existingProfile) {
+        return res.status(409).json({
+          message:
+            "This account already has a doctor profile",
+        });
+      }
+    }
+
+
+    // Prevent duplicate email
+    if (updateData.email) {
+
+      const existingEmail =
+        await doctorModel.findOne({
+          email: updateData.email.toLowerCase(),
+          _id: { $ne: doctor._id },
+        });
+
+      if (existingEmail) {
+        return res.status(409).json({
+          message: "Email already exists",
+        });
+      }
+    }
+
+
+    const updatedDoctor =
+      await doctorModel
+        .findByIdAndUpdate(
+          req.params.id,
+          updateData,
+          {
+            new: true,
+            runValidators: true,
+          }
+        )
+        .populate("user", "name email role")
+        .populate("department", "name");
+
 
     res.status(200).json({
       message: "Doctor updated successfully",
       doctor: updatedDoctor,
     });
+
   } catch (error) {
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "Duplicate doctor data",
+      });
+    }
+
     res.status(500).json({
       message: "Server error",
       error: error.message,
@@ -182,10 +343,19 @@ const updateDoctor = async (req, res) => {
   }
 };
 
-// Delete a doctor - admin only
+
+// ==========================================
+// Delete doctor
+// ==========================================
+
 const deleteDoctor = async (req, res) => {
   try {
-    const doctor = await doctorModel.findByIdAndDelete(req.params.id);
+
+    const doctor =
+      await doctorModel.findByIdAndDelete(
+        req.params.id
+      );
+
 
     if (!doctor) {
       return res.status(404).json({
@@ -193,10 +363,13 @@ const deleteDoctor = async (req, res) => {
       });
     }
 
+
     res.status(200).json({
       message: "Doctor deleted successfully",
     });
+
   } catch (error) {
+
     res.status(500).json({
       message: "Server error",
       error: error.message,
@@ -204,9 +377,11 @@ const deleteDoctor = async (req, res) => {
   }
 };
 
+
 module.exports = {
   getDoctors,
   getDoctorById,
+  getMyDoctorProfile,
   addDoctor,
   updateDoctor,
   deleteDoctor,

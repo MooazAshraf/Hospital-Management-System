@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-require("./users.model");
 
+require("./users.model");
+require("./department.model");
 const doctorSchema = new mongoose.Schema(
   {
     user: {
@@ -31,13 +32,17 @@ const doctorSchema = new mongoose.Schema(
     },
 
     email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email"],
-    },
+  type: String,
+  required: [true, "Email is required"],
+  unique: true,
+  lowercase: true,
+  trim: true,
+
+  match: [
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    "Please enter a valid email",
+  ],
+},
 
     phone: {
       type: String,
@@ -51,7 +56,11 @@ const doctorSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      maxlength: [500, "Description cannot exceed 500 characters"],
+      maxlength: [
+        500,
+        "Description cannot exceed 500 characters",
+      ],
+      default: "",
     },
 
     fees: {
@@ -68,6 +77,7 @@ const doctorSchema = new mongoose.Schema(
     roomNumber: {
       type: String,
       trim: true,
+      default: "",
     },
 
     experienceYears: {
@@ -96,13 +106,23 @@ const doctorSchema = new mongoose.Schema(
           ],
           required: [true, "Day is required"],
         },
+
         startTime: {
           type: String,
           required: [true, "Start time is required"],
+          match: [
+            /^([01]\d|2[0-3]):[0-5]\d$/,
+            "Start time must be in HH:MM format",
+          ],
         },
+
         endTime: {
           type: String,
           required: [true, "End time is required"],
+          match: [
+            /^([01]\d|2[0-3]):[0-5]\d$/,
+            "End time must be in HH:MM format",
+          ],
         },
       },
     ],
@@ -115,7 +135,7 @@ const doctorSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 module.exports = mongoose.model("Doctor", doctorSchema);

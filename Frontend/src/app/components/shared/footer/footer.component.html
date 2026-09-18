@@ -1,38 +1,391 @@
-<footer class="bg-green-900 text-[#D6E3D9] pt-16 pb-8">
-  <div class="wrap">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-      <div>
-        <div class="font-heading font-extrabold text-white text-lg mb-3">urCare</div>
-        <p class="text-sm text-[#AEC4B3] max-w-[280px]">A general hospital in Cairo built around same-week care and one shared patient record.</p>
+<!-- ================= FOOTER ================= -->
+
+<footer class="bg-green-950 text-white">
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+    <!-- ================= FOOTER MAIN ================= -->
+
+    <div class="py-12">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+        <!-- ================= BRAND ================= -->
+
+        <div>
+
+          <a
+            routerLink="/"
+            class="inline-flex items-center gap-3 mb-4"
+          >
+
+            <!-- Logo -->
+            <div
+              class="w-9 h-9 rounded-lg bg-white text-green-950 flex items-center justify-center font-bold text-lg"
+            >
+              +
+            </div>
+
+            <span class="text-xl font-bold">
+              urCare
+            </span>
+
+          </a>
+
+          <p class="text-green-100 text-sm leading-6 max-w-xs">
+            A simple healthcare platform that helps patients find doctors,
+            book appointments, and manage their healthcare journey.
+          </p>
+
+
+          <!-- ================= SOCIAL MEDIA ================= -->
+
+          <div class="flex items-center gap-3 mt-6">
+
+            <!-- Instagram -->
+            <a
+              href="https://www.instagram.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              class="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center hover:scale-110 hover:bg-pink-600 transition duration-200"
+            >
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+
+                <rect
+                  x="3"
+                  y="3"
+                  width="18"
+                  height="18"
+                  rx="5"
+                />
+
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="4"
+                />
+
+                <circle
+                  cx="17.5"
+                  cy="6.5"
+                  r="1"
+                  fill="currentColor"
+                  stroke="none"
+                />
+
+              </svg>
+
+            </a>
+
+
+            <!-- TikTok -->
+            <a
+              href="https://www.tiktok.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              class="w-10 h-10 rounded-full bg-black flex items-center justify-center hover:scale-110 hover:bg-slate-800 transition duration-200"
+            >
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+
+                <path
+                  d="M16.6 5.8a4.9 4.9 0 0 1-1.1-2.8h-3.1v12.1a2.9 2.9 0 1 1-2-2.7V9.2a6 6 0 1 0 5.1 5.9V9a8 8 0 0 0 4.5 1.4V7.3a5 5 0 0 1-3.4-1.5Z"
+                />
+
+              </svg>
+
+            </a>
+
+
+            <!-- YouTube -->
+            <a
+              href="https://www.youtube.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center hover:scale-110 hover:bg-red-700 transition duration-200"
+            >
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+
+                <path
+                  d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8Z"
+                />
+
+                <path
+                  d="m9.5 15.5 5-3.5-5-3.5v7Z"
+                  fill="white"
+                />
+
+              </svg>
+
+            </a>
+
+
+            <!-- LinkedIn -->
+            <a
+              href="https://www.linkedin.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center hover:scale-110 hover:bg-blue-700 transition duration-200"
+            >
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+
+                <path
+                  d="M6.5 8.5H3V21h3.5V8.5ZM4.75 3A2.05 2.05 0 1 0 4.75 7.1 2.05 2.05 0 0 0 4.75 3ZM21 13.9c0-3.7-2-5.4-4.7-5.4-2.2 0-3.2 1.2-3.8 2v-2H9V21h3.5v-6.2c0-1.6.3-3.2 2.3-3.2 2 0 2.1 1.8 2.1 3.3V21H21v-7.1Z"
+                />
+
+              </svg>
+
+            </a>
+
+
+            <!-- Facebook -->
+            <a
+              href="https://www.facebook.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center hover:scale-110 hover:bg-blue-600 transition duration-200"
+            >
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+
+                <path
+                  d="M13.5 21v-8h2.7l.4-3h-3.1V8.1c0-.9.3-1.6 1.7-1.6h1.7V3.8c-.3 0-1.4-.1-2.6-.1-2.6 0-4.4 1.6-4.4 4.5V10H7v3h2.9v8h3.6Z"
+                />
+
+              </svg>
+
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= EXPLORE ================= -->
+
+        <div>
+
+          <h3 class="font-bold text-base mb-5">
+            Explore
+          </h3>
+
+          <ul class="space-y-3 text-sm text-green-100">
+
+            <li>
+
+              <a
+                routerLink="/"
+                fragment="departments"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                Departments
+              </a>
+
+            </li>
+
+            <li>
+
+              <a
+                routerLink="/doctors"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                Doctors
+              </a>
+
+            </li>
+
+            <li>
+
+              <a
+                routerLink="/about"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                About
+              </a>
+
+            </li>
+
+            <li>
+
+              <a
+                routerLink="/contact"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                Contact
+              </a>
+
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- ================= PATIENTS ================= -->
+
+        <div>
+
+          <h3 class="font-bold text-base mb-5">
+            Patients
+          </h3>
+
+          <ul class="space-y-3 text-sm text-green-100">
+
+            <li>
+
+              <a
+                routerLink="/book-appointment"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                Book appointment
+              </a>
+
+            </li>
+
+            <li>
+
+              <a
+                routerLink="/login"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                Patient login
+              </a>
+
+            </li>
+
+            <li>
+
+              <a
+                routerLink="/register"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                Register
+              </a>
+
+            </li>
+
+            <li>
+
+              <a
+                routerLink="/profile"
+                class="hover:text-white hover:translate-x-1 inline-block transition"
+              >
+                My profile
+              </a>
+
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- ================= CONTACT ================= -->
+
+        <div>
+
+          <h3 class="font-bold text-base mb-5">
+            Contact
+          </h3>
+
+          <ul class="space-y-3 text-sm text-green-100">
+
+            <li>
+              Cairo, Egypt
+            </li>
+
+            <li>
+              Emergency line: 123
+            </li>
+
+            <li>
+              info@urcare.com
+            </li>
+
+            <li>
+              +20 100 000 0000
+            </li>
+
+          </ul>
+
+        </div>
+
       </div>
-      <div>
-        <h5 class="text-white text-sm font-semibold mb-4">Explore</h5>
-        <ul class="flex flex-col gap-2.5 text-sm text-[#AEC4B3]">
-          <li><a routerLink="/departments" class="hover:text-white">Departments</a></li>
-          <li><a routerLink="/doctors" class="hover:text-white">Doctors</a></li>
-          <li><a routerLink="/about" class="hover:text-white">About</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5 class="text-white text-sm font-semibold mb-4">Patients</h5>
-        <ul class="flex flex-col gap-2.5 text-sm text-[#AEC4B3]">
-          <li><a routerLink="/book-appointment" class="hover:text-white">Book appointment</a></li>
-          <li><a routerLink="/login" class="hover:text-white">Patient login</a></li>
-          <li><a routerLink="/register" class="hover:text-white">Register</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5 class="text-white text-sm font-semibold mb-4">Contact</h5>
-        <ul class="flex flex-col gap-2.5 text-sm text-[#AEC4B3]">
-          <li><a routerLink="/contact" class="hover:text-white">Location</a></li>
-          <li><a href="tel:+20800123456" class="hover:text-white">Emergency line</a></li>
-          <li><a href="mailto:info@urcare.com" class="hover:text-white">info&#64;urcare.com</a></li>
-        </ul>
-      </div>
+
     </div>
-    <div class="border-t border-[#2E4A35] pt-6 flex justify-between flex-wrap gap-3 text-xs text-[#8FA893]">
-      <span>&#169; {{ year }} urCare Hospital. All rights reserved.</span>
-      <span>Privacy Policy · Terms of Service</span>
+
+
+    <!-- ================= BOTTOM ================= -->
+
+    <div
+      class="border-t border-green-800 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-green-200"
+    >
+
+      <p>
+        © 2026 urCare Hospital. All rights reserved.
+      </p>
+
+      <div class="flex items-center gap-5">
+
+        <a
+          href="#"
+          class="hover:text-white transition"
+        >
+          Privacy Policy
+        </a>
+
+        <span class="text-green-700">
+          |
+        </span>
+
+        <a
+          href="#"
+          class="hover:text-white transition"
+        >
+          Terms of Service
+        </a>
+
+      </div>
+
     </div>
+
   </div>
+
 </footer>

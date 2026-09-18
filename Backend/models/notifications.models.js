@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
-require("./users.model");
 
 const notificationSchema = new mongoose.Schema(
   {
     recipient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "Recipient is required"],
+      required: true,
+      index: true,
     },
 
     sender: {
@@ -17,19 +17,24 @@ const notificationSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ["Appointment", "MedicalReport", "Medicine", "System"],
-      default: "System",
+      enum: [
+        "appointment",
+        "medical-report",
+        "payment",
+        "system",
+      ],
+      default: "system",
     },
 
     title: {
       type: String,
-      required: [true, "Title is required"],
+      required: true,
       trim: true,
     },
 
     message: {
       type: String,
-      required: [true, "Message is required"],
+      required: true,
       trim: true,
     },
 
@@ -48,6 +53,7 @@ const notificationSchema = new mongoose.Schema(
     isRead: {
       type: Boolean,
       default: false,
+      index: true,
     },
   },
   {
@@ -55,4 +61,7 @@ const notificationSchema = new mongoose.Schema(
   },
 );
 
-module.exports = mongoose.model("Notification", notificationSchema);
+module.exports = mongoose.model(
+  "Notification",
+  notificationSchema,
+);

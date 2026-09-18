@@ -8,4 +8,5 @@ export interface Iuser {
   lastLoginDate: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
+  
 }

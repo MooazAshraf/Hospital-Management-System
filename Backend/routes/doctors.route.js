@@ -1,7 +1,13 @@
 const express = require("express");
 
-const { authenticate } = require("../middlewares/isLogged");
-const { authorize } = require("../middlewares/authorize");
+const {
+  authenticate,
+} = require("../middlewares/isLogged");
+
+const {
+  authorize,
+} = require("../middlewares/authorize");
+
 const {
   createDoctorValidationRules,
   validate,
@@ -10,34 +16,94 @@ const {
 const {
   getDoctors,
   getDoctorById,
+  getMyDoctorProfile,
   addDoctor,
   updateDoctor,
   deleteDoctor,
 } = require("../controllers/doctors.controller");
 
+
 const doctorRouter = express.Router();
 
-// Get all doctors - any authenticated user
-doctorRouter.get("/", authenticate, getDoctors);
 
-// Get a single doctor - any authenticated user
-doctorRouter.get("/:id", authenticate, getDoctorById);
+// ==========================================
+// Get logged-in doctor's own profile
+// Doctor only
+// NOTE: must come before "/:id" or Express will
+// treat "me" as an :id value
+// ==========================================
 
-// Create a doctor profile - doctor accounts or admin only
+doctorRouter.get(
+  "/me",
+  authenticate,
+  authorize("doctor"),
+  getMyDoctorProfile
+);
+
+
+// ==========================================
+// Get all doctors
+// Public — anyone can browse the doctors list,
+// no login required
+// ==========================================
+
+doctorRouter.get(
+  "/",
+  getDoctors
+);
+
+
+// ==========================================
+// Get doctor by ID
+// Public — anyone can view a doctor's profile,
+// no login required
+// ==========================================
+
+doctorRouter.get(
+  "/:id",
+  getDoctorById
+);
+
+
+// ==========================================
+// Create doctor profile
+// Doctor or Admin
+// ==========================================
+
 doctorRouter.post(
   "/",
   authenticate,
   authorize("doctor", "admin"),
   createDoctorValidationRules,
   validate,
-  addDoctor,
+  addDoctor
 );
 
-// Update a doctor - owner or admin
-doctorRouter.put("/:id", authenticate, updateDoctor);
 
-// Delete a doctor - admin only
-doctorRouter.delete("/:id", authenticate, authorize("admin"), deleteDoctor);
+// ==========================================
+// Update doctor
+// Owner or Admin
+// ==========================================
+
+doctorRouter.put(
+  "/:id",
+  authenticate,
+  updateDoctor
+);
+
+
+// ==========================================
+// Delete doctor
+// Admin only
+// ==========================================
+
+doctorRouter.delete(
+  "/:id",
+  authenticate,
+  authorize("admin"),
+  deleteDoctor
+);
+
 
 module.exports = {
   doctorRouter,

@@ -1,10 +1,761 @@
-<section class="wrap py-20">
-  <div class="section-head"><h2 class="text-3xl md:text-4xl">Booking an appointment takes four steps</h2></div>
-  <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-    <div class="relative pt-9" *ngFor="let s of steps; let i = index">
-      <div class="absolute top-0 left-0 w-[30px] h-[30px] rounded-full border border-green-700 text-green-700 font-heading font-extrabold text-sm flex items-center justify-center">{{ i + 1 }}</div>
-      <h4 class="text-base mb-2">{{ s.title }}</h4>
-      <p class="text-sm text-gray-600">{{ s.desc }}</p>
+<div class="booking-page">
+
+  <div class="booking-card">
+
+    <!-- Doctor Header -->
+    <div class="doctor-header">
+
+      <div class="doctor-avatar">
+
+        <img
+          *ngIf="doctorImage"
+          [src]="doctorImage"
+          [alt]="doctorName"
+        />
+
+        <span *ngIf="!doctorImage">
+          👨‍⚕️
+        </span>
+
+      </div>
+
+      <div class="doctor-info">
+
+        <h2>
+          د. {{ doctorName }}
+        </h2>
+
+        <p *ngIf="doctorSpecialty">
+          {{ doctorSpecialty }}
+        </p>
+
+        <span
+          *ngIf="
+            doctorFees !== null &&
+            doctorFees !== undefined
+          "
+        >
+          Consultation Fee:
+          {{ doctorFees }} EGP
+        </span>
+
+      </div>
+
     </div>
+
+
+    <div class="divider"></div>
+
+
+    <!-- FORM -->
+
+    <form
+      [formGroup]="detailsForm"
+      (ngSubmit)="confirm()"
+      class="booking-form"
+    >
+
+      <h1>
+        Book an Appointment
+      </h1>
+
+      <p class="form-subtitle">
+        Fill in your information to book an
+        appointment with this doctor.
+      </p>
+
+
+      <!-- Patient Information -->
+
+      <div class="section-title">
+
+        <span>1</span>
+
+        Patient Information
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <!-- Name -->
+
+        <div class="form-group">
+
+          <label for="patientName">
+            Full Name
+          </label>
+
+          <input
+            id="patientName"
+            type="text"
+            formControlName="patientName"
+            placeholder="Enter your full name"
+          />
+
+          @if (
+            detailsForm.get('patientName')?.touched &&
+            detailsForm.get('patientName')?.invalid
+          ) {
+
+            <small class="error">
+              Please enter your name.
+            </small>
+
+          }
+
+        </div>
+
+
+        <!-- Phone -->
+
+        <div class="form-group">
+
+          <label for="phone">
+            Phone Number
+          </label>
+
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="01xxxxxxxxx"
+          />
+
+          @if (
+            detailsForm.get('phone')?.touched &&
+            detailsForm.get('phone')?.invalid
+          ) {
+
+            <small class="error">
+              Please enter a valid Egyptian
+              phone number.
+            </small>
+
+          }
+
+        </div>
+
+
+        <!-- Email -->
+
+        <div class="form-group full">
+
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="example@email.com"
+          />
+
+          @if (
+            detailsForm.get('email')?.touched &&
+            detailsForm.get('email')?.invalid
+          ) {
+
+            <small class="error">
+              Please enter a valid email address.
+            </small>
+
+          }
+
+        </div>
+
+      </div>
+
+
+      <!-- Appointment Information -->
+
+      <div class="section-title">
+
+        <span>2</span>
+
+        Appointment Details
+
+      </div>
+
+
+      <div class="form-grid">
+
+
+        <!-- Date -->
+
+        <div class="form-group">
+
+          <label for="date">
+            Appointment Date
+          </label>
+
+          <input
+            id="date"
+            type="date"
+            formControlName="date"
+            [min]="minDate"
+          />
+
+        </div>
+
+
+        <!-- Time -->
+
+        <div class="form-group">
+
+          <label for="time">
+            Appointment Time
+          </label>
+
+          <select
+            id="time"
+            formControlName="time"
+          >
+
+            <option value="">
+              Select a time
+            </option>
+
+
+            @if (morningSlots().length) {
+
+              <optgroup label="Morning">
+
+                @for (
+                  slot of morningSlots();
+                  track slot.time
+                ) {
+
+                  <option
+                    [value]="slot.time"
+                    [disabled]="slot.booked"
+                  >
+
+                    {{ slot.time }}
+
+                    @if (slot.booked) {
+                      - Booked
+                    }
+
+                  </option>
+
+                }
+
+              </optgroup>
+
+            }
+
+
+            @if (afternoonSlots().length) {
+
+              <optgroup label="Afternoon">
+
+                @for (
+                  slot of afternoonSlots();
+                  track slot.time
+                ) {
+
+                  <option
+                    [value]="slot.time"
+                    [disabled]="slot.booked"
+                  >
+
+                    {{ slot.time }}
+
+                    @if (slot.booked) {
+                      - Booked
+                    }
+
+                  </option>
+
+                }
+
+              </optgroup>
+
+            }
+
+          </select>
+
+
+          @if (loadingSlots()) {
+
+            <small class="hint">
+              Loading available times...
+            </small>
+
+          }
+
+          @if (
+            !loadingSlots() &&
+            detailsForm.get('date')?.value &&
+            !hasAnyAvailableSlot()
+          ) {
+
+            <small class="no-slots">
+              No available appointments on this date.
+            </small>
+
+          }
+
+        </div>
+
+
+        <!-- Visit Type -->
+
+        <div class="form-group full">
+
+          <label for="appointmentType">
+            Visit Type
+          </label>
+
+          <select
+            id="appointmentType"
+            formControlName="appointmentType"
+          >
+
+            <option value="Check-up">
+              New Check-up
+            </option>
+
+            <option value="Follow-up">
+              Follow-up
+            </option>
+
+            <option value="Consultation">
+              Consultation
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Notes -->
+
+        <div class="form-group full">
+
+          <label for="notes">
+
+            Notes
+
+            <span>
+              (Optional)
+            </span>
+
+          </label>
+
+          <textarea
+            id="notes"
+            formControlName="notes"
+            rows="4"
+            placeholder="Tell the doctor anything important about your visit..."
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <!-- Error -->
+
+      @if (errorMessage()) {
+
+        <div class="error-box">
+
+          {{ errorMessage() }}
+
+        </div>
+
+      }
+
+
+      <!-- Footer -->
+
+      <div class="form-footer">
+
+        <div class="secure-text">
+
+           Your information is kept private.
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="book-button"
+          [disabled]="submitting()"
+        >
+
+          @if (submitting()) {
+
+            Booking...
+
+          } @else {
+
+            Book Appointment
+
+          }
+
+        </button>
+
+      </div>
+
+    </form>
+
   </div>
-</section>
+
+</div>
+
+
+<style>
+
+.booking-page {
+  min-height: calc(100vh - 140px);
+  background: #f7f9f8;
+  padding: 50px 20px 70px;
+}
+
+
+.booking-card {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e4e9e6;
+  border-radius: 18px;
+  box-shadow:
+    0 8px 30px rgba(20, 83, 45, 0.08);
+  overflow: hidden;
+}
+
+
+/* Doctor */
+
+.doctor-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 28px 32px;
+}
+
+
+.doctor-avatar {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #eaf4ee;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 32px;
+}
+
+
+.doctor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+.doctor-info {
+  flex: 1;
+}
+
+
+.doctor-info h2 {
+  margin: 0 0 6px;
+  color: #163d28;
+  font-size: 22px;
+}
+
+
+.doctor-info p {
+  margin: 0 0 7px;
+  color: #39745b;
+  font-size: 15px;
+}
+
+
+.doctor-info span {
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* Divider */
+
+.divider {
+  height: 1px;
+  background: #e8ecea;
+}
+
+
+/* Form */
+
+.booking-form {
+  padding: 32px;
+}
+
+
+.booking-form h1 {
+  margin: 0;
+  color: #163d28;
+  font-size: 26px;
+}
+
+
+.form-subtitle {
+  margin: 8px 0 30px;
+  color: #7a8580;
+  font-size: 14px;
+}
+
+
+/* Section */
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 28px 0 18px;
+
+  color: #163d28;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+.section-title span {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 50%;
+
+  background: #1f6f5c;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+}
+
+
+/* Grid */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+
+.form-group label {
+  color: #34423a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+.form-group label span {
+  color: #929a96;
+  font-weight: 400;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  border: 1px solid #d9e0dc;
+  border-radius: 9px;
+
+  padding: 12px 13px;
+
+  background: #fff;
+  color: #26352d;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition: .2s;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #1f6f5c;
+
+  box-shadow:
+    0 0 0 3px rgba(31, 111, 92, .08);
+}
+
+
+.form-group textarea {
+  resize: vertical;
+}
+
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a2aaa5;
+}
+
+
+/* Errors */
+
+.error {
+  color: #c0392b;
+  font-size: 12px;
+}
+
+
+.error-box {
+  margin-top: 20px;
+
+  padding: 12px 15px;
+
+  border-radius: 9px;
+
+  background: #fff0ef;
+  border: 1px solid #ffd3d0;
+
+  color: #b3261e;
+
+  font-size: 14px;
+}
+
+
+.hint {
+  color: #89948e;
+  font-size: 12px;
+}
+
+
+.no-slots {
+  color: #c0392b;
+  font-size: 12px;
+}
+
+
+/* Footer */
+
+.form-footer {
+  margin-top: 30px;
+
+  padding-top: 22px;
+
+  border-top: 1px solid #e8ecea;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+
+.secure-text {
+  color: #7a8580;
+  font-size: 13px;
+}
+
+
+.book-button {
+  border: none;
+  border-radius: 9px;
+
+  padding: 13px 25px;
+
+  background: #1d432b;
+  color: #fff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+
+.book-button:hover:not(:disabled) {
+  background: #163722;
+  transform: translateY(-1px);
+}
+
+
+.book-button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+
+/* Mobile */
+
+@media (max-width: 650px) {
+
+  .booking-page {
+    padding: 25px 12px 40px;
+  }
+
+
+  .doctor-header {
+    padding: 22px;
+  }
+
+
+  .booking-form {
+    padding: 22px;
+  }
+
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .form-group.full {
+    grid-column: auto;
+  }
+
+
+  .form-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+
+  .book-button {
+    width: 100%;
+  }
+
+}
+
+</style>

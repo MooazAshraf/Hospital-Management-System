@@ -1,32 +1,70 @@
 const express = require("express");
 
-const router = express.Router();
-
-const { authenticate } = require("../middlewares/isLogged");
-
-const { authorize } = require("../middlewares/authorize");
-
-const { checkAppointmentAccess } = require("../middlewares/appointmentAccess");
-
 const {
   createAppointment,
   getAllAppointments,
   getAppointmentById,
   updateAppointment,
   deleteAppointment,
+  getAvailableSlots,
 } = require("../controllers/appointment.controller");
 
-// All appointment routes require a logged-in user
-router.use(authenticate);
+const router = express.Router();
 
-// Create and get all appointments
-router.route("/").get(getAllAppointments).post(createAppointment);
+// =====================================================
+// Available Slots
+// GET /api/appointments/available-slots
+// Public - no authentication
+// =====================================================
 
-// Get, update and delete appointment by ID
-router
-  .route("/:id")
-  .get(checkAppointmentAccess, getAppointmentById)
-  .put(checkAppointmentAccess, updateAppointment)
-  .delete(authorize("doctor", "admin"), deleteAppointment);
+router.get(
+  "/available-slots",
+  getAvailableSlots
+);
+
+// =====================================================
+// Get All Appointments
+// =====================================================
+
+router.get(
+  "/",
+  getAllAppointments
+);
+
+// =====================================================
+// Create Appointment
+// =====================================================
+
+router.post(
+  "/",
+  createAppointment
+);
+
+// =====================================================
+// Get Appointment By ID
+// =====================================================
+
+router.get(
+  "/:id",
+  getAppointmentById
+);
+
+// =====================================================
+// Update Appointment
+// =====================================================
+
+router.put(
+  "/:id",
+  updateAppointment
+);
+
+// =====================================================
+// Delete Appointment
+// =====================================================
+
+router.delete(
+  "/:id",
+  deleteAppointment
+);
 
 module.exports = router;

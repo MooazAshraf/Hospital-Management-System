@@ -11,18 +11,27 @@ const {
   updatePatient,
   deletePatient,
   saveMyPatientProfile,
+  getPatientsCount,
 } = require("../controllers/patient.controller");
 
 const patientRouter = express.Router();
 
-// Get all patients - doctors only
 // Get all patients - doctors and admins only
 patientRouter.get("/", authenticate, authorize("doctor", "admin"), getPatients);
 
 // Get logged-in user's patient profile
 patientRouter.get("/me", authenticate, getMyPatientProfile);
 
+// Save logged-in user's patient profile
 patientRouter.put("/patients/me", authenticate, saveMyPatientProfile);
+
+// IMPORTANT: count must come before /:id
+patientRouter.get(
+  "/count",
+  authenticate,
+  authorize("doctor", "admin"),
+  getPatientsCount,
+);
 
 // Get a single patient
 patientRouter.get("/:id", authenticate, getPatientById);
@@ -35,6 +44,7 @@ patientRouter.put("/:id", authenticate, updatePatient);
 
 // Delete patient
 patientRouter.delete("/:id", authenticate, authorize("admin"), deletePatient);
+
 module.exports = {
   patientRouter,
 };

@@ -1,35 +1,45 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { FooterComponent } from '../../shared/footer/footer.component';
+
+import { AdminStatsService } from '../../../services/admin-stats.service';
 
 interface OverviewCard {
   label: string;
   value: string;
 }
 
-// TODO: this page just links out to each management area — the real CRUD
-// tables live in their own collection folders (doctors/, patients/,
-// departments/, appointments/, users/, audit-logs/). Wire the 4 overview
-// numbers below to real counts once each service has a getCount() endpoint:
-// Total Patients -> GET /api/patients/count      (Person 1)
-// Total Doctors  -> GET /api/doctors/count        (Person 1)
-// Appts Today    -> GET /api/appointments/count?date=today   (Person 5)
-// Pending Appts  -> GET /api/appointments/count?status=pending (Person 5)
-
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [RouterLink, CommonModule, NavbarComponent, FooterComponent],
+  imports: [RouterLink, CommonModule, NavbarComponent],
   templateUrl: './admin-dashboard.component.html',
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
+  private adminStatsService = inject(AdminStatsService);
+  private cdr = inject(ChangeDetectorRef);
+
   overview: OverviewCard[] = [
-    { label: 'Total Patients', value: '—' },
-    { label: 'Total Doctors', value: '—' },
-    { label: 'Appointments Today', value: '—' },
-    { label: 'Pending Appointments', value: '—' },
+    {
+      label: 'Total Patients',
+      value: '—',
+    },
+    {
+      label: 'Total Doctors',
+      value: '—',
+    },
+    {
+      label: 'Appointments Today',
+      value: '—',
+    },
+    {
+      label: 'Pending Appointments',
+      value: '—',
+    },
   ];
 
   sections = [
@@ -37,43 +47,36 @@ export class AdminDashboardComponent {
       title: 'Doctors',
       desc: 'Add, edit, remove doctors.',
       link: '/admin/doctors',
-      owner: 'Person 1',
     },
     {
       title: 'Patients',
       desc: 'View and manage patient records.',
       link: '/admin/patients',
-      owner: 'Person 1',
     },
     {
       title: 'Departments',
       desc: 'Add, edit, remove departments.',
       link: '/admin/departments',
-      owner: 'Person 2',
     },
     {
       title: 'Appointments',
       desc: 'Confirm, cancel, update status.',
       link: '/admin/appointments',
-      owner: 'Person 5',
     },
     {
       title: 'Users & Roles',
       desc: 'Manage accounts and role assignment.',
       link: '/admin/users',
-      owner: 'Person 1',
     },
     {
       title: 'Audit Logs',
       desc: 'Track every admin action.',
       link: '/admin/audit-logs',
-      owner: 'Person 2',
     },
     {
       title: 'Payments',
       desc: 'Review payment history and invoices.',
       link: '/admin/payments',
-      owner: 'Person 4',
     },
     {
       title: 'Medicine',
@@ -82,4 +85,38 @@ export class AdminDashboardComponent {
       owner: 'Person 3',
     },
   ];
+
+  ngOnInit(): void {
+    this.adminStatsService.getStats().subscribe({
+      next: (stats) => {
+        console.log('ADMIN STATS:', stats);
+
+        this.overview = [
+          {
+            label: 'Total Patients',
+            value: stats.totalPatients.toString(),
+          },
+          {
+            label: 'Total Doctors',
+            value: stats.totalDoctors.toString(),
+          },
+          {
+            label: 'Appointments Today',
+            value: stats.appointmentsToday.toString(),
+          },
+          {
+            label: 'Pending Appointments',
+            value: stats.pendingAppointments.toString(),
+          },
+        ];
+
+        // Force Angular to update the UI
+        this.cdr.detectChanges();
+      },
+
+      error: (err) => {
+        console.error('Failed to load admin stats:', err);
+      },
+    });
+  }
 }

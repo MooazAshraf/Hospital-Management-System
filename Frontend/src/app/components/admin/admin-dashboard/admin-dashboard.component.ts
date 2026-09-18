@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { FooterComponent } from '../../shared/footer/footer.component';
 
 interface OverviewCard {
   label: string;
@@ -15,10 +17,11 @@ interface OverviewCard {
 // Total Doctors  -> GET /api/doctors/count        (Person 1)
 // Appts Today    -> GET /api/appointments/count?date=today   (Person 5)
 // Pending Appts  -> GET /api/appointments/count?status=pending (Person 5)
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, NavbarComponent, FooterComponent],
   templateUrl: './admin-dashboard.component.html',
 })
 export class AdminDashboardComponent {

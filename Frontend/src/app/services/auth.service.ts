@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Iuser } from '../models/users.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
 

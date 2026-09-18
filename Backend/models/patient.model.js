@@ -39,12 +39,10 @@ const patientSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ["Male", "Female"],
-      required: [true, "Gender is required"],
     },
 
     dateOfBirth: {
       type: Date,
-      required: [true, "Date of birth is required"],
     },
 
     address: {
@@ -55,7 +53,6 @@ const patientSchema = new mongoose.Schema(
     bloodGroup: {
       type: String,
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-      required: [true, "Blood group is required"],
     },
 
     allergies: {
@@ -72,7 +69,6 @@ const patientSchema = new mongoose.Schema(
       name: {
         type: String,
         trim: true,
-        required: [true, "Emergency contact name is required"],
       },
       phone: {
         type: String,

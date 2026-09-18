@@ -16,7 +16,6 @@ import { BookAppointmentComponent } from './appointments/book-appointment/book-a
 import { PaymentFormComponent } from './payments/payment-form/payment-form.component';
 
 import { PatientDashboardComponent } from './patients/patient-dashboard/patient-dashboard.component';
-
 import { DoctorDashboardComponent } from './doctors/doctor-dashboard/doctor-dashboard.component';
 
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';

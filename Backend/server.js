@@ -14,6 +14,7 @@ const { notificationRouter } = require("./routes/notifications.route");
 const { doctorRouter } = require("./routes/doctors.route");
 const reviewRouter = require("./routes/review.route");
 const paymentRouter = require("./routes/payment.route");
+const auditLogRouter = require("./routes/auditlog.route");
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use(
 app.options(/.*/, cors());
 
 app.use(express.json());
+
+app.use("/api/auditLogs", auditLogRouter);
 
 // Users route
 app.use("/api/users", userRouter);

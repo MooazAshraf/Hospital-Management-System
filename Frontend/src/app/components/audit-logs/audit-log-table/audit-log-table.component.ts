@@ -1,11 +1,37 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuditLogService } from '../../../services/audit-log.service';
 
-// TODO(Person 2): admin-only table — GET /api/auditLogs, columns: actor,
-// action, target collection/id, timestamp. Guard this route with an
-// admin-role guard.
 @Component({
   selector: 'app-audit-log-table',
   standalone: true,
-  templateUrl: './audit-log-table.component.html'
+  imports: [CommonModule],
+  templateUrl: './audit-log-table.component.html',
 })
-export class AuditLogTableComponent {}
+export class AuditLogTableComponent implements OnInit {
+  private auditLogService = inject(AuditLogService);
+
+  auditLogs: any[] = [];
+  loading = false;
+  error = '';
+
+  ngOnInit(): void {
+    this.getAuditLogs();
+  }
+
+  getAuditLogs(): void {
+    this.loading = true;
+    this.error = '';
+
+    this.auditLogService.getAuditLogs().subscribe({
+      next: (response) => {
+        this.auditLogs = response.data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Failed to load audit logs';
+        this.loading = false;
+      },
+    });
+  }
+}

@@ -289,6 +289,18 @@ const saveMyPatientProfile = async (req, res) => {
   }
 };
 
+const getPatientsCount = async (req, res) => {
+  try {
+    const count = await patientModel.countDocuments();
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getPatients,
   getPatientById,
@@ -297,4 +309,5 @@ module.exports = {
   deletePatient,
   getMyPatientProfile,
   saveMyPatientProfile,
+  getPatientsCount
 };

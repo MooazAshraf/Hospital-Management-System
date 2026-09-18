@@ -377,6 +377,18 @@ const deleteDoctor = async (req, res) => {
   }
 };
 
+const getDoctorsCount = async (req, res) => {
+  try {
+    const count = await doctorModel.countDocuments();
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 
 module.exports = {
   getDoctors,
@@ -385,4 +397,5 @@ module.exports = {
   addDoctor,
   updateDoctor,
   deleteDoctor,
+  getDoctorsCount
 };

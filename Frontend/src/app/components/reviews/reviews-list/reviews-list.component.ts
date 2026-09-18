@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ReviewCardComponent } from '../review-card/review-card.component';
-import { Review } from '../../models';
+import { IReview } from '../../../models/review.model';
 import { ReviewsService } from '../../../services/reviews.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { ReviewsService } from '../../../services/reviews.service';
 })
 export class ReviewsListComponent implements OnInit {
 
-  reviews: Review[] = [];
+  reviews: IReview[] = [];
 
   constructor(private reviewsService: ReviewsService) {}
 

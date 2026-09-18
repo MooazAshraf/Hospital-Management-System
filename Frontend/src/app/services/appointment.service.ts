@@ -15,7 +15,7 @@ import {
 } from '../models/appointment.model';
 
 const API_BASE_URL =
-  'http://localhost:3000/api';
+  'http://localhost:5000/api';
 
 @Injectable({
   providedIn: 'root',

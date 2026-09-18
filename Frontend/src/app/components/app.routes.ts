@@ -8,6 +8,8 @@ import { PaymentFormComponent } from './payments/payment-form/payment-form.compo
 import { PatientDashboardComponent } from './patients/patient-dashboard/patient-dashboard.component';
 import { DoctorDashboardComponent } from './doctors/doctor-dashboard/doctor-dashboard.component';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
+import { MedicineListComponent } from './medicine/medicine-list/medicine-list.component';
+import { MedicalReportsListComponent } from './medical-reports/medical-reports-list/medical-reports-list.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -16,9 +18,12 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'book-appointment', component: BookAppointmentComponent },
+
   { path: 'payment', component: PaymentFormComponent },
   { path: 'dashboard', component: PatientDashboardComponent },
   { path: 'doctor-dashboard', component: DoctorDashboardComponent },
   { path: 'admin', component: AdminDashboardComponent },
+  { path: 'medicines', component: MedicineListComponent },
+  { path: 'medical-reports', component: MedicalReportsListComponent },
   { path: '**', redirectTo: '' },
 ];

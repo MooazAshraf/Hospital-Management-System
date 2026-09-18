@@ -1,7 +1,7 @@
 const express = require("express");
-
-const router = express.Router();
-
+const { authenticate } = require("../middlewares/isLogged");
+const { authorize } = require("../middlewares/authorize");
+const { checkReviewAccess } = require("../middlewares/checkReviewOwner");
 const {
   createReview,
   getAllReviews,
@@ -9,17 +9,11 @@ const {
   deleteReview,
 } = require("../controllers/review.controller");
 
-const { authenticate } = require("../middlewares/isLogged.js");
-const { checkReviewAccess } = require("../middlewares/checkReviewOwner.js");
+const router = express.Router();
 
-router
-  .route("/")
-  .get(getAllReviews)
-  .post(authenticate, createReview);
-
-router
-  .route("/:id")
-  .put(authenticate, checkReviewAccess, updateReview)
-  .delete(authenticate, checkReviewAccess, deleteReview);
+router.get("/", getAllReviews);
+router.post("/", authenticate, authorize("user"), createReview);
+router.put("/:id", authenticate, checkReviewAccess, updateReview);
+router.delete("/:id", authenticate, checkReviewAccess, deleteReview);
 
 module.exports = router;

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
-import { FooterComponent } from '../../shared/footer/footer.component';
 import { AuthService } from '../../../services/auth.service';
 import { PatientService } from '../../../services/patient.service';
 import { Iuser } from '../../../models/users.model';
@@ -11,7 +10,7 @@ import { Iuser } from '../../../models/users.model';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent {
@@ -193,6 +192,16 @@ export class ProfileComponent {
         if (updatedPatient) {
           this.patient = updatedPatient;
           this.hasPatient = this.checkHasPatient(updatedPatient);
+        }
+
+        const currentUser = this.authService.getUser();
+        if (currentUser) {
+          this.authService.login(this.authService.getToken() || '', {
+            ...currentUser,
+            name: this.editableName,
+            email: this.editableEmail,
+            phone: this.editablePhone,
+          });
         }
 
         this.editMode = false;

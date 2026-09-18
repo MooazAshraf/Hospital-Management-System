@@ -1,7 +1,6 @@
 export type NotificationType =
   | 'appointment'
-  | 'prescription'
-  | 'medicalReport'
+  | 'medical-report'
   | 'payment'
   | 'system';
 
@@ -14,43 +13,27 @@ export interface NotificationUser {
 
 export interface AppNotification {
   _id: string;
-
-  user: string | NotificationUser;
-
+  recipient: string | NotificationUser;
+  sender?: string | NotificationUser | null;
   title: string;
   message: string;
-
   type: NotificationType;
-
+  relatedAppointment?: string | unknown | null;
+  relatedMedicalReport?: string | unknown | null;
   isRead: boolean;
-
-  relatedId?: string;
-
   createdAt: string;
   updatedAt?: string;
 }
 
 export interface NotificationsListResponse {
-  message: string;
+  success?: boolean;
+  message?: string;
   count: number;
   notifications: AppNotification[];
 }
 
 export interface NotificationResponse {
+  success?: boolean;
   message: string;
   notification: AppNotification;
-}
-
-export interface CreateNotificationPayload {
-  user: string;
-  title: string;
-  message: string;
-
-  type?: NotificationType;
-
-  relatedId?: string;
-}
-
-export interface UpdateNotificationPayload {
-  isRead?: boolean;
 }

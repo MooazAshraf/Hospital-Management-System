@@ -1,23 +1,12 @@
 const express = require("express");
+const { authenticate } = require("../middlewares/isLogged");
+const { authorize } = require("../middlewares/authorize");
+const { createAuditLog, getAllAuditLogs, updateAuditLog } = require("../controllers/auditlog.controller");
 
 const router = express.Router();
 
-const { authenticate } = require("../middlewares/isLogged");
-const { authorize } = require("../middlewares/authorize");
-
-const {
-  createAuditLog,
-  getAllAuditLogs,
-  updateAuditLog,
-} = require("../controllers/auditlog.controller");
-
-router
-  .route("/")
-  .get(authenticate, authorize("admin"), getAllAuditLogs)
-  .post(authenticate, createAuditLog);
-
-router
-  .route("/:id")
-  .put(authenticate, updateAuditLog);
+router.get("/", authenticate, authorize("admin"), getAllAuditLogs);
+router.post("/", authenticate, createAuditLog);
+router.put("/:id", authenticate, authorize("admin"), updateAuditLog);
 
 module.exports = router;

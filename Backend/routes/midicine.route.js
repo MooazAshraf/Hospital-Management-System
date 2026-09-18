@@ -1,5 +1,6 @@
 const express = require("express");
-
+const { authenticate } = require("../middlewares/isLogged");
+const { authorize } = require("../middlewares/authorize");
 const {
   getAllMidicines,
   getMidicineById,
@@ -10,21 +11,10 @@ const {
 
 const midicineRouter = express.Router();
 
-// Get all medicines
 midicineRouter.get("/", getAllMidicines);
-
-// Get medicine by ID
 midicineRouter.get("/:id", getMidicineById);
+midicineRouter.post("/", authenticate, authorize("admin"), createMidicine);
+midicineRouter.put("/:id", authenticate, authorize("admin"), updateMidicine);
+midicineRouter.delete("/:id", authenticate, authorize("admin"), deleteMidicine);
 
-// Create medicine
-midicineRouter.post("/", createMidicine);
-
-// Update medicine
-midicineRouter.put("/:id", updateMidicine);
-
-// Delete medicine
-midicineRouter.delete("/:id", deleteMidicine);
-
-module.exports = {
-  midicineRouter,
-};
+module.exports = { midicineRouter };

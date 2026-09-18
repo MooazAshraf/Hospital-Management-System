@@ -16,7 +16,7 @@ interface OverviewCard {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [RouterLink, CommonModule, NavbarComponent],
+  imports: [RouterLink, CommonModule],
   templateUrl: './admin-dashboard.component.html',
 })
 export class AdminDashboardComponent implements OnInit {

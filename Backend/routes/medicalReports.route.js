@@ -1,5 +1,5 @@
 const express = require("express");
-
+const { authenticate } = require("../middlewares/isLogged");
 const {
   getAllMedicalReports,
   getMedicalReportById,
@@ -8,23 +8,13 @@ const {
   deleteMedicalReport,
 } = require("../controllers/medicalReports.controller");
 
-const medicalReportsRouter = express.Router();
+const router = express.Router();
 
-// Get all medical reports
-medicalReportsRouter.get("/", getAllMedicalReports);
+router.use(authenticate);
+router.get("/", getAllMedicalReports);
+router.get("/:id", getMedicalReportById);
+router.post("/", createMedicalReport);
+router.put("/:id", updateMedicalReport);
+router.delete("/:id", deleteMedicalReport);
 
-// Get medical report by ID
-medicalReportsRouter.get("/:id", getMedicalReportById);
-
-// Create medical report
-medicalReportsRouter.post("/", createMedicalReport);
-
-// Update medical report
-medicalReportsRouter.put("/:id", updateMedicalReport);
-
-// Delete medical report
-medicalReportsRouter.delete("/:id", deleteMedicalReport);
-
-module.exports = {
-  medicalReportsRouter,
-};
+module.exports = { medicalReportsRouter: router };

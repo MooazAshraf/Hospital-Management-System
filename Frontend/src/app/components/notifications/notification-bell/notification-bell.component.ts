@@ -65,7 +65,7 @@ export class NotificationBellComponent implements OnInit {
     this.errorMessage = null;
 
     this.notificationService
-      .getNotificationsByUser(this.userId)
+      .getMyNotifications()
       .subscribe({
 
         next: (response) => {
@@ -140,7 +140,7 @@ export class NotificationBellComponent implements OnInit {
     this.isMarkingAll = true;
 
     this.notificationService
-      .markAllAsRead(this.userId)
+      .markAllAsRead()
       .subscribe({
 
         next: () => {
@@ -219,10 +219,7 @@ export class NotificationBellComponent implements OnInit {
       case 'appointment':
         return '📅';
 
-      case 'prescription':
-        return '💊';
-
-      case 'medicalReport':
+      case 'medical-report':
         return '📄';
 
       case 'payment':

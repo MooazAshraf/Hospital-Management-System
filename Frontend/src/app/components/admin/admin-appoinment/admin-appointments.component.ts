@@ -14,7 +14,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 @Component({
   selector: 'app-admin-appointments',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-appointments.component.html',
 })
 export class AdminAppointmentsComponent implements OnInit {

@@ -2,29 +2,41 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Iuser } from '../models/users.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<Iuser | null>(this.getUser());
-  currentUser$ = this.currentUserSubject.asObservable();
+  private readonly currentUserSubject = new BehaviorSubject<Iuser | null>(this.getUser());
+  readonly currentUser$ = this.currentUserSubject.asObservable();
 
-  login(token: string, user: Iuser) {
+  login(token: string, user: Iuser): void {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSubject.next(user);
   }
 
   getUser(): Iuser | null {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    try {
+      const raw = localStorage.getItem('user');
+      return raw ? (JSON.parse(raw) as Iuser) : null;
+    } catch {
+      this.logout();
+      return null;
+    }
   }
 
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  logout() {
+  isLoggedIn(): boolean {
+    return !!this.getToken() && !!this.getUser();
+  }
+
+  hasRole(...roles: Array<Iuser['role']>): boolean {
+    const role = this.getUser()?.role;
+    return !!role && roles.includes(role);
+  }
+
+  logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);

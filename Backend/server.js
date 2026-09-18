@@ -2,9 +2,8 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-var cors = require("cors");
+const cors = require("cors");
 
-// Routes
 const { midicineRouter } = require("./routes/midicine.route");
 const { medicalReportsRouter } = require("./routes/medicalReports.route");
 const appointmentRoutes = require("./routes/appointment.route");
@@ -15,63 +14,65 @@ const { doctorRouter } = require("./routes/doctors.route");
 const reviewRouter = require("./routes/review.route");
 const paymentRouter = require("./routes/payment.route");
 const auditLogRouter = require("./routes/auditlog.route");
+const departmentRouter = require("./routes/department.route");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "*",
-  }),
-);
-
+app.use(cors({ origin: true, credentials: false }));
 app.options(/.*/, cors());
+app.use(express.json({ limit: "1mb" }));
 
-app.use(express.json());
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ success: true, message: "urCare API is running" });
+});
 
+app.use("/api/users", userRouter);
+app.use("/api/medicines", midicineRouter);
+app.use("/api/medicalReports", medicalReportsRouter);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/patients", patientRouter);
+app.use("/api/notifications", notificationRouter);
+app.use("/api/doctors", doctorRouter);
+app.use("/api/payments", paymentRouter);
+app.use("/api/reviews", reviewRouter);
+app.use("/api/departments", departmentRouter);
 app.use("/api/auditLogs", auditLogRouter);
 
-// Users route
-app.use("/api/users", userRouter);
-
-// Medicine routes
-app.use("/api/medicines", midicineRouter);
-
-// Medical Reports route
-app.use("/api/medicalReports", medicalReportsRouter);
-
-// Appointment route
-app.use("/api/appointments", appointmentRoutes);
-
-// Patient route
-app.use("/api/patients", patientRouter);
-
-// Notifications route
-app.use("/api/notifications", notificationRouter);
-
-// Doctors route
-app.use("/api/doctors", doctorRouter);
-
-// Payments route
-app.use("/api/payments", paymentRouter);
-
-// Reviews route
-app.use("/api/reviews", reviewRouter);
-
-// Reviews route
+// Backward-compatible aliases used by older frontend code.
 app.use("/reviews", reviewRouter);
-
-// payments route
 app.use("/payments", paymentRouter);
 
-mongoose
-  .connect(process.env.DB_LINK)
-  .then(() => {
+app.use((_req, res) => {
+  res.status(404).json({ success: false, message: "Route not found" });
+});
+
+app.use((error, _req, res, _next) => {
+  console.error(error);
+  res.status(error.status || 500).json({
+    success: false,
+    message: error.message || "Internal server error",
+  });
+});
+
+const PORT = Number(process.env.PORT) || 5000;
+
+const startServer = async () => {
+  try {
+    if (!process.env.DB_LINK) throw new Error("DB_LINK is missing in Backend/.env");
+    if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is missing in Backend/.env");
+
+    await mongoose.connect(process.env.DB_LINK);
     console.log("MongoDB connected");
 
-    app.listen(process.env.PORT, () => {
-      console.log(`Server running on port ${process.env.PORT}`);
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.log("MongoDB connection error:", error);
-  });
+  } catch (error) {
+    console.error("Startup error:", error.message);
+    process.exit(1);
+  }
+};
+
+if (require.main === module) startServer();
+
+module.exports = app;

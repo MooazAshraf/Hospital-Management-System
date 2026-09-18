@@ -73,12 +73,12 @@ const patientSchema = new mongoose.Schema(
       phone: {
         type: String,
         trim: true,
-        required: [true, "Emergency contact phone is required"],
+        
       },
       relationship: {
         type: String,
         trim: true,
-        required: [true, "Emergency contact relationship is required"],
+        
       },
     },
 

@@ -16,6 +16,7 @@ import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard
 import { PatientListComponent } from './patients/patient-list/patient-list.component';
 import { AdminDoctorsComponent } from './admin/admin-doctors-list/admin-doctors-list.component';
 import { AdminAppointmentsComponent } from './admin/admin-appoinment/admin-appointments.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -56,6 +57,7 @@ export const routes: Routes = [
   {
     path: 'book-appointment',
     component: BookAppointmentComponent,
+    canActivate: [authGuard],
   },
 
   {

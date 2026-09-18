@@ -1,12 +1,15 @@
+
 import {
   Component,
-  Input,
+  ElementRef,
+  HostListener,
   OnInit,
   inject
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { NotificationService } from '../../../services/notification.service';
 
@@ -14,6 +17,7 @@ import {
   AppNotification,
   NotificationType
 } from '../../../models/notification.model';
+
 
 @Component({
   selector: 'app-notification-bell',
@@ -25,47 +29,46 @@ export class NotificationBellComponent implements OnInit {
 
   private notificationService = inject(NotificationService);
 
-  @Input({ required: true })
-  userId!: string;
+  private router = inject(Router);
+
+  private elementRef = inject(ElementRef);
+
 
   notifications: AppNotification[] = [];
 
   isOpen = false;
+
   isLoading = false;
+
   isMarkingAll = false;
 
   errorMessage: string | null = null;
 
 
   get unreadCount(): number {
+
     return this.notifications.filter(
       notification => !notification.isRead
     ).length;
+
   }
 
 
   ngOnInit(): void {
 
-    if (!this.userId) {
-      this.errorMessage = 'User ID is required.';
-      return;
-    }
-
     this.loadNotifications();
+
   }
 
 
   loadNotifications(): void {
 
-    if (!this.userId) {
-      return;
-    }
-
     this.isLoading = true;
+
     this.errorMessage = null;
 
     this.notificationService
-      .getNotificationsByUser(this.userId)
+      .getMyNotifications()
       .subscribe({
 
         next: (response) => {
@@ -74,6 +77,7 @@ export class NotificationBellComponent implements OnInit {
             response.notifications || [];
 
           this.isLoading = false;
+
         },
 
         error: (err: HttpErrorResponse) => {
@@ -88,14 +92,51 @@ export class NotificationBellComponent implements OnInit {
             'Failed to load notifications.';
 
           this.isLoading = false;
+
         }
 
       });
+
   }
 
 
-  toggleDropdown(): void {
+  toggleDropdown(event?: Event): void {
+
+    event?.stopPropagation();
+
     this.isOpen = !this.isOpen;
+
+    if (this.isOpen) {
+
+      this.loadNotifications();
+
+    }
+
+  }
+
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+
+    const clickedInside =
+      this.elementRef.nativeElement.contains(
+        event.target
+      );
+
+    if (!clickedInside) {
+
+      this.isOpen = false;
+
+    }
+
+  }
+
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+
+    this.isOpen = false;
+
   }
 
 
@@ -104,8 +145,15 @@ export class NotificationBellComponent implements OnInit {
   ): void {
 
     if (notification.isRead) {
+
+      this.navigateFromNotification(
+        notification
+      );
+
       return;
+
     }
+
 
     this.notificationService
       .markAsRead(notification._id)
@@ -114,6 +162,11 @@ export class NotificationBellComponent implements OnInit {
         next: () => {
 
           notification.isRead = true;
+
+          this.navigateFromNotification(
+            notification
+          );
+
         },
 
         error: (err: HttpErrorResponse) => {
@@ -122,9 +175,67 @@ export class NotificationBellComponent implements OnInit {
             'Failed to mark notification as read:',
             err
           );
+
         }
 
       });
+
+  }
+
+
+  private navigateFromNotification(
+    notification: AppNotification
+  ): void {
+
+    if (
+      notification.type === 'appointment' &&
+      notification.relatedAppointment
+    ) {
+
+      const appointmentId =
+        typeof notification.relatedAppointment === 'string'
+          ? notification.relatedAppointment
+          : notification.relatedAppointment?._id;
+
+      if (appointmentId) {
+
+        this.isOpen = false;
+
+        this.router.navigate([
+          '/appointments',
+          appointmentId
+        ]);
+
+      }
+
+      return;
+
+    }
+
+
+    if (
+      notification.type === 'medical-report' &&
+      notification.relatedMedicalReport
+    ) {
+
+      const medicalReportId =
+        typeof notification.relatedMedicalReport === 'string'
+          ? notification.relatedMedicalReport
+          : notification.relatedMedicalReport?._id;
+
+      if (medicalReportId) {
+
+        this.isOpen = false;
+
+        this.router.navigate([
+          '/medical-reports',
+          medicalReportId
+        ]);
+
+      }
+
+    }
+
   }
 
 
@@ -134,13 +245,16 @@ export class NotificationBellComponent implements OnInit {
       this.unreadCount === 0 ||
       this.isMarkingAll
     ) {
+
       return;
+
     }
+
 
     this.isMarkingAll = true;
 
     this.notificationService
-      .markAllAsRead(this.userId)
+      .markAllAsRead()
       .subscribe({
 
         next: () => {
@@ -152,19 +266,22 @@ export class NotificationBellComponent implements OnInit {
           );
 
           this.isMarkingAll = false;
+
         },
 
         error: (err: HttpErrorResponse) => {
 
           console.error(
-            'Failed to mark all notifications as read:',
+            'Failed to mark all notifications:',
             err
           );
 
           this.isMarkingAll = false;
+
         }
 
       });
+
   }
 
 
@@ -186,6 +303,7 @@ export class NotificationBellComponent implements OnInit {
               item =>
                 item._id !== notification._id
             );
+
         },
 
         error: (err: HttpErrorResponse) => {
@@ -194,9 +312,11 @@ export class NotificationBellComponent implements OnInit {
             'Failed to delete notification:',
             err
           );
+
         }
 
       });
+
   }
 
 
@@ -207,6 +327,7 @@ export class NotificationBellComponent implements OnInit {
     event?.stopPropagation();
 
     this.loadNotifications();
+
   }
 
 
@@ -219,10 +340,7 @@ export class NotificationBellComponent implements OnInit {
       case 'appointment':
         return '📅';
 
-      case 'prescription':
-        return '💊';
-
-      case 'medicalReport':
+      case 'medical-report':
         return '📄';
 
       case 'payment':
@@ -233,14 +351,18 @@ export class NotificationBellComponent implements OnInit {
 
       default:
         return '🔔';
+
     }
+
   }
 
 
   formatDate(date: string): string {
 
     if (!date) {
+
       return '';
+
     }
 
     return new Date(date).toLocaleString(
@@ -250,5 +372,18 @@ export class NotificationBellComponent implements OnInit {
         timeStyle: 'short'
       }
     );
+
   }
+
+
+  trackByNotificationId(
+    index: number,
+    notification: AppNotification
+  ): string {
+
+    return notification._id;
+
+  }
+
 }
+

@@ -3,10 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import {
-  AppNotification,
-  CreateNotificationPayload,
   NotificationResponse,
-  NotificationsListResponse
+  NotificationsListResponse,
+  SimpleMessageResponse,
 } from '../models/notification.model';
 
 @Injectable({
@@ -19,14 +18,16 @@ export class NotificationService {
 
   constructor(private http: HttpClient) {}
 
-  // Get all notifications for a specific user
-  getNotificationsByUser(
-    userId: string
+  // Get current logged-in user's notifications
+  getMyNotifications(
+    unreadOnly = false
   ): Observable<NotificationsListResponse> {
 
-    return this.http.get<NotificationsListResponse>(
-      `${this.baseUrl}/user/${userId}`
-    );
+    const url = unreadOnly
+      ? `${this.baseUrl}?unread=true`
+      : this.baseUrl;
+
+    return this.http.get<NotificationsListResponse>(url);
   }
 
   // Get one notification by ID
@@ -36,17 +37,6 @@ export class NotificationService {
 
     return this.http.get<NotificationResponse>(
       `${this.baseUrl}/${notificationId}`
-    );
-  }
-
-  // Create a new notification
-  createNotification(
-    payload: CreateNotificationPayload
-  ): Observable<NotificationResponse> {
-
-    return this.http.post<NotificationResponse>(
-      this.baseUrl,
-      payload
     );
   }
 
@@ -61,13 +51,11 @@ export class NotificationService {
     );
   }
 
-  // Mark all user notifications as read
-  markAllAsRead(
-    userId: string
-  ): Observable<{ message: string }> {
+  // Mark all notifications as read
+  markAllAsRead(): Observable<SimpleMessageResponse> {
 
-    return this.http.patch<{ message: string }>(
-      `${this.baseUrl}/user/${userId}/read-all`,
+    return this.http.patch<SimpleMessageResponse>(
+      `${this.baseUrl}/read-all`,
       {}
     );
   }
@@ -75,9 +63,9 @@ export class NotificationService {
   // Delete one notification
   deleteNotification(
     notificationId: string
-  ): Observable<{ message: string }> {
+  ): Observable<SimpleMessageResponse> {
 
-    return this.http.delete<{ message: string }>(
+    return this.http.delete<SimpleMessageResponse>(
       `${this.baseUrl}/${notificationId}`
     );
   }

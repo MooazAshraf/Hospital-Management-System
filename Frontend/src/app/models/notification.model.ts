@@ -1,56 +1,76 @@
+
 export type NotificationType =
   | 'appointment'
-  | 'prescription'
-  | 'medicalReport'
+  | 'medical-report'
   | 'payment'
   | 'system';
 
+
 export interface NotificationUser {
+
   _id: string;
+
   name?: string;
-  email?: string;
+
   role?: string;
+
 }
 
+
 export interface AppNotification {
+
   _id: string;
 
-  user: string | NotificationUser;
+  recipient: string;
+
+  sender: NotificationUser | null;
 
   title: string;
+
   message: string;
 
   type: NotificationType;
 
   isRead: boolean;
 
-  relatedId?: string;
+  relatedAppointment?: any;
+
+  relatedMedicalReport?: any;
 
   createdAt: string;
+
   updatedAt?: string;
+
 }
+
 
 export interface NotificationsListResponse {
-  message: string;
+
+  success: boolean;
+
   count: number;
+
   notifications: AppNotification[];
+
 }
+
 
 export interface NotificationResponse {
-  message: string;
+
+  success: boolean;
+
+  message?: string;
+
   notification: AppNotification;
+
 }
 
-export interface CreateNotificationPayload {
-  user: string;
-  title: string;
+
+export interface SimpleMessageResponse {
+
+  success: boolean;
+
   message: string;
 
-  type?: NotificationType;
-
-  relatedId?: string;
 }
 
-export interface UpdateNotificationPayload {
-  isRead?: boolean;
-}

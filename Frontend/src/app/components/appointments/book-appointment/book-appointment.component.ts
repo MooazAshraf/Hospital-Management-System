@@ -8,7 +8,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { DoctorService } from '../../../services/doctor.service';
 import { Doctor } from '../../../models/doctor.model';
@@ -23,6 +23,7 @@ import { BookingStepsComponent } from '../booking-steps/booking-steps.component'
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     BookingStepsComponent,
   ],
 
@@ -44,6 +45,21 @@ export class BookAppointmentComponent implements OnInit {
 
   readonly searchTerm = signal('');
 
+  readonly selectedDepartment = signal(''); // '' = all departments
+
+  // Tracks which doctor images failed to load, so we can fall back
+  // to the emoji placeholder instead of showing a broken image.
+  readonly failedImages = signal<Set<string>>(new Set());
+
+
+  readonly departments = computed(() => {
+    const names = this.doctors()
+      .map((d) => this.departmentName(d))
+      .filter((name) => name && name !== 'N/A');
+
+    return Array.from(new Set(names)).sort();
+  });
+
 
   readonly filteredDoctors = computed(() => {
 
@@ -51,7 +67,15 @@ export class BookAppointmentComponent implements OnInit {
       .trim()
       .toLowerCase();
 
-    const list = this.doctors();
+    const department = this.selectedDepartment();
+
+    let list = this.doctors();
+
+    if (department) {
+      list = list.filter(
+        (doctor) => this.departmentName(doctor) === department
+      );
+    }
 
     if (!term) {
       return list;
@@ -153,6 +177,33 @@ export class BookAppointmentComponent implements OnInit {
       '/appointments',
       appointmentId,
     ]);
+  }
+
+
+  onImageError(doctorId: string): void {
+    const current = new Set(this.failedImages());
+    current.add(doctorId);
+    this.failedImages.set(current);
+  }
+
+
+  isArabicName(name: string): boolean {
+    return /[\u0600-\u06FF]/.test(name || '');
+  }
+
+
+  departmentName(doctor: Doctor): string {
+    const department = doctor?.department;
+
+    if (department && typeof department === 'object') {
+      return (department as any).name || 'N/A';
+    }
+
+    if (typeof department === 'string') {
+      return department;
+    }
+
+    return 'N/A';
   }
 
 }

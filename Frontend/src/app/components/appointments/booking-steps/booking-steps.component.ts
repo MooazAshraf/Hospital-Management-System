@@ -23,6 +23,8 @@ import {
   HttpClient,
 } from '@angular/common/http';
 
+import { AuthService } from '../../../services/auth.service';
+
 interface Slot {
   time: string;
   booked: boolean;
@@ -104,7 +106,8 @@ export class BookingStepsComponent
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService
   ) {
     this.detailsForm =
       this.fb.group({
@@ -155,6 +158,25 @@ export class BookingStepsComponent
 
     this.minDate =
       this.formatDate(today);
+
+    // تعبية بيانات المستخدم المسجّل دخوله تلقائيًا
+    const currentUser = this.authService.getUser();
+
+    if (currentUser) {
+      this.detailsForm.patchValue({
+        patientName: currentUser.name,
+        phone: currentUser.phone,
+        email: currentUser.email,
+      });
+
+      this.detailsForm.get('patientName')?.disable();
+      this.detailsForm.get('phone')?.disable();
+      this.detailsForm.get('email')?.disable();
+    } else {
+      this.errorMessage.set(
+        'يجب تسجيل الدخول أولاً لحجز موعد.'
+      );
+    }
 
     this.detailsForm
       .get('date')
@@ -208,7 +230,7 @@ export class BookingStepsComponent
     this.availableSlots.set([]);
 
     const url =
-      'http://localhost:3000/api/appointments/available-slots';
+      'http://localhost:5000/api/appointments/available-slots';
 
     const params = {
       doctor: this.doctorId,
@@ -361,6 +383,15 @@ export class BookingStepsComponent
   confirm(): void {
     this.errorMessage.set('');
 
+    const currentUser = this.authService.getUser();
+
+    if (!currentUser) {
+      this.errorMessage.set(
+        'يجب تسجيل الدخول أولاً لحجز موعد.'
+      );
+      return;
+    }
+
     if (
       this.detailsForm.invalid
     ) {
@@ -413,7 +444,7 @@ export class BookingStepsComponent
 
     this.http
       .post<any>(
-        'http://localhost:3000/api/appointments',
+        'http://localhost:5000/api/appointments',
         payload
       )
       .subscribe({

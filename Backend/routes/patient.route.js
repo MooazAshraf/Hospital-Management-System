@@ -10,6 +10,7 @@ const {
   addPatient,
   updatePatient,
   deletePatient,
+  saveMyPatientProfile,
 } = require("../controllers/patient.controller");
 
 const patientRouter = express.Router();
@@ -21,6 +22,8 @@ patientRouter.get("/", authenticate, authorize("doctor", "admin"), getPatients);
 // Get logged-in user's patient profile
 patientRouter.get("/me", authenticate, getMyPatientProfile);
 
+patientRouter.put("/patients/me", authenticate, saveMyPatientProfile);
+
 // Get a single patient
 patientRouter.get("/:id", authenticate, getPatientById);
 
@@ -31,12 +34,7 @@ patientRouter.post("/", authenticate, addPatient);
 patientRouter.put("/:id", authenticate, updatePatient);
 
 // Delete patient
-patientRouter.delete(
-  "/:id",
-  authenticate,
-  authorize("doctor", "admin"),
-  deletePatient,
-);
+patientRouter.delete("/:id", authenticate, authorize("admin"), deletePatient);
 module.exports = {
   patientRouter,
 };

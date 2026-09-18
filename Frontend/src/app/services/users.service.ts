@@ -30,4 +30,25 @@ export class UserServices {
   login(data: { email: string; password: string }): Observable<ILoginResponse> {
     return this.http.post<ILoginResponse>(`${this.baseUrl}/login`, data);
   }
+
+  updateProfile(
+    id: string,
+    data: Partial<{
+      name: string;
+      email: string;
+      phone: string;
+    }>,
+  ): Observable<IuserResponse> {
+    return this.http.put<IuserResponse>(`${this.baseUrl}/${id}`, data);
+  }
+
+  addStaff(data: {
+    name: string;
+    email: string;  
+    password: string;
+    phone: string;
+    role: 'doctor' | 'admin';
+  }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/staff`, data);
+  }
 }

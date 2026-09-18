@@ -10,8 +10,3 @@ export interface Doctor {
   experienceYears: number;
 }
 
-export interface Review {
-  quote: string;
-  name: string;
-  role: string;
-}

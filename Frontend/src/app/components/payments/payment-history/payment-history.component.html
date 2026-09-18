@@ -1,4 +1,38 @@
 <section class="wrap py-16">
-  <h2 class="text-2xl mb-4">Payment History</h2>
-  <p class="text-gray-600 text-sm">TODO(Person 4): list of past payments per patient, GET /api/payments?patientId=.</p>
+  <h2 class="text-2xl mb-6">Payment History</h2>
+
+  <div *ngIf="payments.length === 0" class="text-gray-600 text-sm">
+    No payments found.
+  </div>
+
+  <div *ngIf="payments.length > 0" class="space-y-4">
+
+    <div
+      *ngFor="let payment of payments"
+      class="bg-white rounded-xl p-6 shadow-sm"
+    >
+      <div class="flex justify-between items-start gap-4">
+
+        <div>
+          <p class="font-semibold text-green-900">
+            {{ payment.amount }} EGP
+          </p>
+
+          <p class="text-sm text-gray-600 mt-1">
+            Method: {{ payment.method }}
+          </p>
+
+          <p class="text-sm text-gray-600">
+            Transaction ID: {{ payment.transactionId }}
+          </p>
+        </div>
+
+        <span class="text-sm font-semibold">
+          {{ payment.status }}
+        </span>
+
+      </div>
+    </div>
+
+  </div>
 </section>

@@ -9,14 +9,17 @@ const {
   deleteReview,
 } = require("../controllers/review.controller");
 
+const { authenticate } = require("../middlewares/isLogged.js");
+const { checkReviewAccess } = require("../middlewares/checkReviewOwner.js");
+
 router
   .route("/")
   .get(getAllReviews)
-  .post(createReview);
+  .post(authenticate, createReview);
 
 router
   .route("/:id")
-  .put(updateReview)
-  .delete(deleteReview);
+  .put(authenticate, checkReviewAccess, updateReview)
+  .delete(authenticate, checkReviewAccess, deleteReview);
 
 module.exports = router;

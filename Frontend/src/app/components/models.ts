@@ -10,3 +10,19 @@ export interface Doctor {
   experienceYears: number;
 }
 
+export interface ReviewUser {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+export interface Review {
+  _id: string;
+  patient: ReviewUser;
+  doctor: ReviewUser;
+  appointment: any;
+  rating: number;
+  comment: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

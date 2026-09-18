@@ -1,4 +1,143 @@
 <section class="wrap py-16">
-  <h2 class="text-2xl mb-4">Payment</h2>
-  <p class="text-gray-600 text-sm">TODO(Person 4): shown after booking; card/insurance form -> POST /api/payments, then confirmation.</p>
+  <div class="max-w-xl mx-auto bg-white rounded-xl p-7 shadow-sm">
+
+    <h2 class="text-2xl mb-6">Payment</h2>
+
+    <div
+      *ngIf="successMessage"
+      class="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 mb-5 text-sm"
+    >
+      {{ successMessage }}
+    </div>
+
+    <div
+      *ngIf="errorMessage"
+      class="bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 mb-5 text-sm"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          Appointment ID
+        </label>
+
+        <input
+          type="text"
+          formControlName="appointment"
+          placeholder="Enter appointment ID"
+          class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700"
+        >
+
+        <p
+          *ngIf="form.get('appointment')?.touched && form.get('appointment')?.invalid"
+          class="text-red-500 text-xs mt-1"
+        >
+          Appointment is required.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          Amount
+        </label>
+
+        <input
+          type="number"
+          formControlName="amount"
+          placeholder="Enter amount"
+          class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700"
+        >
+
+        <p
+          *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid"
+          class="text-red-500 text-xs mt-1"
+        >
+          Please enter a valid amount.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          Payment Method
+        </label>
+
+        <select
+          formControlName="method"
+          class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700"
+        >
+          <option value="">Select payment method</option>
+          <option value="Cash">Cash</option>
+          <option value="VodafoneCash">Vodafone Cash</option>
+          <option value="InstaPay">InstaPay</option>
+          <option value="ECash">ECash</option>
+        </select>
+
+        <p
+          *ngIf="form.get('method')?.touched && form.get('method')?.invalid"
+          class="text-red-500 text-xs mt-1"
+        >
+          Payment method is required.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          Transaction ID
+        </label>
+
+        <input
+          type="text"
+          formControlName="transactionId"
+          placeholder="Enter transaction ID"
+          class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700"
+        >
+
+        <p
+          *ngIf="form.get('transactionId')?.touched && form.get('transactionId')?.invalid"
+          class="text-red-500 text-xs mt-1"
+        >
+          Transaction ID is required.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          Sender Phone
+        </label>
+
+        <input
+          type="text"
+          formControlName="senderPhone"
+          placeholder="01xxxxxxxxx"
+          class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700"
+        >
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          InstaPay Username
+        </label>
+
+        <input
+          type="text"
+          formControlName="instapayUsername"
+          placeholder="Enter InstaPay username"
+          class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700"
+        >
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full bg-green-700 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-green-800 disabled:opacity-50"
+      >
+        {{ loading ? 'Processing...' : 'Pay Now' }}
+      </button>
+
+    </form>
+
+  </div>
 </section>

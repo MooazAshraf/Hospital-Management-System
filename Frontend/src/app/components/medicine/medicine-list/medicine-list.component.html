@@ -8,6 +8,7 @@
       <p class="text-gray-500 text-sm mt-1.5">Manage medicines, stock levels and pharmacy inventory.</p>
     </div>
 
+    @if (canManage) {
     <button
       type="button"
       (click)="openAddModal()"
@@ -17,6 +18,7 @@
       </svg>
       Add Medicine
     </button>
+    }
   </div>
 
   <!-- Stat cards -->
@@ -183,6 +185,7 @@
               </td>
 
               <td class="px-5 py-3.5">
+                @if (canManage) {
                 <div class="flex justify-end gap-2">
 
                   <button
@@ -206,6 +209,7 @@
                   </button>
 
                 </div>
+                }
               </td>
 
             </tr>

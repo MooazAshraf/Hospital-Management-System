@@ -11,8 +11,8 @@
     <button
       type="button"
       (click)="openAddModal()"
-      [disabled]="needsLogin"
-      title="{{ needsLogin ? 'Log in to add a report' : '' }}"
+      [disabled]="!canManage"
+      title="{{ !canManage ? 'Only doctors and admins can manage reports' : '' }}"
       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-green-800 text-white text-sm font-medium shadow-sm hover:bg-green-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
         <path d="M12 5v14M5 12h14" />

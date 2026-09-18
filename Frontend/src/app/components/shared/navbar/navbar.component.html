@@ -58,14 +58,6 @@
   <!-- Right -->
   <div class="flex items-center gap-5">
     <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
-      <!-- Book Appointment -->
-      <a
-        routerLink="/book-appointment"
-        class="px-5 py-3 rounded-lg bg-green-900 text-white font-semibold transition-all duration-200 hover:bg-green-950 hover:-translate-y-1"
-      >
-        Book appointment
-      </a>
-
       <!-- User Dropdown -->
       <div class="relative">
         <button (click)="toggleDropdown($event)" class="flex items-center gap-2 focus:outline-none">

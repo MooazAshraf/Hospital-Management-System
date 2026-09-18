@@ -1,75 +1,44 @@
 const AuditLog = require("../models/auditlog.model");
 
-require("../models/users.model");
-
 const createAuditLog = async (req, res) => {
   try {
-    const newAuditLog = await AuditLog.create(req.body);
-
-    res.status(201).json({
-      success: true,
-      data: newAuditLog,
+    const { action, collectionName, documentId, relatedPatient, relatedDoctor, description } = req.body;
+    const log = await AuditLog.create({
+      action,
+      collectionName,
+      documentId,
+      performedBy: req.user.userId,
+      relatedPatient,
+      relatedDoctor,
+      description,
     });
+    res.status(201).json({ success: true, data: log });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(400).json({ success: false, message: "Failed to create audit log", error: error.message });
   }
 };
 
 const getAllAuditLogs = async (req, res) => {
   try {
-    const auditLogs = await AuditLog.find()
-      .populate("performedBy", "name email")
+    const logs = await AuditLog.find()
+      .populate("performedBy", "name email role")
       .populate("relatedPatient", "name email")
-      .populate("relatedDoctor", "name email");
-
-    res.status(200).json({
-      success: true,
-      count: auditLogs.length,
-      data: auditLogs,
-    });
+      .populate("relatedDoctor", "name email")
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: logs.length, data: logs });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
 const updateAuditLog = async (req, res) => {
   try {
-    const updatedAuditLog = await AuditLog.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!updatedAuditLog) {
-      return res.status(404).json({
-        success: false,
-        message: "Audit log not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: updatedAuditLog,
-    });
+    const log = await AuditLog.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!log) return res.status(404).json({ success: false, message: "Audit log not found" });
+    res.status(200).json({ success: true, data: log });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
-module.exports = {
-  createAuditLog,
-  getAllAuditLogs,
-  updateAuditLog,
-};
+module.exports = { createAuditLog, getAllAuditLogs, updateAuditLog };

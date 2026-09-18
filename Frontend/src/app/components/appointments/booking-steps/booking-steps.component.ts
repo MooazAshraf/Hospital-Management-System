@@ -208,7 +208,7 @@ export class BookingStepsComponent
     this.availableSlots.set([]);
 
     const url =
-      'http://localhost:3000/api/appointments/available-slots';
+      'http://localhost:5000/api/appointments/available-slots';
 
     const params = {
       doctor: this.doctorId,
@@ -413,7 +413,7 @@ export class BookingStepsComponent
 
     this.http
       .post<any>(
-        'http://localhost:3000/api/appointments',
+        'http://localhost:5000/api/appointments',
         payload
       )
       .subscribe({

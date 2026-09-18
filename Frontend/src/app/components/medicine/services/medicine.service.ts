@@ -13,7 +13,7 @@ interface MutationResponse {
 })
 export class MedicineService {
 
-  private apiUrl = 'http://localhost:3000/api/medicines';
+  private apiUrl = 'http://localhost:5000/api/medicines';
 
   constructor(private http: HttpClient) {}
 

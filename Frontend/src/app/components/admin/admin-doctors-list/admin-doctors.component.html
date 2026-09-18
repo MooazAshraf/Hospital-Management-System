@@ -1,4 +1,3 @@
-<app-navbar></app-navbar>
 
 <main class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-7xl mx-auto space-y-6">
@@ -314,6 +313,20 @@
             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1B3B2B] focus:ring-1 focus:ring-[#1B3B2B]/20"
           />
         </div>
+      </div>
+
+      <!-- Account Password -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5"> Account Password </label>
+        <input
+          type="password"
+          [(ngModel)]="doctorForm.password"
+          name="password"
+          [required]="!isEditMode"
+          minlength="8"
+          placeholder="At least 8 characters (new doctor)"
+          class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1B3B2B] focus:ring-1 focus:ring-[#1B3B2B]/20"
+        />
       </div>
 
       <!-- Qualifications -->

@@ -26,8 +26,8 @@ interface UsersResponse {
 })
 export class MedicalReportService {
 
-  private apiUrl = 'http://localhost:3000/api/medicalReports';
-  private usersUrl = 'http://localhost:3000/api/users';
+  private apiUrl = 'http://localhost:5000/api/medicalReports';
+  private usersUrl = 'http://localhost:5000/api/users';
 
   constructor(private http: HttpClient) {}
 

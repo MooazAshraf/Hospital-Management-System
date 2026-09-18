@@ -24,8 +24,9 @@ export class MedicalReportCardComponent {
   @Output() edit = new EventEmitter<MedicalReport>();
   @Output() remove = new EventEmitter<MedicalReport>();
 
-  medicineName(id: string): string {
-    return this.medicineNames[id] || 'Unknown medicine';
+  medicineName(value: any): string {
+    if (value && typeof value === 'object') return value.name || 'Unknown medicine';
+    return this.medicineNames[String(value)] || 'Unknown medicine';
   }
 
   onEdit(): void {

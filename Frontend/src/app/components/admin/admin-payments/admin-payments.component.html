@@ -1,0 +1,34 @@
+<main class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <div class="border-b border-gray-200/80 pb-6">
+      <h1 class="text-2xl md:text-3xl font-bold text-[#1B3B2B]">Payments</h1>
+      <p class="text-sm text-gray-500 mt-1">Review payment history and update payment status.</p>
+    </div>
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">{{ errorMessage }}</div>
+    <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-gray-50/80 border-b border-gray-200 text-xs uppercase text-[#1B3B2B]">
+            <tr><th class="py-4 px-6">Transaction</th><th class="py-4 px-6">Patient</th><th class="py-4 px-6">Amount</th><th class="py-4 px-6">Method</th><th class="py-4 px-6">Status</th><th class="py-4 px-6">Date</th></tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-sm">
+            <tr *ngFor="let p of payments" class="hover:bg-gray-50/50">
+              <td class="py-4 px-6 font-medium">{{ p.transactionId }}</td>
+              <td class="py-4 px-6">{{ p.patient?.name || 'N/A' }}</td>
+              <td class="py-4 px-6">{{ p.amount | number:'1.2-2' }} EGP</td>
+              <td class="py-4 px-6">{{ p.method }}</td>
+              <td class="py-4 px-6">
+                <select [ngModel]="p.status" (ngModelChange)="setStatus(p, $event)" [disabled]="savingId === p._id" class="px-2 py-1.5 border border-gray-200 rounded-lg text-xs">
+                  <option value="Pending">Pending</option><option value="Paid">Paid</option><option value="Failed">Failed</option>
+                </select>
+              </td>
+              <td class="py-4 px-6">{{ p.createdAt | date:'mediumDate' }}</td>
+            </tr>
+            <tr *ngIf="loading"><td colspan="6" class="py-12 text-center text-gray-500">Loading payments...</td></tr>
+            <tr *ngIf="!loading && !payments.length"><td colspan="6" class="py-12 text-center text-gray-500">No payments found.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>

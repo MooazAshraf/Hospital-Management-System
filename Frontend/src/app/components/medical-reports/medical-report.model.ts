@@ -1,5 +1,5 @@
 export interface PrescribedMedicine {
-  medicine: string;   // Medicine _id
+  medicine: string | { _id: string; name?: string };
   dosage: string;
   frequency: string;
   duration: string;
@@ -7,8 +7,8 @@ export interface PrescribedMedicine {
 
 export interface MedicalReport {
   _id?: string;
-  patient: string;    // User _id
-  doctor: string;      // User _id
+  patient: string | { _id: string; name?: string; email?: string };
+  doctor: string | { _id: string; name?: string; email?: string };
   appointment?: string | null;
   surgery?: string | null;
   reportType: string;

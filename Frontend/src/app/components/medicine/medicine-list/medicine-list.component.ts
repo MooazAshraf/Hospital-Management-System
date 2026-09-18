@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MedicineService } from '../services/medicine.service';
 import { Medicine, emptyMedicine } from '../medicine.model';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-medicine-list',
@@ -18,6 +19,7 @@ export class MedicineListComponent implements OnInit {
 
   loading = false;
   errorMessage = '';
+  canManage = false;
 
   searchTerm = '';
   categoryFilter = '';
@@ -35,7 +37,7 @@ export class MedicineListComponent implements OnInit {
 
   form: FormGroup;
 
-  constructor(private medicineService: MedicineService, private fb: FormBuilder) {
+  constructor(private medicineService: MedicineService, private fb: FormBuilder, private authService: AuthService) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       genericName: ['', [Validators.required]],
@@ -50,6 +52,7 @@ export class MedicineListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.canManage = this.authService.hasRole('admin');
     this.loadMedicines();
   }
 

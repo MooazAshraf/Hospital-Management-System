@@ -1,0 +1,52 @@
+<main class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <div class="border-b border-gray-200/80 pb-6">
+      <h1 class="text-2xl md:text-3xl font-bold text-[#1B3B2B]">Users &amp; Roles</h1>
+      <p class="text-sm text-gray-500 mt-1">Manage accounts, roles, and account status.</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+      {{ errorMessage }}
+    </div>
+
+    <div class="bg-white border border-gray-200/80 rounded-2xl p-4 shadow-sm">
+      <input [(ngModel)]="search" placeholder="Search users..." class="w-full max-w-md px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1B3B2B]">
+    </div>
+
+    <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-gray-50/80 border-b border-gray-200 text-xs uppercase text-[#1B3B2B]">
+            <tr>
+              <th class="py-4 px-6">Name</th><th class="py-4 px-6">Email</th><th class="py-4 px-6">Phone</th>
+              <th class="py-4 px-6">Role</th><th class="py-4 px-6">Status</th><th class="py-4 px-6 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-sm">
+            <tr *ngFor="let user of filteredUsers" class="hover:bg-gray-50/50">
+              <td class="py-4 px-6 font-semibold text-gray-900">{{ user.name }}</td>
+              <td class="py-4 px-6 text-gray-600">{{ user.email }}</td>
+              <td class="py-4 px-6 text-gray-600">{{ user.phone }}</td>
+              <td class="py-4 px-6">
+                <select [ngModel]="user.role" (ngModelChange)="updateRole(user, $event)" [disabled]="savingId === user._id" class="px-2 py-1.5 border border-gray-200 rounded-lg text-xs">
+                  <option value="user">User</option><option value="doctor">Doctor</option><option value="admin">Admin</option>
+                </select>
+              </td>
+              <td class="py-4 px-6">
+                <span [class.bg-green-50]="user.isActive" [class.text-green-700]="user.isActive" [class.bg-red-50]="!user.isActive" [class.text-red-700]="!user.isActive" class="px-2 py-1 rounded-full text-xs font-semibold">
+                  {{ user.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="py-4 px-6 text-right space-x-3">
+                <button (click)="toggleActive(user)" class="text-[#1B3B2B] font-medium">{{ user.isActive ? 'Deactivate' : 'Activate' }}</button>
+                <button (click)="deleteUser(user)" class="text-red-500 font-medium">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="loading"><td colspan="6" class="py-12 text-center text-gray-500">Loading users...</td></tr>
+            <tr *ngIf="!loading && !filteredUsers.length"><td colspan="6" class="py-12 text-center text-gray-500">No users found.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>

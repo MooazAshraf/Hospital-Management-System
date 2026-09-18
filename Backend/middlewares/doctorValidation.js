@@ -24,9 +24,7 @@ const createDoctorValidationRules = [
 
   body("department")
     .notEmpty()
-    .withMessage("Department is required")
-    .isMongoId()
-    .withMessage("Invalid department id"),
+    .withMessage("Department is required"),
 
   body("email")
     .trim()

@@ -1,198 +1,119 @@
-const notificationModel = require("../models/notifications.models");
-
-
-// =====================================================
-// Get My Notifications
-// =====================================================
+const Notification = require("../models/notifications.models");
 
 const getMyNotifications = async (req, res) => {
   try {
-    const filter = {
-      recipient: req.user.userId,
-    };
+    const filter = { recipient: req.user.userId };
+    if (req.query.unread === "true") filter.isRead = false;
 
-    if (req.query.unread === "true") {
-      filter.isRead = false;
-    }
-
-    const notifications = await notificationModel
-      .find(filter)
+    const notifications = await Notification.find(filter)
       .populate("sender", "name role")
       .populate("relatedAppointment")
-      .sort({
-        createdAt: -1,
-      });
+      .populate("relatedMedicalReport")
+      .sort({ createdAt: -1 });
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
+      message: "Notifications fetched successfully",
       count: notifications.length,
       notifications,
     });
   } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch notifications",
-    });
+    res.status(500).json({ success: false, message: "Failed to fetch notifications", error: error.message });
   }
 };
-
-
-// =====================================================
-// Get Notification
-// =====================================================
 
 const getNotificationById = async (req, res) => {
   try {
-    const notification =
-      await notificationModel
-        .findById(req.params.id)
-        .populate("sender", "name role")
-        .populate("relatedAppointment");
+    const notification = await Notification.findById(req.params.id)
+      .populate("sender", "name role")
+      .populate("relatedAppointment")
+      .populate("relatedMedicalReport");
 
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: "Notification not found",
-      });
+    if (!notification) return res.status(404).json({ success: false, message: "Notification not found" });
+
+    const owner = String(notification.recipient) === String(req.user.userId);
+    if (!owner && req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied" });
     }
 
-    const isOwner =
-      notification.recipient.toString() ===
-      req.user.userId.toString();
-
-    const isAdmin = req.user.role === "admin";
-
-    if (!isOwner && !isAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      notification,
-    });
+    res.status(200).json({ success: true, notification });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch notification",
-    });
+    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid notification id" });
+    res.status(500).json({ success: false, message: "Failed to fetch notification", error: error.message });
   }
 };
-
-
-// =====================================================
-// Mark One As Read
-// =====================================================
 
 const markAsRead = async (req, res) => {
   try {
-    const notification =
-      await notificationModel.findOneAndUpdate(
-        {
-          _id: req.params.id,
-          recipient: req.user.userId,
-        },
-        {
-          $set: {
-            isRead: true,
-          },
-        },
-        {
-          new: true,
-        },
-      );
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, recipient: req.user.userId },
+      { $set: { isRead: true } },
+      { new: true },
+    );
 
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: "Notification not found",
-      });
-    }
+    if (!notification) return res.status(404).json({ success: false, message: "Notification not found" });
 
-    return res.status(200).json({
-      success: true,
-      message: "Notification marked as read",
-      notification,
-    });
+    res.status(200).json({ success: true, message: "Notification marked as read", notification });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to mark notification as read",
-    });
+    res.status(500).json({ success: false, message: "Failed to mark notification as read", error: error.message });
   }
 };
-
-
-// =====================================================
-// Mark All As Read
-// =====================================================
 
 const markAllAsRead = async (req, res) => {
   try {
-    await notificationModel.updateMany(
-      {
-        recipient: req.user.userId,
-        isRead: false,
-      },
-      {
-        $set: {
-          isRead: true,
-        },
-      },
+    await Notification.updateMany(
+      { recipient: req.user.userId, isRead: false },
+      { $set: { isRead: true } },
     );
-
-    return res.status(200).json({
-      success: true,
-      message: "All notifications marked as read",
-    });
+    res.status(200).json({ success: true, message: "All notifications marked as read" });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to mark notifications as read",
-    });
+    res.status(500).json({ success: false, message: "Failed to mark notifications as read", error: error.message });
   }
 };
-
-
-// =====================================================
-// Delete Notification
-// =====================================================
 
 const deleteNotification = async (req, res) => {
   try {
-    const notification =
-      await notificationModel.findOneAndDelete({
-        _id: req.params.id,
-        recipient: req.user.userId,
-      });
-
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: "Notification not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Notification deleted successfully",
+    const result = await Notification.findOneAndDelete({
+      _id: req.params.id,
+      recipient: req.user.userId,
     });
+    if (!result) return res.status(404).json({ success: false, message: "Notification not found" });
+
+    res.status(200).json({ success: true, message: "Notification deleted successfully" });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to delete notification",
-    });
+    res.status(500).json({ success: false, message: "Failed to delete notification", error: error.message });
   }
 };
 
+const createNotification = async (req, res) => {
+  try {
+    const { recipient, title, message, type = "system", sender = req.user.userId, relatedAppointment, relatedMedicalReport } = req.body;
+
+    if (!recipient || !title || !message) {
+      return res.status(400).json({ success: false, message: "recipient, title and message are required" });
+    }
+
+    const notification = await Notification.create({
+      recipient,
+      sender,
+      title,
+      message,
+      type,
+      relatedAppointment: relatedAppointment || null,
+      relatedMedicalReport: relatedMedicalReport || null,
+    });
+
+    res.status(201).json({ success: true, message: "Notification created successfully", notification });
+  } catch (error) {
+    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
+    res.status(500).json({ success: false, message: "Failed to create notification", error: error.message });
+  }
+};
 
 module.exports = {
   getMyNotifications,
   getNotificationById,
+  createNotification,
   markAsRead,
   markAllAsRead,
   deleteNotification,

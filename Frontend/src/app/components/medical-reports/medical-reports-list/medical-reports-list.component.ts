@@ -16,6 +16,7 @@ import { MedicalReportService, SimpleUser } from '../services/medical-report.ser
 import { MedicineService } from '../../medicine/services/medicine.service';
 import { Medicine } from '../../medicine/medicine.model';
 import { emptyReport, MedicalReport } from '../medical-report.model';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-medical-reports-list',
@@ -32,6 +33,7 @@ export class MedicalReportsListComponent implements OnInit {
   // The page still works, it just falls back to showing raw names/IDs
   // instead of resolved patient/doctor names, and add/edit is disabled.
   needsLogin = false;
+  canManage = false;
 
   patients: SimpleUser[] = [];
   doctors: SimpleUser[] = [];
@@ -65,6 +67,7 @@ export class MedicalReportsListComponent implements OnInit {
     private reportService: MedicalReportService,
     private medicineService: MedicineService,
     private fb: FormBuilder,
+    private authService: AuthService,
   ) {
     this.form = this.fb.group({
       patient: ['', Validators.required],
@@ -80,6 +83,7 @@ export class MedicalReportsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.canManage = this.authService.hasRole('doctor', 'admin');
     this.loadAll();
   }
 
@@ -141,12 +145,14 @@ export class MedicalReportsListComponent implements OnInit {
     });
   }
 
-  patientName(id: string): string {
-    return this.usersById[id] || 'Unknown patient';
+  patientName(value: any): string {
+    if (value && typeof value === 'object') return value.name || 'Unknown patient';
+    return this.usersById[String(value)] || 'Unknown patient';
   }
 
-  doctorName(id: string): string {
-    return this.usersById[id] || 'Unknown doctor';
+  doctorName(value: any): string {
+    if (value && typeof value === 'object') return value.name || 'Unknown doctor';
+    return this.usersById[String(value)] || 'Unknown doctor';
   }
 
   applyFilters(): void {
@@ -194,7 +200,7 @@ export class MedicalReportsListComponent implements OnInit {
   // ---------- Modal (Add / Edit) ----------
 
   openAddModal(): void {
-    if (this.needsLogin) return;
+    if (!this.canManage) return;
     this.isEditMode = false;
     this.editingId = null;
     this.formError = '';
@@ -213,7 +219,7 @@ export class MedicalReportsListComponent implements OnInit {
     (report.prescribedMedicines || []).forEach((pm) => {
       this.prescribedMedicines.push(
         this.fb.group({
-          medicine: [pm.medicine, Validators.required],
+          medicine: [typeof pm.medicine === 'object' ? pm.medicine._id : pm.medicine, Validators.required],
           dosage: [pm.dosage, Validators.required],
           frequency: [pm.frequency, Validators.required],
           duration: [pm.duration, Validators.required],
@@ -222,8 +228,8 @@ export class MedicalReportsListComponent implements OnInit {
     });
 
     this.form.patchValue({
-      patient: report.patient,
-      doctor: report.doctor,
+      patient: typeof report.patient === 'object' ? report.patient._id : report.patient,
+      doctor: typeof report.doctor === 'object' ? report.doctor._id : report.doctor,
       reportType: report.reportType,
       title: report.title,
       diagnosis: report.diagnosis,

@@ -1,8 +1,6 @@
 const express = require("express");
-
 const { authenticate } = require("../middlewares/isLogged");
 const { authorize } = require("../middlewares/authorize");
-
 const {
   getPatients,
   getPatientById,
@@ -16,35 +14,14 @@ const {
 
 const patientRouter = express.Router();
 
-// Get all patients - doctors and admins only
-patientRouter.get("/", authenticate, authorize("doctor", "admin"), getPatients);
-
-// Get logged-in user's patient profile
 patientRouter.get("/me", authenticate, getMyPatientProfile);
+patientRouter.put("/me", authenticate, saveMyPatientProfile);
 
-// Save logged-in user's patient profile
-patientRouter.put("/patients/me", authenticate, saveMyPatientProfile);
-
-// IMPORTANT: count must come before /:id
-patientRouter.get(
-  "/count",
-  authenticate,
-  authorize("doctor", "admin"),
-  getPatientsCount,
-);
-
-// Get a single patient
+patientRouter.get("/count", authenticate, authorize("doctor", "admin"), getPatientsCount);
+patientRouter.get("/", authenticate, authorize("doctor", "admin"), getPatients);
 patientRouter.get("/:id", authenticate, getPatientById);
-
-// Create patient profile
 patientRouter.post("/", authenticate, addPatient);
-
-// Update patient
 patientRouter.put("/:id", authenticate, updatePatient);
-
-// Delete patient
 patientRouter.delete("/:id", authenticate, authorize("admin"), deletePatient);
 
-module.exports = {
-  patientRouter,
-};
+module.exports = { patientRouter };

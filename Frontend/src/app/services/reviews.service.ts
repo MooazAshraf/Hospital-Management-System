@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Review } from '../components/models';
-
+import { IReview } from '../models/review.model';
 interface ReviewsResponse {
   success: boolean;
   count: number;
-  data: Review[];
+  data: IReview[];
 }
 
 @Injectable({

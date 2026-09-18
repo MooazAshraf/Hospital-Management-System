@@ -1,96 +1,55 @@
-const Midicine = require("../models/midicine.model");
+const Medicine = require("../models/midicine.model");
 
-// Get all medicines
-const getAllMidicines = async (req, res, next) => {
+const getAllMidicines = async (req, res) => {
   try {
-    const midicines = await Midicine.find();
-    res.status(200).json(midicines);
+    const medicines = await Medicine.find().sort({ name: 1 });
+    res.status(200).json(medicines);
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: "Failed to fetch medicines", error: error.message });
   }
 };
 
-// Get medicine by ID
-const getMidicineById = async (req, res, next) => {
+const getMidicineById = async (req, res) => {
   try {
-    const midicine = await Midicine.findById(req.params.id);
-
-    if (!midicine) {
-      return res.status(404).json({
-        message: "Midicine not found",
-      });
-    }
-
-    res.status(200).json(midicine);
+    const medicine = await Medicine.findById(req.params.id);
+    if (!medicine) return res.status(404).json({ success: false, message: "Medicine not found" });
+    res.status(200).json(medicine);
   } catch (error) {
-    next(error);
+    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid medicine id" });
+    res.status(500).json({ success: false, message: "Failed to fetch medicine", error: error.message });
   }
 };
 
-// Create medicine
-const createMidicine = async (req, res, next) => {
+const createMidicine = async (req, res) => {
   try {
-    const midicine = await Midicine.create(req.body);
-
-    res.status(201).json({
-      message: "Midicine created successfully",
-      data: midicine,
-    });
+    const medicine = await Medicine.create(req.body);
+    res.status(201).json({ success: true, message: "Medicine created successfully", data: medicine });
   } catch (error) {
-    next(error);
+    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
+    res.status(500).json({ success: false, message: "Failed to create medicine", error: error.message });
   }
 };
 
-// Update medicine
-const updateMidicine = async (req, res, next) => {
+const updateMidicine = async (req, res) => {
   try {
-    const midicine = await Midicine.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!midicine) {
-      return res.status(404).json({
-        message: "Midicine not found",
-      });
-    }
-
-    res.status(200).json({
-      message: "Midicine updated successfully",
-      data: midicine,
-    });
+    const medicine = await Medicine.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!medicine) return res.status(404).json({ success: false, message: "Medicine not found" });
+    res.status(200).json({ success: true, message: "Medicine updated successfully", data: medicine });
   } catch (error) {
-    next(error);
+    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
+    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid medicine id" });
+    res.status(500).json({ success: false, message: "Failed to update medicine", error: error.message });
   }
 };
 
-// Delete medicine
-const deleteMidicine = async (req, res, next) => {
+const deleteMidicine = async (req, res) => {
   try {
-    const midicine = await Midicine.findByIdAndDelete(req.params.id);
-
-    if (!midicine) {
-      return res.status(404).json({
-        message: "Midicine not found",
-      });
-    }
-
-    res.status(200).json({
-      message: "Midicine deleted successfully",
-    });
+    const medicine = await Medicine.findByIdAndDelete(req.params.id);
+    if (!medicine) return res.status(404).json({ success: false, message: "Medicine not found" });
+    res.status(200).json({ success: true, message: "Medicine deleted successfully" });
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: "Failed to delete medicine", error: error.message });
   }
 };
 
-module.exports = {
-  getAllMidicines,
-  getMidicineById,
-  createMidicine,
-  updateMidicine,
-  deleteMidicine,
-};
+module.exports = { getAllMidicines, getMidicineById, createMidicine, updateMidicine, deleteMidicine };

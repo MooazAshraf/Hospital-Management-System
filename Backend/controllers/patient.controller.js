@@ -1,303 +1,258 @@
-const patientModel = require("../models/patient.model");
+const Patient = require("../models/patient.model");
+const User = require("../models/users.model");
 
-// Get all patients - accessible to doctors and admins only
+const normalizeGender = (value) => {
+  if (!value) return value;
+  const normalized = String(value).toLowerCase();
+  if (normalized === "male") return "Male";
+  if (normalized === "female") return "Female";
+  return value;
+};
+
 const getPatients = async (req, res) => {
   try {
-    const patients = await patientModel
-      .find()
-      .populate("user", "name email role")
-      .populate("primaryDoctor", "name email");
+    const patients = await Patient.find()
+      .populate("user", "name email phone role isActive")
+      .populate("primaryDoctor", "name email")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
+      success: true,
       message: "Patients fetched successfully",
+      count: patients.length,
       patients,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
-
-// Get a single patient by ID - accessible to the patient themselves, or a doctor/admin
 
 const getPatientById = async (req, res) => {
   try {
-    const patient = await patientModel
-      .findById(req.params.id)
-      .populate("user", "name email role")
+    const patient = await Patient.findById(req.params.id)
+      .populate("user", "name email phone role isActive")
       .populate("primaryDoctor", "name email");
 
-    if (!patient) {
-      return res.status(404).json({
-        message: "Patient not found",
-      });
+    if (!patient) return res.status(404).json({ success: false, message: "Patient not found" });
+
+    const ownerId = patient.user?._id || patient.user;
+    const isOwner = String(ownerId) === String(req.user.userId);
+    const staff = ["doctor", "admin"].includes(req.user.role);
+
+    if (!isOwner && !staff) {
+      return res.status(403).json({ success: false, message: "You are not allowed to view this patient record" });
     }
 
-    const isOwner = patient.user._id.toString() === req.user.userId;
-    const isDoctorOrAdmin =
-      req.user.role === "doctor" || req.user.role === "admin";
-
-    if (!isOwner && !isDoctorOrAdmin) {
-      return res.status(403).json({
-        message: "You are not allowed to view this patient record",
-      });
-    }
-
-    res.status(200).json({
-      message: "Patient fetched successfully",
-      patient,
-    });
+    res.status(200).json({ success: true, message: "Patient fetched successfully", patient });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid patient id" });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
-// Create a new patient profile for the logged-in user
 const addPatient = async (req, res) => {
   try {
     const {
-      name,
-      email,
-      phone,
-      gender,
-      dateOfBirth,
-      address,
-      bloodGroup,
-      allergies,
-      chronicDiseases,
-      emergencyContact,
-      primaryDoctor,
+      name, email, phone, password, gender, dateOfBirth, address, bloodGroup,
+      allergies, chronicDiseases, emergencyContact, primaryDoctor,
     } = req.body;
 
-    // One patient profile per user account
-    const existingPatientForUser = await patientModel.findOne({
-      user: req.user.userId,
-    });
+    let targetUserId = req.user.userId;
+    let createdUser = null;
 
-    if (existingPatientForUser) {
-      return res.status(409).json({
-        message: "This account already has a patient profile",
+    if (req.user.role === "admin") {
+      if (!password || String(password).length < 8) {
+        return res.status(400).json({ success: false, message: "A password of at least 8 characters is required when an admin creates a patient account" });
+      }
+
+      const existingUser = await User.findOne({ email: String(email).toLowerCase() });
+      if (existingUser) {
+        return res.status(409).json({ success: false, message: "A user with this email already exists" });
+      }
+
+      const bcrypt = require("bcrypt");
+      createdUser = await User.create({
+        name,
+        email: String(email).toLowerCase(),
+        password: await bcrypt.hash(password, 12),
+        phone,
+        role: "user",
       });
+      targetUserId = createdUser._id;
+    } else if (req.user.role !== "user") {
+      return res.status(403).json({ success: false, message: "Only patients or admins can create a patient profile" });
     }
 
-    // Check if email already exists
-    const existingEmail = await patientModel.findOne({ email });
+    const existing = await Patient.findOne({ user: targetUserId });
+    if (existing) return res.status(409).json({ success: false, message: "This account already has a patient profile" });
 
-    if (existingEmail) {
-      return res.status(409).json({
-        message: "Email already exists",
-      });
-    }
+    const emailExists = await Patient.findOne({ email: String(email).toLowerCase() });
+    if (emailExists) return res.status(409).json({ success: false, message: "Email already exists" });
 
-    // Create patient, tied to the logged-in user (not trusted from req.body)
-    const patient = await patientModel.create({
-      user: req.user.userId,
+    const patient = await Patient.create({
+      user: targetUserId,
       name,
       email,
       phone,
-      gender,
+      gender: normalizeGender(gender),
       dateOfBirth,
       address,
       bloodGroup,
       allergies,
       chronicDiseases,
       emergencyContact,
-      primaryDoctor,
+      primaryDoctor: req.user.role === "admin" ? primaryDoctor : undefined,
     });
 
     res.status(201).json({
+      success: true,
       message: "Patient profile created successfully",
       patient,
+      user: createdUser ? { _id: createdUser._id, name: createdUser.name, email: createdUser.email, role: createdUser.role } : undefined,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    if (error.code === 11000) return res.status(409).json({ success: false, message: "Patient profile already exists or email is already used" });
+    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
-
-// Update a patient - accessible to the patient themselves, or a doctor/admin
 const updatePatient = async (req, res) => {
   try {
-    const patient = await patientModel.findById(req.params.id);
+    const patient = await Patient.findById(req.params.id);
+    if (!patient) return res.status(404).json({ success: false, message: "Patient not found" });
 
-    if (!patient) {
-      return res.status(404).json({
-        message: "Patient not found",
-      });
+    const isOwner = String(patient.user) === String(req.user.userId);
+    const staff = ["doctor", "admin"].includes(req.user.role);
+
+    if (!isOwner && !staff) {
+      return res.status(403).json({ success: false, message: "You are not allowed to update this patient record" });
     }
 
-    const isOwner = patient.user.toString() === req.user.userId;
-    const isDoctorOrAdmin =
-      req.user.role === "doctor" || req.user.role === "admin";
-    if (!isOwner && !isDoctorOrAdmin) {
-      return res.status(403).json({
-        message: "You are not allowed to update this patient record",
-      });
-    }
-
-    // A patient shouldn't be able to reassign their own primary doctor or user link
     const updateData = { ...req.body };
-    if (!isDoctorOrAdmin) {
-      delete updateData.primaryDoctor;
-      delete updateData.user;
+    delete updateData.user;
+
+    if (updateData.gender) updateData.gender = normalizeGender(updateData.gender);
+    if (!staff) delete updateData.primaryDoctor;
+
+    if (updateData.email) {
+      updateData.email = String(updateData.email).toLowerCase();
+      const emailExists = await Patient.findOne({
+        email: updateData.email,
+        _id: { $ne: patient._id },
+      });
+      if (emailExists) return res.status(409).json({ success: false, message: "Email already exists" });
     }
 
-    const updatedPatient = await patientModel
-      .findByIdAndUpdate(req.params.id, updateData, {
-        new: true,
-        runValidators: true,
-      })
-      .populate("user", "name email role")
+    const updated = await Patient.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    })
+      .populate("user", "name email phone role isActive")
       .populate("primaryDoctor", "name email");
 
-    res.status(200).json({
-      message: "Patient updated successfully",
-      patient: updatedPatient,
-    });
+    // Keep the linked User's basic contact data synchronized for the owner.
+    if (isOwner && updated?.user?._id) {
+      const userUpdate = {};
+      if (updateData.name !== undefined) userUpdate.name = updateData.name;
+      if (updateData.email !== undefined) userUpdate.email = updateData.email;
+      if (updateData.phone !== undefined) userUpdate.phone = updateData.phone;
+      if (Object.keys(userUpdate).length) {
+        await User.findByIdAndUpdate(updated.user._id, userUpdate, { runValidators: true });
+      }
+    }
+
+    res.status(200).json({ success: true, message: "Patient updated successfully", patient: updated });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    if (error.code === 11000) return res.status(409).json({ success: false, message: "Email already exists" });
+    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
-// Delete a patient - accessible to doctors and admins only
 const deletePatient = async (req, res) => {
   try {
-    const patient = await patientModel.findByIdAndDelete(req.params.id);
+    const patient = await Patient.findByIdAndDelete(req.params.id);
+    if (!patient) return res.status(404).json({ success: false, message: "Patient not found" });
 
-    if (!patient) {
-      return res.status(404).json({
-        message: "Patient not found",
-      });
-    }
-
-    res.status(200).json({
-      message: "Patient deleted successfully",
-    });
+    res.status(200).json({ success: true, message: "Patient deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid patient id" });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 const getMyPatientProfile = async (req, res) => {
   try {
-    const patient = await patientModel
-      .findOne({ user: req.user.userId })
-      .populate("user", "name email role")
+    const patient = await Patient.findOne({ user: req.user.userId })
+      .populate("user", "name email phone role isActive")
       .populate("primaryDoctor", "name email");
 
-    if (!patient) {
-      return res.status(200).json({
-        exists: false,
-        patient: null,
-      });
-    }
-
     res.status(200).json({
-      message: "Patient profile fetched successfully",
-      patient,
+      success: true,
+      exists: !!patient,
+      patient: patient || null,
     });
   } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        message: "Validation failed",
-        error: error.message,
-      });
-    }
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 const saveMyPatientProfile = async (req, res) => {
   try {
     const {
-      name,
-      email,
-      phone,
-      gender,
-      dateOfBirth,
-      address,
-      bloodGroup,
-      allergies,
-      chronicDiseases,
-      emergencyContact,
+      name, email, phone, gender, dateOfBirth, address, bloodGroup,
+      allergies, chronicDiseases, emergencyContact,
     } = req.body;
 
-    // لو الإيميل ده مستخدم فعلاً من يوزر تاني (مش نفس صاحب البروفايل)
-    if (email) {
-      const existingEmail = await patientModel.findOne({
-        email,
+    const normalizedEmail = email ? String(email).toLowerCase() : email;
+    if (normalizedEmail) {
+      const existing = await Patient.findOne({
+        email: normalizedEmail,
         user: { $ne: req.user.userId },
       });
-      if (existingEmail) {
-        return res.status(409).json({ message: "Email already exists" });
-      }
+      if (existing) return res.status(409).json({ success: false, message: "Email already exists" });
     }
 
     const updateData = {
-      name,
-      email,
-      phone,
-      gender,
-      dateOfBirth,
-      address,
-      bloodGroup,
-      allergies,
-      chronicDiseases,
-      emergencyContact,
       user: req.user.userId,
+      name,
+      email: normalizedEmail,
+      phone,
+      gender: normalizeGender(gender),
+      dateOfBirth: dateOfBirth || undefined,
+      address,
+      bloodGroup: bloodGroup || undefined,
+      allergies: allergies || [],
+      chronicDiseases: chronicDiseases || [],
+      emergencyContact,
     };
 
-    const patient = await patientModel.findOneAndUpdate(
+    const patient = await Patient.findOneAndUpdate(
       { user: req.user.userId },
       updateData,
-      {
-        new: true,
-        upsert: true,
-        runValidators: true,
-        setDefaultsOnInsert: true,
-      },
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true },
+    ).populate("user", "name email phone role isActive");
+
+    await User.findByIdAndUpdate(
+      req.user.userId,
+      { name, email: normalizedEmail, phone },
+      { new: true, runValidators: true },
     );
 
-    res.status(200).json({
-      message: "Patient profile saved successfully",
-      patient,
-    });
+    res.status(200).json({ success: true, message: "Patient profile saved successfully", patient });
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({ message: "Email already exists" });
-    }
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    if (error.code === 11000) return res.status(409).json({ success: false, message: "Email already exists" });
+    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 const getPatientsCount = async (req, res) => {
   try {
-    const count = await patientModel.countDocuments();
+    const count = await Patient.countDocuments();
     res.status(200).json({ count });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -309,5 +264,5 @@ module.exports = {
   deletePatient,
   getMyPatientProfile,
   saveMyPatientProfile,
-  getPatientsCount
+  getPatientsCount,
 };

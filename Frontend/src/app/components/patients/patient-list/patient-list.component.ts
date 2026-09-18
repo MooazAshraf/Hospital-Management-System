@@ -9,7 +9,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 @Component({
   selector: 'app-patient-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './patient-list.component.html',
 })
 export class PatientListComponent implements OnInit {
@@ -28,6 +28,7 @@ export class PatientListComponent implements OnInit {
     gender: '',
     dateOfBirth: '',
     bloodGroup: '',
+    password: '',
   };
 
   // ==========================
@@ -195,6 +196,7 @@ export class PatientListComponent implements OnInit {
       gender: '',
       dateOfBirth: '',
       bloodGroup: '',
+      password: '',
     };
   }
 

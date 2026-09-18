@@ -20,23 +20,15 @@ export interface NotificationUser {
 export interface AppNotification {
 
   _id: string;
-
-  recipient: string;
-
-  sender: NotificationUser | null;
-
+  recipient: string | NotificationUser;
+  sender?: string | NotificationUser | null;
   title: string;
 
   message: string;
-
   type: NotificationType;
-
+  relatedAppointment?: string | unknown | null;
+  relatedMedicalReport?: string | unknown | null;
   isRead: boolean;
-
-  relatedAppointment?: any;
-
-  relatedMedicalReport?: any;
-
   createdAt: string;
 
   updatedAt?: string;
@@ -45,9 +37,8 @@ export interface AppNotification {
 
 
 export interface NotificationsListResponse {
-
-  success: boolean;
-
+  success?: boolean;
+  message?: string;
   count: number;
 
   notifications: AppNotification[];
@@ -56,21 +47,8 @@ export interface NotificationsListResponse {
 
 
 export interface NotificationResponse {
-
-  success: boolean;
-
-  message?: string;
-
+  success?: boolean;
+  message: string;
   notification: AppNotification;
 
 }
-
-
-export interface SimpleMessageResponse {
-
-  success: boolean;
-
-  message: string;
-
-}
-

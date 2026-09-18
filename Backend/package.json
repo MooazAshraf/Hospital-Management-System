@@ -4,7 +4,8 @@
   "description": "A comprehensive web-based Hospital Management System\"designed to streamline patient registration, appointment booking, doctor management, and medical records efficiently.\"",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "seed:admin": "node seed/createAdminAccount.js"
   },
   "repository": {
     "type": "git",

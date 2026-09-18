@@ -21,7 +21,7 @@ const {
 const userRouter = express.Router();
 
 // Get all users - authenticated users only
-userRouter.get("/", authenticate, getUsers);
+userRouter.get("/", authenticate, authorize("doctor", "admin"), getUsers);
 
 // Login
 userRouter.post("/login", userLogin);

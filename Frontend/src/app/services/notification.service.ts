@@ -1,72 +1,36 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
 import {
+  AppNotification,
   NotificationResponse,
   NotificationsListResponse,
-  SimpleMessageResponse,
 } from '../models/notification.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class NotificationService {
+  private readonly baseUrl = 'http://localhost:5000/api/notifications';
 
-  private readonly baseUrl =
-    'http://localhost:5000/api/notifications';
+  constructor(private readonly http: HttpClient) {}
 
-  constructor(private http: HttpClient) {}
-
-  // Get current logged-in user's notifications
-  getMyNotifications(
-    unreadOnly = false
-  ): Observable<NotificationsListResponse> {
-
-    const url = unreadOnly
-      ? `${this.baseUrl}?unread=true`
-      : this.baseUrl;
-
-    return this.http.get<NotificationsListResponse>(url);
+  getMyNotifications(unread = false): Observable<NotificationsListResponse> {
+    const suffix = unread ? '?unread=true' : '';
+    return this.http.get<NotificationsListResponse>(`${this.baseUrl}${suffix}`);
   }
 
-  // Get one notification by ID
-  getNotificationById(
-    notificationId: string
-  ): Observable<NotificationResponse> {
-
-    return this.http.get<NotificationResponse>(
-      `${this.baseUrl}/${notificationId}`
-    );
+  getNotificationById(id: string): Observable<NotificationResponse> {
+    return this.http.get<NotificationResponse>(`${this.baseUrl}/${id}`);
   }
 
-  // Mark one notification as read
-  markAsRead(
-    notificationId: string
-  ): Observable<NotificationResponse> {
-
-    return this.http.patch<NotificationResponse>(
-      `${this.baseUrl}/${notificationId}/read`,
-      {}
-    );
+  markAsRead(id: string): Observable<NotificationResponse> {
+    return this.http.patch<NotificationResponse>(`${this.baseUrl}/${id}/read`, {});
   }
 
-  // Mark all notifications as read
-  markAllAsRead(): Observable<SimpleMessageResponse> {
-
-    return this.http.patch<SimpleMessageResponse>(
-      `${this.baseUrl}/read-all`,
-      {}
-    );
+  markAllAsRead(): Observable<{ success?: boolean; message: string }> {
+    return this.http.patch<{ success?: boolean; message: string }>(`${this.baseUrl}/read-all`, {});
   }
 
-  // Delete one notification
-  deleteNotification(
-    notificationId: string
-  ): Observable<SimpleMessageResponse> {
-
-    return this.http.delete<SimpleMessageResponse>(
-      `${this.baseUrl}/${notificationId}`
-    );
+  deleteNotification(id: string): Observable<{ success?: boolean; message: string }> {
+    return this.http.delete<{ success?: boolean; message: string }>(`${this.baseUrl}/${id}`);
   }
 }

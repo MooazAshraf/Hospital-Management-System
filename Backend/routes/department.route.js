@@ -1,22 +1,18 @@
 const express = require("express");
-
-const router = express.Router();
-
 const { authenticate } = require("../middlewares/isLogged");
-
+const { authorize } = require("../middlewares/authorize");
 const {
   createDepartment,
   getAllDepartments,
   updateDepartment,
+  deleteDepartment,
 } = require("../controllers/department.controller");
 
-router
-  .route("/")
-  .get(getAllDepartments)
-  .post(authenticate, createDepartment);
+const router = express.Router();
 
-router
-  .route("/:id")
-  .put(authenticate, updateDepartment);
+router.get("/", getAllDepartments);
+router.post("/", authenticate, authorize("admin"), createDepartment);
+router.put("/:id", authenticate, authorize("admin"), updateDepartment);
+router.delete("/:id", authenticate, authorize("admin"), deleteDepartment);
 
 module.exports = router;

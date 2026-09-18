@@ -1,5 +1,7 @@
 const doctorModel = require("../models/doctors.model");
 const userModel = require("../models/users.model");
+const bcrypt = require("bcrypt");
+const Department = require("../models/department.model");
 
 
 // ==========================================
@@ -116,13 +118,34 @@ const addDoctor = async (req, res) => {
       image,
     } = req.body;
 
-    // Doctors link to their own account; admins can link any doctor account
-    const targetUserId =
-      req.user.role === "admin" && user
-        ? user
-        : req.user.userId;
+    // A doctor can create their own profile. An admin can either
+    // link an existing doctor account or create the account in one step.
+    let targetUserId = req.user.userId;
+    let createdUser = null;
 
-    // Check user account
+    if (req.user.role === "admin" && user) {
+      targetUserId = user;
+    } else if (req.user.role === "admin" && !user) {
+      const password = req.body.password;
+      if (!password || String(password).length < 8) {
+        return res.status(400).json({ message: "Password of at least 8 characters is required when creating a doctor account" });
+      }
+
+      const existingUser = await userModel.findOne({ email: String(email).toLowerCase() });
+      if (existingUser) {
+        return res.status(409).json({ message: "A user with this email already exists" });
+      }
+
+      createdUser = await userModel.create({
+        name,
+        email: String(email).toLowerCase(),
+        password: await bcrypt.hash(password, 12),
+        phone,
+        role: "doctor",
+      });
+      targetUserId = createdUser._id;
+    }
+
     const targetUser = await userModel.findById(targetUserId);
 
     if (!targetUser) {
@@ -168,11 +191,21 @@ const addDoctor = async (req, res) => {
     }
 
 
+    let departmentId = department;
+    if (department && !/^[0-9a-fA-F]{24}$/.test(String(department))) {
+      const departmentDoc = await Department.findOne({
+        name: { $regex: `^${String(department).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" },
+        isActive: true,
+      });
+      if (!departmentDoc) return res.status(404).json({ message: "Department not found" });
+      departmentId = departmentDoc._id;
+    }
+
     const newDoctor = await doctorModel.create({
       user: targetUserId,
       name,
       specialty,
-      department,
+      department: departmentId,
       email,
       phone,
       description,
@@ -195,6 +228,9 @@ const addDoctor = async (req, res) => {
     res.status(201).json({
       message: "Doctor profile created successfully",
       doctor,
+      user: createdUser
+        ? { _id: createdUser._id, name: createdUser.name, email: createdUser.email, role: createdUser.role }
+        : undefined,
     });
 
   } catch (error) {

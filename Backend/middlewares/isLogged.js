@@ -1,42 +1,53 @@
 const jwt = require("jsonwebtoken");
 
 const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({
+      success: false,
+      message: "Authorization header is required",
+    });
+  }
+
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid authorization format",
+    });
+  }
+
+  const token = authHeader.slice(7).trim();
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication token is required",
+    });
+  }
+
   try {
-    const authHeader = req.headers.authorization;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Check if Authorization header exists
-    if (!authHeader) {
+    if (!decoded?.userId || !decoded?.role) {
       return res.status(401).json({
-        message: "Authorization header is required",
+        success: false,
+        message: "Invalid authentication token",
       });
     }
 
-    // Check Bearer token
-    if (!authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        message: "Invalid authorization format",
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
-
-    // Save user information in request
-    req.user = decoded;
+    req.user = {
+      userId: String(decoded.userId),
+      role: decoded.role,
+    };
 
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({
+      success: false,
       message: "Invalid or expired token",
     });
   }
 };
 
-module.exports = {
-  authenticate,
-};
+module.exports = { authenticate };

@@ -8,7 +8,7 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 @Component({
   selector: 'app-admin-doctors',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-doctors.component.html',
 })
 export class AdminDoctorsComponent implements OnInit {
@@ -37,6 +37,7 @@ export class AdminDoctorsComponent implements OnInit {
     experienceYears: '',
     isAvailable: true,
     image: '',
+    password: '',
   };
 
   constructor(
@@ -194,6 +195,7 @@ export class AdminDoctorsComponent implements OnInit {
       experienceYears: '',
       isAvailable: true,
       image: '',
+      password: '',
     };
   }
 }

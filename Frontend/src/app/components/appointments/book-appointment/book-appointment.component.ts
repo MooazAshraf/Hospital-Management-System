@@ -173,10 +173,7 @@ export class BookAppointmentComponent implements OnInit {
 
   onBooked(appointmentId: string): void {
 
-    this.router.navigate([
-      '/appointments',
-      appointmentId,
-    ]);
+    this.router.navigate(['/patient-dashboard']);
   }
 
 

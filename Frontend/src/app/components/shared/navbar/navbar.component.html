@@ -16,6 +16,15 @@
 
     <!-- Navigation -->
     <nav class="hidden md:flex items-center gap-9 text-[15px] font-medium">
+      <!-- رابط الـ Dashboard يظهر فقط عند تسجيل الدخول ويُوجّه حسب الـ Role -->
+      <a
+        *ngIf="user"
+        [routerLink]="dashboardRoute"
+        class="text-green-900 font-semibold hover:text-green-900 transition"
+      >
+        Dashboard
+      </a>
+
       <a routerLink="/departments" class="hover:text-green-900"> Departments </a>
 
       <a routerLink="/doctors" class="hover:text-green-900"> Doctors </a>
@@ -86,8 +95,17 @@
         <!-- Dropdown -->
         <div
           *ngIf="dropdownOpen"
-          class="absolute right-0 top-12 w-44 bg-white border border-gray-100 rounded-xl shadow-lg py-2"
+          class="absolute right-0 top-12 w-44 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50"
         >
+          <!-- Dashboard Option in Dropdown -->
+          <a
+            [routerLink]="dashboardRoute"
+            (click)="dropdownOpen = false"
+            class="block px-4 py-2.5 text-sm hover:bg-gray-50 transition"
+          >
+            Dashboard
+          </a>
+
           <!-- Profile -->
           <button
             type="button"

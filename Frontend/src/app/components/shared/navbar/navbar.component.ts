@@ -1,41 +1,53 @@
-  import { Component } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { Router, RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { Iuser } from '../../../models/users.model';
 import { AuthService } from '../../../services/auth.service';
 
+@Component({
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
+  templateUrl: './navbar.component.html',
+})
+export class NavbarComponent {
+  mobileOpen = false;
+  user: Iuser | null = null;
+  dropdownOpen = false;
 
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {
+    this.user = this.authService.getUser();
+  }
 
-  @Component({
-    selector: 'app-navbar',
-    standalone: true,
-    imports: [CommonModule, RouterLink],
-    templateUrl: './navbar.component.html',
-  })
-  export class NavbarComponent {
-    mobileOpen = false;
-    user: Iuser | null = null;
-    dropdownOpen = false;
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
 
-    constructor(
-      private authService: AuthService,
-      private router: Router,
-    ) {
-      this.user = this.authService.getUser();
-    }
+  goToProfile() {
+    this.dropdownOpen = false;
+    this.router.navigate(['/profile']);
+  }
 
-    toggleDropdown() {
-      this.dropdownOpen = !this.dropdownOpen;
-    }
+  logout() {
+    this.authService.logout();
+    this.dropdownOpen = false;
+    this.router.navigate(['/login']);
+  }
 
-    goToProfile() {
-      this.dropdownOpen = false;
-      this.router.navigate(['/profile']);
-    }
+  get dashboardRoute(): string {
+    if (!this.user) return '/login';
 
-    logout() {
-      this.authService.logout();
-      this.dropdownOpen = false;
-      this.router.navigate(['/login']);
+    switch (this.user.role) {
+      case 'doctor':
+        return '/doctor-dashboard';
+      case 'admin':
+        return '/admin';
+      case 'user':
+      default:
+        return '/dashboard';
     }
   }
+}

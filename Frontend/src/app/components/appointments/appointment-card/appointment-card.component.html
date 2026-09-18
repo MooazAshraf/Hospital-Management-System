@@ -1,7 +1,84 @@
-<div class="border border-gray-100 rounded-xl p-5 flex justify-between items-center">
-  <div>
-    <div class="font-semibold text-sm text-green-900">{{ appointment.doctorName }}</div>
-    <div class="text-sm text-gray-600">{{ appointment.date }} · {{ appointment.time }}</div>
+<article class="appointment-card" [attr.data-status]="appointment.status">
+  <header>
+    <span class="queue">#{{ appointment.queueNumber }}</span>
+    <span class="status-badge">{{ statusLabel }}</span>
+  </header>
+
+  <div class="body">
+    <p class="doctor">{{ doctorLabel }}</p>
+    <p class="datetime">{{ appointment.date }} — {{ appointment.time }}</p>
+    <p class="type">{{ appointmentTypeLabel }}</p>
+    @if (appointment.notes) {
+      <p class="notes">{{ appointment.notes }}</p>
+    }
   </div>
-  <span class="text-xs font-semibold px-3 py-1 rounded-full bg-mint text-green-900">{{ appointment.status }}</span>
-</div>
+
+  @if (canCancel && appointment.status !== 'Cancelled' && appointment.status !== 'Completed') {
+    <footer>
+      <button type="button" class="btn-cancel" (click)="onCancel()">إلغاء الموعد</button>
+    </footer>
+  }
+</article>
+
+<style>
+  .appointment-card {
+    border: 1px solid #e2e7e4;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: #fff;
+  }
+
+  .appointment-card[data-status='Cancelled'] {
+    opacity: 0.6;
+  }
+
+  .appointment-card header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .appointment-card .queue {
+    font-size: 0.8rem;
+    color: #7a8b83;
+  }
+
+  .appointment-card .status-badge {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: #eef2f0;
+    color: #1f6f5c;
+  }
+
+  .appointment-card .doctor {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .appointment-card .datetime,
+  .appointment-card .type,
+  .appointment-card .notes {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #4b564f;
+  }
+
+  .appointment-card footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .appointment-card .btn-cancel {
+    background: transparent;
+    border: 1px solid #b3261e;
+    color: #b3261e;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+</style>

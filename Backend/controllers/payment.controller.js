@@ -5,7 +5,10 @@ require("../models/appointment.model");
 
 const createPayment = async (req, res) => {
   try {
-    const newPayment = await Payment.create(req.body);
+    const newPayment = await Payment.create({
+      ...req.body,
+      patient: req.user.userId,
+    });
 
     res.status(201).json({
       success: true,
@@ -21,9 +24,19 @@ const createPayment = async (req, res) => {
 
 const getAllPayments = async (req, res) => {
   try {
-    const payments = await Payment.find()
-      .populate("patient", "name email")
-      .populate("appointment");
+    let payments;
+
+    if (req.user.role === "admin") {
+      payments = await Payment.find()
+        .populate("patient", "name email")
+        .populate("appointment");
+    } else {
+      payments = await Payment.find({
+        patient: req.user.userId,
+      })
+        .populate("patient", "name email")
+        .populate("appointment");
+    }
 
     res.status(200).json({
       success: true,

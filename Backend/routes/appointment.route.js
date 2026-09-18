@@ -1,32 +1,44 @@
 const express = require("express");
-
-const router = express.Router();
-
 const { authenticate } = require("../middlewares/isLogged");
-
-const { authorize } = require("../middlewares/authorize");
-
-const { checkAppointmentAccess } = require("../middlewares/appointmentAccess");
-
 const {
   createAppointment,
   getAllAppointments,
   getAppointmentById,
   updateAppointment,
   deleteAppointment,
+  getAvailableSlots,
+  getAppointmentsCount,
 } = require("../controllers/appointment.controller");
 
-// All appointment routes require a logged-in user
-router.use(authenticate);
+const router = express.Router();
 
-// Create and get all appointments
-router.route("/").get(getAllAppointments).post(createAppointment);
+// Available Slots
+// GET /api/appointments/available-slots
+// Public - no authentication
+router.get("/available-slots", getAvailableSlots);
 
-// Get, update and delete appointment by ID
-router
-  .route("/:id")
-  .get(checkAppointmentAccess, getAppointmentById)
-  .put(checkAppointmentAccess, updateAppointment)
-  .delete(authorize("doctor", "admin"), deleteAppointment);
+// Get All Appointments
+// GET /api/appointments/
+router.get("/", authenticate, getAllAppointments);
+
+// Get Appointments Count
+// GET /api/appointments/count
+router.get("/count", getAppointmentsCount);
+
+// Create Appointment
+// POST /api/appointments/
+router.post("/", authenticate, createAppointment);
+
+// Get Appointment By ID
+// GET /api/appointments/:id
+router.get("/:id", getAppointmentById);
+
+// Update Appointment
+// PUT /api/appointments/:id
+router.put("/:id", updateAppointment);
+
+// Delete Appointment
+// DELETE /api/appointments/:id
+router.delete("/:id", deleteAppointment);
 
 module.exports = router;

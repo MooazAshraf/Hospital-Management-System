@@ -1,0 +1,111 @@
+<section class="wrap py-16">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading()" class="text-center py-10 text-gray-500">
+    Loading doctor profile...
+  </div>
+
+  <!-- Error -->
+  <div
+    *ngIf="!isLoading() && errorMessage()"
+    class="text-center py-10 text-red-600"
+  >
+    {{ errorMessage() }}
+  </div>
+
+  <!-- Profile -->
+  <div
+    *ngIf="!isLoading() && doctor() as d"
+    class="grid grid-cols-1 md:grid-cols-3 gap-10"
+  >
+
+    <!-- Photo + booking -->
+    <div>
+      <div class="h-64 rounded-2xl overflow-hidden bg-gray-100 mb-5">
+        <img
+          *ngIf="d.image"
+          [src]="d.image"
+          [alt]="d.name"
+          class="w-full h-full object-cover"
+        />
+        <div
+          *ngIf="!d.image"
+          class="w-full h-full flex items-center justify-center text-6xl"
+        >
+          👨‍⚕️
+        </div>
+      </div>
+
+      <span
+        class="inline-block text-xs px-3 py-1 rounded-full mb-5"
+        [class.bg-green-100]="d.isAvailable"
+        [class.text-green-700]="d.isAvailable"
+        [class.bg-red-100]="!d.isAvailable"
+        [class.text-red-700]="!d.isAvailable"
+      >
+        {{ d.isAvailable ? 'Available' : 'Unavailable' }}
+      </span>
+
+      <a
+        [routerLink]="['/book-appointment']"
+        [queryParams]="{ doctorId: d._id }"
+        class="block text-center w-full py-3 rounded-lg bg-green-900
+               text-white font-semibold hover:bg-green-800 transition"
+      >
+        Book Now
+      </a>
+    </div>
+
+    <!-- Details -->
+    <div class="md:col-span-2">
+      <h1 class="text-3xl font-bold text-green-900">Dr. {{ d.name }}</h1>
+      <p class="text-green-700 mt-1">{{ d.specialty }}</p>
+
+      <p class="text-gray-600 mt-6" *ngIf="d.description">
+        {{ d.description }}
+      </p>
+
+      <div class="grid grid-cols-2 gap-6 mt-8">
+        <div>
+          <p class="text-sm text-gray-400">Department</p>
+          <p class="font-semibold text-gray-800">{{ departmentName }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-400">Experience</p>
+          <p class="font-semibold text-gray-800">
+            {{ d.experienceYears }} years
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-400">Fees</p>
+          <p class="font-semibold text-gray-800">{{ d.fees }} EGP</p>
+        </div>
+        <div *ngIf="d.roomNumber">
+          <p class="text-sm text-gray-400">Room</p>
+          <p class="font-semibold text-gray-800">{{ d.roomNumber }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="d.qualifications?.length" class="mt-8">
+        <p class="text-sm text-gray-400 mb-2">Qualifications</p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1">
+          <li *ngFor="let q of d.qualifications">{{ q }}</li>
+        </ul>
+      </div>
+
+      <div *ngIf="d.availability?.length" class="mt-8">
+        <p class="text-sm text-gray-400 mb-2">Weekly availability</p>
+        <div class="flex flex-wrap gap-2">
+          <span
+            *ngFor="let slot of d.availability"
+            class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700"
+          >
+            {{ slot.day }}: {{ slot.startTime }} - {{ slot.endTime }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>

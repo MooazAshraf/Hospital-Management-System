@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const { authenticate } = require("../middlewares/isLogged");
+const { authorize } = require("../middlewares/authorize");
 
 const {
   createAuditLog,
@@ -12,7 +13,7 @@ const {
 
 router
   .route("/")
-  .get(authenticate, getAllAuditLogs)
+  .get(authenticate, authorize("admin"), getAllAuditLogs)
   .post(authenticate, createAuditLog);
 
 router

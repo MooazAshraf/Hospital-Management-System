@@ -2,6 +2,7 @@ const express = require("express");
 
 const { authenticate } = require("../middlewares/isLogged");
 const { authorize } = require("../middlewares/authorize");
+
 const {
   createDoctorValidationRules,
   validate,
@@ -10,20 +11,28 @@ const {
 const {
   getDoctors,
   getDoctorById,
+  getMyDoctorProfile,
   addDoctor,
   updateDoctor,
   deleteDoctor,
+  getDoctorsCount,
 } = require("../controllers/doctors.controller");
 
 const doctorRouter = express.Router();
 
-// Get all doctors - any authenticated user
-doctorRouter.get("/", authenticate, getDoctors);
+// Get logged-in doctor's own profile
+doctorRouter.get("/me", authenticate, authorize("doctor"), getMyDoctorProfile);
 
-// Get a single doctor - any authenticated user
-doctorRouter.get("/:id", authenticate, getDoctorById);
+// Get all doctors
+doctorRouter.get("/", getDoctors);
 
-// Create a doctor profile - doctor accounts or admin only
+// IMPORTANT: count must come before /:id
+doctorRouter.get("/count", getDoctorsCount);
+
+// Get doctor by ID
+doctorRouter.get("/:id", getDoctorById);
+
+// Create doctor profile
 doctorRouter.post(
   "/",
   authenticate,
@@ -33,10 +42,10 @@ doctorRouter.post(
   addDoctor,
 );
 
-// Update a doctor - owner or admin
+// Update doctor
 doctorRouter.put("/:id", authenticate, updateDoctor);
 
-// Delete a doctor - admin only
+// Delete doctor
 doctorRouter.delete("/:id", authenticate, authorize("admin"), deleteDoctor);
 
 module.exports = {

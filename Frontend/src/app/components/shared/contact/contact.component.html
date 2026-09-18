@@ -1,14 +1,370 @@
-<section class="py-20" id="contact">
-  <div class="wrap grid md:grid-cols-2 gap-14">
-    <div>
-      <h2 class="text-2xl md:text-3xl mb-6">Visit or reach us</h2>
-      <div class="flex flex-col gap-5">
-        <div><h4 class="text-[15px] mb-0.5">Address</h4><p class="text-sm text-gray-600">14 Al Nasr Street, New Cairo, Cairo, Egypt</p></div>
-        <div><h4 class="text-[15px] mb-0.5">Phone</h4><p class="text-sm text-gray-600">+20 2 2456 7890 · Emergency: +20 800 123 456</p></div>
-        <div><h4 class="text-[15px] mb-0.5">Email</h4><p class="text-sm text-gray-600">info&#64;urcare.com</p></div>
-        <div><h4 class="text-[15px] mb-0.5">Hours</h4><p class="text-sm text-gray-600">Sat–Thu, 8:00 AM – 9:00 PM · Emergency open 24/7</p></div>
+<!-- Send Us a Message -->
+<div
+  class="bg-white rounded-2xl p-8 shadow-sm
+         transition-all duration-300
+         hover:shadow-xl hover:-translate-y-1"
+>
+  <h3 class="text-2xl font-bold text-green-950 mb-2">
+    Send us a message
+  </h3>
+
+  <p class="text-gray-500 text-sm mb-8">
+    Fill in the form below and we'll get back to you shortly.
+  </p>
+
+  <form class="space-y-5">
+
+    <!-- Name + Email -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- Name -->
+      <div class="group">
+        <label
+          class="block text-sm font-semibold text-gray-800 mb-2
+                 transition-colors duration-300
+                 group-focus-within:text-green-900"
+        >
+          Name
+        </label>
+
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Enter your name"
+            class="w-full px-4 py-3 rounded-xl
+                   border border-gray-200
+                   bg-gray-50
+                   text-gray-800
+                   outline-none
+                   transition-all duration-300
+                   hover:border-green-300
+                   hover:bg-white
+                   focus:border-green-900
+                   focus:bg-white
+                   focus:ring-4
+                   focus:ring-green-900/10
+                   focus:-translate-y-0.5
+                   placeholder:text-gray-400"
+          />
+
+          <div
+            class="absolute right-4 top-1/2 -translate-y-1/2
+                   text-gray-400
+                   transition-all duration-300
+                   group-focus-within:text-green-900
+                   group-focus-within:scale-110"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21a8 8 0 0 0-16 0"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Email -->
+      <div class="group">
+        <label
+          class="block text-sm font-semibold text-gray-800 mb-2
+                 transition-colors duration-300
+                 group-focus-within:text-green-900"
+        >
+          Email
+        </label>
+
+        <div class="relative">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            class="w-full px-4 py-3 rounded-xl
+                   border border-gray-200
+                   bg-gray-50
+                   text-gray-800
+                   outline-none
+                   transition-all duration-300
+                   hover:border-green-300
+                   hover:bg-white
+                   focus:border-green-900
+                   focus:bg-white
+                   focus:ring-4
+                   focus:ring-green-900/10
+                   focus:-translate-y-0.5
+                   placeholder:text-gray-400"
+          />
+
+          <div
+            class="absolute right-4 top-1/2 -translate-y-1/2
+                   text-gray-400
+                   transition-all duration-300
+                   group-focus-within:text-green-900
+                   group-focus-within:scale-110"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <path d="m3 7 9 6 9-6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- Mobile + Subject -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- Mobile -->
+      <div class="group">
+        <label
+          class="block text-sm font-semibold text-gray-800 mb-2
+                 transition-colors duration-300
+                 group-focus-within:text-green-900"
+        >
+          Mobile
+        </label>
+
+        <div class="relative">
+          <input
+            type="tel"
+            placeholder="01xxxxxxxxx"
+            class="w-full px-4 py-3 rounded-xl
+                   border border-gray-200
+                   bg-gray-50
+                   text-gray-800
+                   outline-none
+                   transition-all duration-300
+                   hover:border-green-300
+                   hover:bg-white
+                   focus:border-green-900
+                   focus:bg-white
+                   focus:ring-4
+                   focus:ring-green-900/10
+                   focus:-translate-y-0.5
+                   placeholder:text-gray-400"
+          />
+
+          <div
+            class="absolute right-4 top-1/2 -translate-y-1/2
+                   text-gray-400
+                   transition-all duration-300
+                   group-focus-within:text-green-900
+                   group-focus-within:scale-110"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2
+                19.79 19.79 0 0 1-8.63-3.07
+                19.5 19.5 0 0 1-6-6
+                19.79 19.79 0 0 1-3.07-8.67
+                A2 2 0 0 1 4.11 2h3
+                a2 2 0 0 1 2 1.72
+                12.84 12.84 0 0 0 .7 2.81
+                2 2 0 0 1-.45 2.11L8.09 9.91
+                a16 16 0 0 0 6 6l1.27-1.27
+                a2 2 0 0 1 2.11-.45
+                12.84 12.84 0 0 0 2.81.7
+                A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Subject -->
+      <div class="group">
+        <label
+          class="block text-sm font-semibold text-gray-800 mb-2
+                 transition-colors duration-300
+                 group-focus-within:text-green-900"
+        >
+          Subject
+        </label>
+
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Enter subject"
+            class="w-full px-4 py-3 rounded-xl
+                   border border-gray-200
+                   bg-gray-50
+                   text-gray-800
+                   outline-none
+                   transition-all duration-300
+                   hover:border-green-300
+                   hover:bg-white
+                   focus:border-green-900
+                   focus:bg-white
+                   focus:ring-4
+                   focus:ring-green-900/10
+                   focus:-translate-y-0.5
+                   placeholder:text-gray-400"
+          />
+
+          <div
+            class="absolute right-4 top-1/2 -translate-y-1/2
+                   text-gray-400
+                   transition-all duration-300
+                   group-focus-within:text-green-900
+                   group-focus-within:scale-110"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- Message -->
+    <div class="group">
+      <label
+        class="block text-sm font-semibold text-gray-800 mb-2
+               transition-colors duration-300
+               group-focus-within:text-green-900"
+      >
+        Message
+      </label>
+
+      <div class="relative">
+
+        <textarea
+          rows="6"
+          placeholder="Write your message..."
+          class="w-full px-4 py-3 rounded-xl
+                 border border-gray-200
+                 bg-gray-50
+                 text-gray-800
+                 outline-none
+                 resize-none
+                 transition-all duration-300
+                 hover:border-green-300
+                 hover:bg-white
+                 focus:border-green-900
+                 focus:bg-white
+                 focus:ring-4
+                 focus:ring-green-900/10
+                 focus:-translate-y-0.5
+                 placeholder:text-gray-400"
+        ></textarea>
+
+        <div
+          class="absolute right-4 top-4
+                 text-gray-400
+                 transition-all duration-300
+                 group-focus-within:text-green-900
+                 group-focus-within:scale-110"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="19"
+            height="19"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+          </svg>
+        </div>
+
       </div>
     </div>
-    <div class="bg-gray-100 border border-dashed border-gray-100 rounded-xl min-h-[280px] flex items-center justify-center text-sm text-gray-600">Map preview placeholder</div>
-  </div>
-</section>
+
+
+    <!-- Send Button -->
+    <button
+      type="button"
+      class="group relative overflow-hidden
+             mt-2
+             px-8 py-3.5
+             rounded-xl
+             bg-green-900
+             text-white
+             font-semibold
+             transition-all duration-300
+             hover:-translate-y-1
+             hover:shadow-xl
+             active:translate-y-0
+             active:scale-95"
+    >
+      <span
+        class="relative z-10 flex items-center gap-2"
+      >
+        Send message
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform duration-300
+                 group-hover:translate-x-1"
+        >
+          <path d="m22 2-7 20-4-9-9-4Z"/>
+          <path d="M22 2 11 13"/>
+        </svg>
+      </span>
+
+      <!-- Hover effect -->
+      <span
+        class="absolute inset-0
+               bg-green-800
+               translate-y-full
+               group-hover:translate-y-0
+               transition-transform duration-300"
+      ></span>
+    </button>
+
+  </form>
+</div>

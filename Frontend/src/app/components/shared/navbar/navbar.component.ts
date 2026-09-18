@@ -1,41 +1,65 @@
-  import { Component } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { Router, RouterLink } from '@angular/router';
-import { Iuser } from '../../../models/users.model';
+import { Component, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
+@Component({
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive],
+  templateUrl: './navbar.component.html',
+})
+export class NavbarComponent {
+  isDropdownOpen = false;
 
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+  ) {}
 
-  @Component({
-    selector: 'app-navbar',
-    standalone: true,
-    imports: [CommonModule, RouterLink],
-    templateUrl: './navbar.component.html',
-  })
-  export class NavbarComponent {
-    mobileOpen = false;
-    user: Iuser | null = null;
-    dropdownOpen = false;
+  get currentUser$() {
+    return this.authService.currentUser$;
+  }
 
-    constructor(
-      private authService: AuthService,
-      private router: Router,
-    ) {
-      this.user = this.authService.getUser();
-    }
+  getInitials(name: string): string {
+    return (
+      name
+        ?.trim()
+        .split(' ')
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase() ?? ''
+    );
+  }
 
-    toggleDropdown() {
-      this.dropdownOpen = !this.dropdownOpen;
-    }
+  toggleDropdown(event: MouseEvent) {
+    event.stopPropagation();
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
 
-    goToProfile() {
-      this.dropdownOpen = false;
-      this.router.navigate(['/profile']);
-    }
+  @HostListener('document:click')
+  closeDropdown() {
+    this.isDropdownOpen = false;
+  }
 
-    logout() {
-      this.authService.logout();
-      this.dropdownOpen = false;
-      this.router.navigate(['/login']);
+  onLogout() {
+    this.authService.logout();
+    this.isDropdownOpen = false;
+    this.router.navigate(['/login']);
+  }
+
+  goToDashboard() {
+    const role = this.authService.getUser()?.role;
+    switch (role) {
+      case 'admin':
+        this.router.navigate(['/admin-dashboard']);
+        break;
+      case 'doctor':
+        this.router.navigate(['/doctor-dashboard']);
+        break;
+      default:
+        this.router.navigate(['/patient-dashboard']);
     }
   }
+}

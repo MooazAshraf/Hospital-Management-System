@@ -1,11 +1,12 @@
 const express = require("express");
 
-const { authenticate } = require("../middlewares/isLogged");
+const {
+  authenticate,
+} = require("../middlewares/isLogged");
 
 const {
   getMyNotifications,
   getNotificationById,
-  createNotification,
   markAsRead,
   markAllAsRead,
   deleteNotification,
@@ -13,26 +14,45 @@ const {
 
 const notificationRouter = express.Router();
 
-// All notification routes require a logged-in user
+
+// Authentication
 notificationRouter.use(authenticate);
 
-// Get my notifications (?unread=true to filter)
-notificationRouter.get("/", getMyNotifications);
 
-// Mark all my notifications as read
-notificationRouter.patch("/read-all", markAllAsRead);
+// Get notifications
+notificationRouter.get(
+  "/",
+  getMyNotifications,
+);
 
-// Get a single notification (owner only)
-notificationRouter.get("/:id", getNotificationById);
 
-// Create a notification for another user (e.g. doctor -> patient)
-notificationRouter.post("/", createNotification);
+// Mark all read
+notificationRouter.patch(
+  "/read-all",
+  markAllAsRead,
+);
 
-// Mark one notification as read (owner only)
-notificationRouter.patch("/:id/read", markAsRead);
 
-// Delete a notification (owner only)
-notificationRouter.delete("/:id", deleteNotification);
+// Get one
+notificationRouter.get(
+  "/:id",
+  getNotificationById,
+);
+
+
+// Mark one read
+notificationRouter.patch(
+  "/:id/read",
+  markAsRead,
+);
+
+
+// Delete
+notificationRouter.delete(
+  "/:id",
+  deleteNotification,
+);
+
 
 module.exports = {
   notificationRouter,

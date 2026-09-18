@@ -1,118 +1,136 @@
-<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
-  <div class="wrap flex items-center justify-between h-[76px]">
-    <!-- Logo -->
+<nav
+  class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-4 bg-white shadow-sm"
+>
+  <!-- Logo -->
+  <a routerLink="/" class="flex items-center gap-2 text-green-900 font-bold text-xl">
+    <span class="w-7 h-7 rounded-md bg-green-900 text-white flex items-center justify-center">
+      +
+    </span>
+
+    urCare
+  </a>
+
+  <!-- Links -->
+  <div class="flex items-center gap-8">
+    <!-- Home -->
     <a
       routerLink="/"
-      class="flex items-center gap-2 font-heading font-extrabold text-xl text-green-900"
+      routerLinkActive="text-green-900 font-semibold"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
     >
-      <span
-        class="w-7 h-7 rounded-md bg-green-900 flex items-center justify-center text-mint font-bold"
-      >
-        +
-      </span>
-
-      urCare
+      Home
     </a>
 
-    <!-- Navigation -->
-    <nav class="hidden md:flex items-center gap-9 text-[15px] font-medium">
-      <a routerLink="/departments" class="hover:text-green-900"> Departments </a>
+    <!-- Departments -->
+    <a
+      (click)="goToDashboard()"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1 cursor-pointer"
+    >
+      Dashboard
+    </a>
 
-      <a routerLink="/doctors" class="hover:text-green-900"> Doctors </a>
+    <!-- Doctors -->
+    <a
+      routerLink="/doctors"
+      routerLinkActive="text-green-900 font-semibold"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
+    >
+      Doctors
+    </a>
 
-      <a routerLink="/about" class="hover:text-green-900"> About </a>
+    <!-- About -->
+    <a
+      routerLink="/about"
+      routerLinkActive="text-green-900 font-semibold"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
+    >
+      About
+    </a>
 
-      <a routerLink="/contact" class="hover:text-green-900"> Contact </a>
-    </nav>
+    <!-- Contact -->
+    <a
+      routerLink="/contact"
+      routerLinkActive="text-green-900 font-semibold"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
+    >
+      Contact
+    </a>
+  </div>
 
-    <!-- Right Side -->
-    <div class="hidden md:flex items-center gap-3">
-      <!-- Not Logged In -->
-      <ng-container *ngIf="!user">
-        <a routerLink="/login" class="btn btn-ghost"> Log in </a>
-      </ng-container>
+  <!-- Right -->
+  <div class="flex items-center gap-5">
+    <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
+      <!-- Book Appointment -->
+      <a
+        routerLink="/book-appointment"
+        class="px-5 py-3 rounded-lg bg-green-900 text-white font-semibold transition-all duration-200 hover:bg-green-950 hover:-translate-y-1"
+      >
+        Book appointment
+      </a>
 
-      <!-- Logged In -->
-      <div *ngIf="user" class="relative">
-        <!-- User Button -->
-        <button
-          type="button"
-          (click)="toggleDropdown()"
-          class="flex items-center gap-2 hover:text-green-900 transition"
-        >
-          <!-- Person Icon -->
+      <!-- User Dropdown -->
+      <div class="relative">
+        <button (click)="toggleDropdown($event)" class="flex items-center gap-2 focus:outline-none">
           <span
-            class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"
+            class="w-9 h-9 rounded-full bg-green-900 text-white flex items-center justify-center text-sm font-semibold"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
+            {{ getInitials(user.name) }}
+          </span>
+          <span class="text-gray-700 font-medium">{{ user.name }}</span>
+          <svg
+            class="w-4 h-4 text-gray-500 transition-transform"
+            [class.rotate-180]="isDropdownOpen"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
               stroke-linecap="round"
               stroke-linejoin="round"
-            >
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-            </svg>
-          </span>
-
-          <!-- User Name -->
-          <span class="text-sm font-medium">
-            {{ user.name }}
-          </span>
-
-          <!-- Arrow -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            [class.rotate-180]="dropdownOpen"
-            class="transition-transform"
-          >
-            <path d="m6 9 6 6 6-6" />
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
 
-        <!-- Dropdown -->
         <div
-          *ngIf="dropdownOpen"
-          class="absolute right-0 top-12 w-44 bg-white border border-gray-100 rounded-xl shadow-lg py-2"
+          *ngIf="isDropdownOpen"
+          (click)="$event.stopPropagation()"
+          class="absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50"
         >
-          <!-- Profile -->
-          <button
-            type="button"
-            (click)="goToProfile()"
-            class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition"
+          <a
+            routerLink="/profile"
+            class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-900"
           >
             Profile
-          </button>
-
-          <!-- Logout -->
+          </a>
           <button
-            type="button"
-            (click)="logout()"
-            class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition"
+            (click)="goToDashboard()"
+            class="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-900"
           >
-            Logout
+            Dashboard
+          </button>
+          <button
+            (click)="onLogout()"
+            class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+          >
+            Log out
           </button>
         </div>
       </div>
+    </ng-container>
 
-      <!-- Book Appointment -->
-      <a routerLink="/book-appointment" class="btn btn-primary"> Book appointment </a>
-    </div>
-
-    <!-- Mobile Menu Button -->
-    <button class="md:hidden" aria-label="Open menu" (click)="mobileOpen = !mobileOpen">☰</button>
+    <ng-template #guestLinks>
+      <a routerLink="/login" class="text-gray-700 font-medium hover:text-green-900 transition">
+        Log in
+      </a>
+      <a
+        routerLink="/book-appointment"
+        class="px-5 py-3 rounded-lg bg-green-900 text-white font-semibold transition-all duration-200 hover:bg-green-950 hover:-translate-y-1"
+      >
+        Book appointment
+      </a>
+    </ng-template>
   </div>
-</header>
+</nav>

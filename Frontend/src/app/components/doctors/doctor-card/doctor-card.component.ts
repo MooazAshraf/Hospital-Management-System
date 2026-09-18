@@ -1,13 +1,55 @@
-import { Component, Input } from '@angular/core';
+import {
+  Component,
+  Input,
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
-import { Doctor } from '../../models';
+
+import { Doctor } from '../../../models/doctor.model';
+
 
 @Component({
   selector: 'app-doctor-card',
   standalone: true,
-  imports: [RouterLink],
-  templateUrl: './doctor-card.component.html'
+
+  imports: [
+    CommonModule,
+    RouterLink,
+  ],
+
+  templateUrl:
+    './doctor-card.component.html',
 })
 export class DoctorCardComponent {
-  @Input({ required: true }) doctor!: Doctor;
+
+  @Input()
+  doctor!: Doctor;
+
+
+  get departmentName(): string {
+
+    const department =
+      this.doctor?.department;
+
+
+    if (
+      department &&
+      typeof department === 'object'
+    ) {
+      return department.name || 'N/A';
+    }
+
+
+    if (
+      typeof department === 'string'
+    ) {
+      return department;
+    }
+
+
+    return 'N/A';
+  }
+
 }

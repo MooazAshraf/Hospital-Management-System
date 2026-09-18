@@ -199,8 +199,9 @@ const getMyPatientProfile = async (req, res) => {
       .populate("primaryDoctor", "name email");
 
     if (!patient) {
-      return res.status(404).json({
-        message: "Patient profile not found",
+      return res.status(200).json({
+        exists: false,
+        patient: null,
       });
     }
 
@@ -208,6 +209,90 @@ const getMyPatientProfile = async (req, res) => {
       message: "Patient profile fetched successfully",
       patient,
     });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Validation failed",
+        error: error.message,
+      });
+    }
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+const saveMyPatientProfile = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      phone,
+      gender,
+      dateOfBirth,
+      address,
+      bloodGroup,
+      allergies,
+      chronicDiseases,
+      emergencyContact,
+    } = req.body;
+
+    // لو الإيميل ده مستخدم فعلاً من يوزر تاني (مش نفس صاحب البروفايل)
+    if (email) {
+      const existingEmail = await patientModel.findOne({
+        email,
+        user: { $ne: req.user.userId },
+      });
+      if (existingEmail) {
+        return res.status(409).json({ message: "Email already exists" });
+      }
+    }
+
+    const updateData = {
+      name,
+      email,
+      phone,
+      gender,
+      dateOfBirth,
+      address,
+      bloodGroup,
+      allergies,
+      chronicDiseases,
+      emergencyContact,
+      user: req.user.userId,
+    };
+
+    const patient = await patientModel.findOneAndUpdate(
+      { user: req.user.userId },
+      updateData,
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+        setDefaultsOnInsert: true,
+      },
+    );
+
+    res.status(200).json({
+      message: "Patient profile saved successfully",
+      patient,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+const getPatientsCount = async (req, res) => {
+  try {
+    const count = await patientModel.countDocuments();
+    res.status(200).json({ count });
   } catch (error) {
     res.status(500).json({
       message: "Server error",
@@ -223,4 +308,6 @@ module.exports = {
   updatePatient,
   deletePatient,
   getMyPatientProfile,
+  saveMyPatientProfile,
+  getPatientsCount
 };

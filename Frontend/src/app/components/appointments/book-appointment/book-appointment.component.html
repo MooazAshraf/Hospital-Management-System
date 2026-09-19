@@ -93,7 +93,7 @@
 
           <img
             *ngIf="doctor.image"
-            [src]="doctor.image"
+            [src]="doctor.image | imagePath"
             [alt]="doctor.name"
           />
 

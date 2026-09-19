@@ -6,6 +6,7 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { RouterLink } from '@angular/router';
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
 
 import { Doctor } from '../../../models/doctor.model';
 
@@ -17,6 +18,7 @@ import { Doctor } from '../../../models/doctor.model';
   imports: [
     CommonModule,
     RouterLink,
+    ImagePathPipe,
   ],
 
   templateUrl:

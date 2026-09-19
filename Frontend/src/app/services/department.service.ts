@@ -1,33 +1,55 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
 
-export interface DepartmentApi {
-  _id?: string;
-  name: string;
-  description: string;
-  image: string;
-  isActive?: boolean;
+import { Department } from '../models';
+
+interface DepartmentsResponse {
+  success?: boolean;
+  count?: number;
+  data: Department[];
 }
 
-interface DepartmentResponse { success?: boolean; data: DepartmentApi[]; }
-interface MutationResponse { success?: boolean; message: string; data: DepartmentApi; }
+interface DepartmentResponse {
+  success?: boolean;
+  message?: string;
+  data: Department;
+}
 
 @Injectable({ providedIn: 'root' })
-export class DepartmentService {
+export class DepartmentsService {
   private readonly http = inject(HttpClient);
+
   private readonly baseUrl = 'http://localhost:5000/api/departments';
 
-  getAll(): Observable<DepartmentApi[]> {
-    return this.http.get<DepartmentResponse>(this.baseUrl).pipe(map((r) => r.data || []));
+  getAll(): Observable<DepartmentsResponse> {
+    return this.http.get<DepartmentsResponse>(this.baseUrl);
   }
 
-  create(data: Omit<DepartmentApi, '_id'>): Observable<MutationResponse> {
-    return this.http.post<MutationResponse>(this.baseUrl, data);
+  // NOTE: the backend only exposes GET / (no GET /:id), so a single
+  // department is found by filtering the full list client-side.
+  // If a GET /api/departments/:id route gets added later, swap this for
+  // a direct this.http.get call — that'll be faster once there are a lot
+  // of departments.
+  getById(id: string): Observable<Department | undefined> {
+    return this.getAll().pipe(
+      map((res) => (res.data || []).find((d) => d._id === id)),
+    );
   }
 
-  update(id: string, data: Partial<DepartmentApi>): Observable<MutationResponse> {
-    return this.http.put<MutationResponse>(`${this.baseUrl}/${id}`, data);
+  create(data: {
+    name: string;
+    description: string;
+    image: string;
+  }): Observable<DepartmentResponse> {
+    return this.http.post<DepartmentResponse>(this.baseUrl, data);
+  }
+
+  update(
+    id: string,
+    data: Partial<{ name: string; description: string; image: string; isActive: boolean }>,
+  ): Observable<DepartmentResponse> {
+    return this.http.put<DepartmentResponse>(`${this.baseUrl}/${id}`, data);
   }
 
   delete(id: string): Observable<{ success?: boolean; message: string }> {

@@ -18,6 +18,7 @@ import {
 import {
   CommonModule,
 } from '@angular/common';
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
 
 import {
   HttpClient,
@@ -34,6 +35,7 @@ interface Slot {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+      ImagePathPipe,
   ],
   templateUrl:
     './booking-steps.component.html',

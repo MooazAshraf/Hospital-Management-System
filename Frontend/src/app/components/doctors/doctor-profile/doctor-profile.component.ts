@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
 
 import { DoctorService } from '../../../services/doctor.service';
 import { Doctor } from '../../../models/doctor.model';
@@ -8,7 +9,7 @@ import { Doctor } from '../../../models/doctor.model';
 @Component({
   selector: 'app-doctor-profile',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ImagePathPipe],
   templateUrl: './doctor-profile.component.html',
 })
 export class DoctorProfileComponent implements OnInit {

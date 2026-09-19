@@ -1,6 +1,28 @@
-<div class="border border-gray-100 rounded-xl p-7 hover:shadow-lg hover:border-mint-deep transition">
-  <h3 class="text-lg mb-2">{{ department.name }}</h3>
-  <p class="text-sm text-gray-600 mb-3">{{ department.description }}</p>
-  <div class="text-[13px] text-gray-600 mb-4">{{ department.doctorsCount }} doctors available</div>
-  <a [routerLink]="['/departments', department.name]" class="text-sm font-semibold text-green-900">View department →</a>
+<div
+  class="border border-gray-100 rounded-xl overflow-hidden hover:shadow-lg hover:border-mint-deep transition"
+>
+  <img
+    *ngIf="department.image"
+    [src]="department.image | imagePath"
+    [alt]="department.name"
+    class="w-full h-36 object-cover"
+  />
+
+  <div class="p-7">
+    <h3 class="text-lg mb-2">
+      {{ department.name }}
+    </h3>
+
+    <p class="text-sm text-gray-600 mb-3">
+      {{ department.description }}
+    </p>
+
+    <div *ngIf="department.doctorsCount as count" class="text-[13px] text-gray-600 mb-4">
+      {{ count }} doctors available
+    </div>
+
+    <a [routerLink]="['/departments', department._id]" class="text-sm font-semibold text-green-900">
+      View department →
+    </a>
+  </div>
 </div>

@@ -16,7 +16,7 @@ export class ReviewsService {
 
   private apiUrl = 'http://localhost:5000/api/reviews';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getReviews(): Observable<ReviewsResponse> {
     return this.http.get<ReviewsResponse>(this.apiUrl);

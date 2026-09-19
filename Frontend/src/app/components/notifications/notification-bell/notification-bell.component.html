@@ -1,9 +1,9 @@
-
 <section
   #notificationContainer
+  dir="rtl"
   class="relative inline-block"
 >
-  <!-- ==================== Notification Button ==================== -->
+  <!-- ==================== زر الإشعارات ==================== -->
   <button
     type="button"
     (click)="toggleDropdown($event)"
@@ -11,10 +11,9 @@
            bg-white flex items-center justify-center
            hover:bg-gray-50 hover:shadow-sm
            transition-all duration-200"
-    aria-label="Notifications"
+    aria-label="الإشعارات"
   >
-
-    <!-- Bell -->
+    <!-- الجرس -->
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="w-5 h-5 text-green-900"
@@ -30,7 +29,7 @@
       />
     </svg>
 
-    <!-- Unread Badge -->
+    <!-- عدد الإشعارات غير المقروءة -->
     <span
       *ngIf="unreadCount > 0"
       class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
@@ -40,50 +39,45 @@
     >
       {{ unreadCount > 99 ? '99+' : unreadCount }}
     </span>
-
   </button>
 
-
-  <!-- ==================== Dropdown ==================== -->
+  <!-- ==================== القائمة المنسدلة ==================== -->
   <div
     *ngIf="isOpen"
     (click)="$event.stopPropagation()"
-    class="absolute right-0 mt-3 w-96 max-w-[90vw]
+    class="absolute left-0 mt-3 w-96 max-w-[90vw]
            bg-white border border-gray-100
            rounded-2xl shadow-xl
            z-50 overflow-hidden"
   >
-
-    <!-- ==================== Header ==================== -->
+    <!-- ==================== العنوان ==================== -->
     <div
       class="flex items-center justify-between
              px-4 py-3 border-b border-gray-100"
     >
-
       <div>
         <h3 class="text-sm font-bold text-green-900">
-          Notifications
+          الإشعارات
         </h3>
 
         <p
           *ngIf="unreadCount > 0"
           class="text-xs text-gray-500 mt-0.5"
         >
-          {{ unreadCount }} unread notification{{ unreadCount > 1 ? 's' : '' }}
+          {{ unreadCount }}
+          إشعار غير مقروء
         </p>
 
         <p
           *ngIf="unreadCount === 0"
           class="text-xs text-gray-500 mt-0.5"
         >
-          You're all caught up
+          لا توجد إشعارات جديدة
         </p>
       </div>
 
-
       <div class="flex items-center gap-2">
-
-        <!-- Refresh -->
+        <!-- تحديث -->
         <button
           type="button"
           (click)="refreshNotifications($event)"
@@ -95,12 +89,12 @@
                  hover:bg-gray-50
                  transition
                  disabled:opacity-40"
-          title="Refresh notifications"
+          title="تحديث الإشعارات"
         >
           ↻
         </button>
 
-        <!-- Mark All -->
+        <!-- تحديد الكل كمقروء -->
         <button
           *ngIf="unreadCount > 0"
           type="button"
@@ -111,20 +105,20 @@
                  hover:text-green-900
                  disabled:opacity-50"
         >
-          {{ isMarkingAll ? 'Marking...' : 'Mark all as read' }}
+          {{
+            isMarkingAll
+              ? 'جاري التحديث...'
+              : 'تحديد الكل كمقروء'
+          }}
         </button>
-
       </div>
-
     </div>
 
-
-    <!-- ==================== Loading ==================== -->
+    <!-- ==================== التحميل ==================== -->
     <div
       *ngIf="isLoading"
       class="px-4 py-10 text-center"
     >
-
       <div
         class="inline-block w-6 h-6
                border-2 border-gray-200
@@ -133,18 +127,15 @@
       ></div>
 
       <p class="text-sm text-gray-500 mt-3">
-        Loading notifications...
+        جاري تحميل الإشعارات...
       </p>
-
     </div>
 
-
-    <!-- ==================== Error ==================== -->
+    <!-- ==================== الخطأ ==================== -->
     <div
       *ngIf="!isLoading && errorMessage"
       class="px-4 py-8 text-center"
     >
-
       <div class="text-2xl mb-2">
         ⚠️
       </div>
@@ -161,13 +152,11 @@
                font-semibold
                hover:text-green-900"
       >
-        Try again
+        حاول مرة أخرى
       </button>
-
     </div>
 
-
-    <!-- ==================== Empty ==================== -->
+    <!-- ==================== لا توجد إشعارات ==================== -->
     <div
       *ngIf="
         !isLoading &&
@@ -176,23 +165,20 @@
       "
       class="px-4 py-10 text-center"
     >
-
       <div class="text-3xl mb-2">
         🔔
       </div>
 
       <p class="text-sm font-semibold text-gray-700">
-        No notifications yet
+        لا توجد إشعارات حتى الآن
       </p>
 
       <p class="text-xs text-gray-400 mt-1">
-        We'll notify you when something happens.
+        سنرسل لك إشعارًا عند حدوث أي جديد.
       </p>
-
     </div>
 
-
-    <!-- ==================== Notifications ==================== -->
+    <!-- ==================== الإشعارات ==================== -->
     <div
       *ngIf="
         !isLoading &&
@@ -201,7 +187,6 @@
       "
       class="max-h-[420px] overflow-y-auto"
     >
-
       <div
         *ngFor="let n of notifications; trackBy: trackByNotificationId"
         class="group relative
@@ -210,20 +195,17 @@
                transition-colors duration-150"
         [class.bg-green-50]="!n.isRead"
       >
-
-        <!-- Notification Button -->
+        <!-- زر الإشعار -->
         <button
           type="button"
           (click)="onNotificationClick(n)"
-          class="w-full text-left
+          class="w-full text-right
                  px-4 py-3
                  hover:bg-gray-50
                  transition-colors duration-150"
         >
-
           <div class="flex gap-3">
-
-            <!-- Notification Icon -->
+            <!-- أيقونة الإشعار -->
             <div
               class="w-10 h-10 rounded-full
                      bg-white
@@ -234,17 +216,14 @@
               {{ getNotificationIcon(n.type) }}
             </div>
 
-
-            <!-- Notification Content -->
-            <div class="flex-1 min-w-0 pr-6">
-
-              <!-- Title + Unread -->
+            <!-- محتوى الإشعار -->
+            <div class="flex-1 min-w-0 pl-6">
+              <!-- العنوان + غير مقروء -->
               <div
                 class="flex items-start
                        justify-between
                        gap-2"
               >
-
                 <span
                   class="text-sm text-green-900"
                   [class.font-bold]="!n.isRead"
@@ -253,7 +232,7 @@
                   {{ n.title }}
                 </span>
 
-                <!-- Unread Dot -->
+                <!-- نقطة عدم القراءة -->
                 <span
                   *ngIf="!n.isRead"
                   class="w-2 h-2
@@ -262,11 +241,9 @@
                          shrink-0
                          mt-1.5"
                 ></span>
-
               </div>
 
-
-              <!-- Message -->
+              <!-- الرسالة -->
               <p
                 class="text-xs text-gray-600
                        mt-1
@@ -275,44 +252,36 @@
                 {{ n.message }}
               </p>
 
-
-              <!-- Type -->
+              <!-- النوع والتاريخ -->
               <div class="mt-2 flex items-center gap-2">
-
                 <span
                   class="text-[10px]
                          px-2 py-0.5
                          rounded-full
                          bg-gray-100
-                         text-gray-500
-                         capitalize"
+                         text-gray-500"
                 >
                   {{ n.type }}
                 </span>
 
-                <!-- Date -->
+                <!-- التاريخ -->
                 <span
                   class="text-[10px]
                          text-gray-400"
                 >
                   {{ formatDate(n.createdAt) }}
                 </span>
-
               </div>
-
             </div>
-
           </div>
-
         </button>
 
-
-        <!-- Delete Button -->
+        <!-- حذف الإشعار -->
         <button
           type="button"
           (click)="deleteNotification(n, $event)"
           class="absolute
-                 right-3 bottom-3
+                 left-3 bottom-3
                  w-7 h-7
                  rounded-md
                  flex items-center justify-center
@@ -322,16 +291,11 @@
                  hover:text-red-600
                  hover:bg-red-50
                  transition-all duration-150"
-          title="Delete notification"
+          title="حذف الإشعار"
         >
           ×
         </button>
-
       </div>
-
     </div>
-
   </div>
-
 </section>
-

@@ -1,15 +1,20 @@
-
-<main class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+<main
+  dir="rtl"
+  class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8"
+>
   <div class="max-w-7xl mx-auto space-y-10">
+
     <!-- Header Section -->
     <div
       class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/80 pb-6"
     >
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-[#1B3B2B]">Admin Dashboard</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-[#1B3B2B]">
+          لوحة تحكم المسؤول
+        </h1>
 
         <p class="text-sm text-gray-500 mt-1">
-          Manage system operations, users, departments, and medical records.
+          إدارة عمليات النظام والمستخدمين والأقسام والسجلات الطبية.
         </p>
       </div>
 
@@ -18,7 +23,12 @@
           routerLink="/admin/patients"
           class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B3B2B] text-white font-semibold text-sm rounded-xl hover:bg-emerald-900 shadow-sm transition-all"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -27,14 +37,16 @@
             />
           </svg>
 
-          View Patient List
+          عرض قائمة المرضى
         </a>
       </div>
     </div>
 
     <!-- Overview Stats -->
     <div>
-      <h2 class="text-lg font-bold text-gray-800 mb-4">Overview</h2>
+      <h2 class="text-lg font-bold text-gray-800 mb-4">
+        نظرة عامة
+      </h2>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
         <div
@@ -54,9 +66,13 @@
 
     <!-- Management Modules -->
     <div>
-      <h2 class="text-lg font-bold text-gray-800 mb-4">Management Modules</h2>
+      <h2 class="text-lg font-bold text-gray-800 mb-4">
+        أقسام الإدارة
+      </h2>
 
-      <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div
+        class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      >
         <a
           *ngFor="let s of sections"
           [routerLink]="s.link"
@@ -69,12 +85,16 @@
               {{ s.title }}
             </h3>
 
-            <p class="text-xs text-gray-500 leading-relaxed mb-4">
+            <p
+              class="text-xs text-gray-500 leading-relaxed mb-4"
+            >
               {{ s.desc }}
             </p>
           </div>
 
-          <div class="pt-3 border-t border-gray-100 flex items-center justify-end">
+          <div
+            class="pt-3 border-t border-gray-100 flex items-center justify-end"
+          >
             <svg
               class="w-4 h-4 text-gray-400 group-hover:text-[#1B3B2B] group-hover:translate-x-1 transition-all"
               fill="none"
@@ -92,5 +112,6 @@
         </a>
       </div>
     </div>
+
   </div>
 </main>

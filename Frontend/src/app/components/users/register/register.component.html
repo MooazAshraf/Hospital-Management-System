@@ -1,105 +1,159 @@
-<section class="min-h-screen flex items-center justify-center px-4 py-12">
+<section
+  dir="rtl"
+  class="min-h-screen flex items-center justify-center px-4 py-12"
+>
   <div class="w-full max-w-md">
     <!-- Card -->
     <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+
       <!-- Header -->
       <div class="mb-7">
-        <h2 class="text-2xl font-semibold text-gray-900">Create your account</h2>
+        <h2 class="text-2xl font-semibold text-gray-900">
+          إنشاء حسابك
+        </h2>
 
-        <p class="text-sm text-gray-500 mt-2">Enter your details to create your account.</p>
+        <p class="text-sm text-gray-500 mt-2">
+          أدخل بياناتك لإنشاء حسابك.
+        </p>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="flex flex-col gap-5"
+      >
+
         <!-- Name -->
         <div>
-          <label class="block text-sm font-medium mb-1.5"> Full name </label>
+          <label class="block text-sm font-medium mb-1.5">
+            الاسم الكامل
+          </label>
 
           <input
             type="text"
             formControlName="name"
+            placeholder="أدخل اسمك الكامل"
             class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700 transition-colors"
-            [class.border-red-400]="f['name'].touched && f['name'].invalid"
+            [class.border-red-400]="
+              f['name'].touched && f['name'].invalid
+            "
           />
 
           <p
-            *ngIf="f['name'].touched && f['name'].errors?.['required']"
+            *ngIf="
+              f['name'].touched &&
+              f['name'].errors?.['required']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Name is required.
+            الاسم مطلوب.
           </p>
 
           <p
-            *ngIf="f['name'].touched && f['name'].errors?.['minlength']"
+            *ngIf="
+              f['name'].touched &&
+              f['name'].errors?.['minlength']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Name must be at least 2 characters.
+            يجب ألا يقل الاسم عن حرفين.
           </p>
         </div>
 
         <!-- Email -->
         <div>
-          <label class="block text-sm font-medium mb-1.5"> Email </label>
+          <label class="block text-sm font-medium mb-1.5">
+            البريد الإلكتروني
+          </label>
 
           <input
             type="email"
             formControlName="email"
+            placeholder="أدخل بريدك الإلكتروني"
             class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700 transition-colors"
-            [class.border-red-400]="f['email'].touched && f['email'].invalid"
+            [class.border-red-400]="
+              f['email'].touched && f['email'].invalid
+            "
           />
 
           <p
-            *ngIf="f['email'].touched && f['email'].errors?.['required']"
+            *ngIf="
+              f['email'].touched &&
+              f['email'].errors?.['required']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Email is required.
+            البريد الإلكتروني مطلوب.
           </p>
 
           <p
-            *ngIf="f['email'].touched && f['email'].errors?.['email']"
+            *ngIf="
+              f['email'].touched &&
+              f['email'].errors?.['email']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Enter a valid email.
+            يرجى إدخال بريد إلكتروني صحيح.
           </p>
         </div>
 
         <!-- Phone -->
         <div>
-          <label class="block text-sm font-medium mb-1.5"> Phone number </label>
+          <label class="block text-sm font-medium mb-1.5">
+            رقم الهاتف
+          </label>
 
           <input
             type="tel"
             formControlName="phone"
             placeholder="01XXXXXXXXX"
+            dir="ltr"
             class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-700 transition-colors"
-            [class.border-red-400]="f['phone'].touched && f['phone'].invalid"
+            [class.border-red-400]="
+              f['phone'].touched && f['phone'].invalid
+            "
           />
 
           <p
-            *ngIf="f['phone'].touched && f['phone'].errors?.['required']"
+            *ngIf="
+              f['phone'].touched &&
+              f['phone'].errors?.['required']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Phone number is required.
+            رقم الهاتف مطلوب.
           </p>
         </div>
 
         <!-- Password -->
         <div>
-          <label class="block text-sm font-medium mb-1.5"> Password </label>
+          <label class="block text-sm font-medium mb-1.5">
+            كلمة المرور
+          </label>
 
           <div class="relative">
             <input
-              [type]="showPassword ? 'text' : 'password'"
+              [type]="
+                showPassword
+                  ? 'text'
+                  : 'password'
+              "
               formControlName="password"
               class="w-full border border-gray-200 rounded-lg px-4 py-2.5 pr-11 text-sm focus:outline-none focus:border-green-700 transition-colors"
-              [class.border-red-400]="f['password'].touched && f['password'].invalid"
+              [class.border-red-400]="
+                f['password'].touched &&
+                f['password'].invalid
+              "
             />
 
             <button
               type="button"
-              (click)="showPassword = !showPassword"
+              (click)="
+                showPassword =
+                  !showPassword
+              "
               class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
             >
-              <!-- Eye -->
               <svg
                 *ngIf="!showPassword"
                 xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +167,7 @@
                 stroke-linejoin="round"
               >
                 <path
-                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 1 1 0 0 1-19.876 0"
                 />
                 <circle cx="12" cy="12" r="3" />
               </svg>
@@ -140,40 +194,55 @@
           </div>
 
           <p
-            *ngIf="f['password'].touched && f['password'].errors?.['required']"
+            *ngIf="
+              f['password'].touched &&
+              f['password'].errors?.['required']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Password is required.
+            كلمة المرور مطلوبة.
           </p>
 
           <p
-            *ngIf="f['password'].touched && f['password'].errors?.['minlength']"
+            *ngIf="
+              f['password'].touched &&
+              f['password'].errors?.['minlength']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Password must be at least 6 characters.
+            يجب ألا تقل كلمة المرور عن 6 أحرف.
           </p>
         </div>
 
         <!-- Confirm Password -->
         <div>
-          <label class="block text-sm font-medium mb-1.5"> Confirm password </label>
+          <label class="block text-sm font-medium mb-1.5">
+            تأكيد كلمة المرور
+          </label>
 
           <div class="relative">
             <input
-              [type]="showConfirmPassword ? 'text' : 'password'"
+              [type]="
+                showConfirmPassword
+                  ? 'text'
+                  : 'password'
+              "
               formControlName="confirmPassword"
               class="w-full border border-gray-200 rounded-lg px-4 py-2.5 pr-11 text-sm focus:outline-none focus:border-green-700 transition-colors"
               [class.border-red-400]="
-                f['confirmPassword'].touched && form.errors?.['passwordMismatch']
+                f['confirmPassword'].touched &&
+                form.errors?.['passwordMismatch']
               "
             />
 
             <button
               type="button"
-              (click)="showConfirmPassword = !showConfirmPassword"
+              (click)="
+                showConfirmPassword =
+                  !showConfirmPassword
+              "
               class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
             >
-              <!-- Eye -->
               <svg
                 *ngIf="!showConfirmPassword"
                 xmlns="http://www.w3.org/2000/svg"
@@ -187,7 +256,7 @@
                 stroke-linejoin="round"
               >
                 <path
-                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 1 1 0 0 1-19.876 0"
                 />
                 <circle cx="12" cy="12" r="3" />
               </svg>
@@ -205,7 +274,7 @@
                 stroke-linejoin="round"
               >
                 <path
-                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 1 1 0 0 1-19.876 0"
                 />
                 <circle cx="12" cy="12" r="3" />
                 <path d="m4 4 16 16" />
@@ -214,27 +283,47 @@
           </div>
 
           <p
-            *ngIf="f['confirmPassword'].touched && form.errors?.['passwordMismatch']"
+            *ngIf="
+              f['confirmPassword'].touched &&
+              form.errors?.['passwordMismatch']
+            "
             class="text-red-500 text-xs mt-1"
           >
-            Passwords don't match.
+            كلمتا المرور غير متطابقتين.
           </p>
         </div>
 
         <!-- Error -->
-        <p *ngIf="errorMessage" class="text-red-500 text-sm">
+        <p
+          *ngIf="errorMessage"
+          class="text-red-500 text-sm"
+        >
           {{ errorMessage }}
         </p>
 
         <!-- Submit -->
-        <button type="submit" class="btn btn-primary w-full rounded-lg" [disabled]="loading">
-          {{ loading ? 'Creating account…' : 'Create account' }}
+        <button
+          type="submit"
+          class="btn btn-primary w-full rounded-lg"
+          [disabled]="loading"
+        >
+          {{
+            loading
+              ? 'جاري إنشاء الحساب…'
+              : 'إنشاء الحساب'
+          }}
         </button>
 
         <!-- Login -->
         <p class="text-sm text-gray-600 text-center">
-          Already have an account?
-          <a routerLink="/login" class="text-green-900 font-semibold hover:underline"> Log in </a>
+          لديك حساب بالفعل؟
+
+          <a
+            routerLink="/login"
+            class="text-green-900 font-semibold hover:underline"
+          >
+            تسجيل الدخول
+          </a>
         </p>
       </form>
     </div>

@@ -1,14 +1,21 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { DoctorService } from '../../../services/doctor.service';
-import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-admin-doctors',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+  ],
   templateUrl: './admin-doctors.component.html',
 })
 export class AdminDoctorsComponent implements OnInit {
@@ -55,17 +62,24 @@ export class AdminDoctorsComponent implements OnInit {
 
     this.doctorService.getDoctors().subscribe({
       next: (doctors) => {
-        this.doctors = doctors;
+        this.doctors = doctors || [];
         this.loading = false;
+
         this.cdr.detectChanges();
       },
 
       error: (err) => {
-        console.error('Error fetching doctors:', err);
+        console.error(
+          'Error fetching doctors:',
+          err
+        );
 
-        this.errorMessage = err?.error?.message || 'Failed to load doctors';
+        this.errorMessage =
+          err?.error?.message ||
+          'فشل تحميل الأطباء. يرجى المحاولة مرة أخرى.';
 
         this.loading = false;
+
         this.cdr.detectChanges();
       },
     });
@@ -74,6 +88,7 @@ export class AdminDoctorsComponent implements OnInit {
   openAddDoctorModal(): void {
     this.isEditMode = false;
     this.errorMessage = '';
+
     this.resetForm();
 
     this.showModal = true;
@@ -88,10 +103,17 @@ export class AdminDoctorsComponent implements OnInit {
     this.doctorForm = {
       ...doctor,
 
-      user: typeof doctor.user === 'object' ? doctor.user?._id : doctor.user,
+      user:
+        typeof doctor.user === 'object'
+          ? doctor.user?._id || ''
+          : doctor.user || '',
 
       department:
-        typeof doctor.department === 'object' ? doctor.department?._id : doctor.department,
+        typeof doctor.department === 'object'
+          ? doctor.department?._id || ''
+          : doctor.department || '',
+
+      password: '',
     };
 
     this.showModal = true;
@@ -109,6 +131,10 @@ export class AdminDoctorsComponent implements OnInit {
   }
 
   saveDoctor(): void {
+    if (this.saving) {
+      return;
+    }
+
     this.saving = true;
     this.errorMessage = '';
 
@@ -117,66 +143,119 @@ export class AdminDoctorsComponent implements OnInit {
     };
 
     if (this.isEditMode && payload._id) {
-      this.doctorService.updateDoctor(payload._id, payload).subscribe({
-        next: () => {
-          this.saving = false;
+      this.doctorService
+        .updateDoctor(
+          payload._id,
+          payload
+        )
+        .subscribe({
+          next: () => {
+            this.saving = false;
 
-          this.closeModal();
-          this.loadDoctors();
-        },
+            this.closeModal();
+            this.loadDoctors();
+          },
 
-        error: (err) => {
-          console.error('Error updating doctor:', err);
+          error: (err) => {
+            console.error(
+              'Error updating doctor:',
+              err
+            );
 
-          this.errorMessage = err?.error?.message || 'Failed to update doctor';
+            this.errorMessage =
+              err?.error?.message ||
+              'فشل تحديث بيانات الطبيب.';
 
-          this.saving = false;
+            this.saving = false;
 
-          this.cdr.detectChanges();
-        },
-      });
+            this.cdr.detectChanges();
+          },
+        });
     } else {
       delete payload._id;
 
-      this.doctorService.createDoctor(payload).subscribe({
-        next: () => {
-          this.saving = false;
+      this.doctorService
+        .createDoctor(payload)
+        .subscribe({
+          next: () => {
+            this.saving = false;
 
-          this.closeModal();
-          this.loadDoctors();
-        },
+            this.closeModal();
+            this.loadDoctors();
+          },
 
-        error: (err) => {
-          console.error('Error creating doctor:', err);
+          error: (err) => {
+            console.error(
+              'Error creating doctor:',
+              err
+            );
 
-          this.errorMessage = err?.error?.message || 'Failed to create doctor';
+            this.errorMessage =
+              err?.error?.message ||
+              'فشل إضافة الطبيب.';
 
-          this.saving = false;
+            this.saving = false;
 
-          this.cdr.detectChanges();
-        },
-      });
+            this.cdr.detectChanges();
+          },
+        });
     }
   }
 
   deleteDoctor(id: string): void {
-    if (!id) return;
-
-    if (!confirm('Are you sure you want to delete this doctor?')) {
+    if (!id) {
       return;
     }
 
-    this.doctorService.deleteDoctor(id).subscribe({
-      next: () => {
-        this.loadDoctors();
-      },
+    if (
+      !confirm(
+        'هل أنت متأكد أنك تريد حذف هذا الطبيب؟'
+      )
+    ) {
+      return;
+    }
 
-      error: (err) => {
-        console.error('Error deleting doctor:', err);
+    this.doctorService
+      .deleteDoctor(id)
+      .subscribe({
+        next: () => {
+          this.loadDoctors();
+        },
 
-        alert(err?.error?.message || 'Failed to delete doctor');
-      },
-    });
+        error: (err) => {
+          console.error(
+            'Error deleting doctor:',
+            err
+          );
+
+          alert(
+            err?.error?.message ||
+            'فشل حذف الطبيب.'
+          );
+        },
+      });
+  }
+
+  departmentName(doctor: any): string {
+    const department =
+      doctor?.department;
+
+    if (
+      department &&
+      typeof department === 'object'
+    ) {
+      return department.name || 'غير محدد';
+    }
+
+    return department || 'غير محدد';
+  }
+
+  doctorEmail(doctor: any): string {
+    return (
+      doctor?.email ||
+      doctor?.user?.email ||
+      'غير محدد'
+    );
   }
 
   private resetForm(): void {

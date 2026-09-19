@@ -4,44 +4,73 @@ const auditLogSchema = new mongoose.Schema(
   {
     action: {
       type: String,
-      required: [true, "Action is required"],
+      required: true,
+      trim: true,
     },
 
     collectionName: {
       type: String,
-      required: [true, "Collection name is required"],
+      required: true,
+      trim: true,
     },
 
     documentId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: [true, "Document ID is required"],
+      default: null,
     },
 
     performedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "Performed by is required"],
+      default: null,
     },
 
     relatedPatient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      default: null,
     },
 
     relatedDoctor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      default: null,
     },
 
     description: {
       type: String,
-      required: [true, "Description is required"],
+      default: "",
       trim: true,
+    },
+
+    oldData: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    newData: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    ipAddress: {
+      type: String,
+      default: "",
+    },
+
+    userAgent: {
+      type: String,
+      default: "",
     },
   },
   {
     timestamps: true,
+    collection: "auditlogs",
   }
 );
 
-module.exports = mongoose.model("AuditLog", auditLogSchema);
+const AuditLog =
+  mongoose.models.AuditLog ||
+  mongoose.model("AuditLog", auditLogSchema);
+
+module.exports = AuditLog;

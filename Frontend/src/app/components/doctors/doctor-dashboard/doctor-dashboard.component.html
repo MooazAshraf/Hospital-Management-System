@@ -1,41 +1,175 @@
-<section class="min-h-screen bg-gray-50 py-16 px-6">
+<section
+  dir="rtl"
+  class="min-h-screen bg-gray-50 py-16 px-6"
+>
   <div class="max-w-7xl mx-auto space-y-6">
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-      <h1 class="text-3xl font-bold text-green-900 mb-3">Doctor Dashboard</h1>
-      <p class="text-gray-500">Manage today's appointments and update their status.</p>
+
+    <!-- العنوان -->
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8"
+    >
+      <h1
+        class="text-3xl font-bold text-green-900 mb-3"
+      >
+        لوحة تحكم الطبيب
+      </h1>
+
+      <p class="text-gray-500">
+        إدارة مواعيد اليوم وتحديث حالة المواعيد.
+      </p>
     </div>
 
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm">{{ errorMessage }}</div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <p class="text-xs text-gray-500">Today's appointments</p>
-        <p class="text-3xl font-bold text-green-900 mt-2">{{ todayAppointments.length }}</p>
-      </div>
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <p class="text-xs text-gray-500">All appointments</p>
-        <p class="text-3xl font-bold text-green-900 mt-2">{{ appointments.length }}</p>
-      </div>
+    <!-- رسالة الخطأ -->
+    <div
+      *ngIf="errorMessage"
+      class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm"
+    >
+      {{ errorMessage }}
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div class="px-6 py-5 border-b border-gray-100">
-        <h2 class="text-lg font-bold text-green-900">Today's Schedule</h2>
+
+    <!-- الإحصائيات -->
+    <div
+      class="grid grid-cols-2 md:grid-cols-3 gap-4"
+    >
+
+      <!-- مواعيد اليوم -->
+      <div
+        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+      >
+        <p class="text-xs text-gray-500">
+          مواعيد اليوم
+        </p>
+
+        <p
+          class="text-3xl font-bold text-green-900 mt-2"
+        >
+          {{ todayAppointments.length }}
+        </p>
       </div>
-      <div *ngIf="loading" class="p-10 text-center text-gray-500">Loading appointments...</div>
-      <div *ngIf="!loading && !todayAppointments.length" class="p-10 text-center text-gray-500">No appointments for today.</div>
-      <div *ngFor="let a of todayAppointments" class="px-6 py-5 border-b border-gray-100 last:border-0 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+
+      <!-- جميع المواعيد -->
+      <div
+        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+      >
+        <p class="text-xs text-gray-500">
+          جميع المواعيد
+        </p>
+
+        <p
+          class="text-3xl font-bold text-green-900 mt-2"
+        >
+          {{ appointments.length }}
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- جدول مواعيد اليوم -->
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+    >
+
+      <div
+        class="px-6 py-5 border-b border-gray-100"
+      >
+        <h2
+          class="text-lg font-bold text-green-900"
+        >
+          جدول مواعيد اليوم
+        </h2>
+      </div>
+
+
+      <!-- جاري التحميل -->
+      <div
+        *ngIf="loading"
+        class="p-10 text-center text-gray-500"
+      >
+        جاري تحميل المواعيد...
+      </div>
+
+
+      <!-- لا توجد مواعيد -->
+      <div
+        *ngIf="!loading && !todayAppointments.length"
+        class="p-10 text-center text-gray-500"
+      >
+        لا توجد مواعيد لليوم.
+      </div>
+
+
+      <!-- المواعيد -->
+      <div
+        *ngFor="let a of todayAppointments"
+        class="px-6 py-5 border-b border-gray-100 last:border-0 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+      >
+
+        <!-- بيانات الموعد -->
         <div>
-          <p class="font-semibold text-gray-900">{{ a.time }} · {{ patientName(a) }}</p>
-          <p class="text-sm text-gray-500 mt-1">{{ a.appointmentType }} · {{ a.status }}</p>
-          <p *ngIf="a.notes" class="text-xs text-gray-400 mt-1">{{ a.notes }}</p>
+
+          <p
+            class="font-semibold text-gray-900"
+          >
+            {{ a.time }} · {{ patientName(a) }}
+          </p>
+
+          <p
+            class="text-sm text-gray-500 mt-1"
+          >
+            {{ a.appointmentType }} · {{ a.status }}
+          </p>
+
+          <p
+            *ngIf="a.notes"
+            class="text-xs text-gray-400 mt-1"
+          >
+            {{ a.notes }}
+          </p>
+
         </div>
+
+
+        <!-- أزرار التحكم -->
         <div class="flex gap-2">
-          <button *ngIf="a.status === 'Pending'" (click)="setStatus(a, 'Confirmed')" class="px-3 py-2 rounded-lg bg-green-900 text-white text-xs font-semibold">Confirm</button>
-          <button *ngIf="a.status === 'Confirmed'" (click)="setStatus(a, 'Completed')" class="px-3 py-2 rounded-lg bg-green-900 text-white text-xs font-semibold">Complete</button>
-          <button *ngIf="a.status !== 'Completed' && a.status !== 'Cancelled'" (click)="setStatus(a, 'Cancelled')" class="px-3 py-2 rounded-lg border border-red-200 text-red-600 text-xs font-semibold">Cancel</button>
+
+          <!-- تأكيد -->
+          <button
+            *ngIf="a.status === 'Pending'"
+            (click)="setStatus(a, 'Confirmed')"
+            class="px-3 py-2 rounded-lg bg-green-900 text-white text-xs font-semibold"
+          >
+            تأكيد
+          </button>
+
+
+          <!-- إكمال -->
+          <button
+            *ngIf="a.status === 'Confirmed'"
+            (click)="setStatus(a, 'Completed')"
+            class="px-3 py-2 rounded-lg bg-green-900 text-white text-xs font-semibold"
+          >
+            إكمال
+          </button>
+
+
+          <!-- إلغاء -->
+          <button
+            *ngIf="a.status !== 'Completed' && a.status !== 'Cancelled'"
+            (click)="setStatus(a, 'Cancelled')"
+            class="px-3 py-2 rounded-lg border border-red-200 text-red-600 text-xs font-semibold"
+          >
+            إلغاء
+          </button>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
 </section>

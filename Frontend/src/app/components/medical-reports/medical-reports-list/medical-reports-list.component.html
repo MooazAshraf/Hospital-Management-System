@@ -1,118 +1,261 @@
-<section class="wrap py-16">
+<section
+  dir="rtl"
+  class="wrap py-16"
+>
 
   <!-- Header -->
   <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
     <div>
-      <p class="text-xs font-semibold tracking-widest uppercase text-green-800 mb-1">Records</p>
-      <h2 class="text-3xl font-bold text-gray-900">Medical Reports</h2>
-      <p class="text-gray-500 text-sm mt-1.5">Diagnoses, findings and prescriptions for each patient visit.</p>
+      <p
+        class="text-xs font-semibold tracking-widest uppercase text-green-800 mb-1"
+      >
+        السجلات الطبية
+      </p>
+
+      <h2 class="text-3xl font-bold text-gray-900">
+        التقارير الطبية
+      </h2>
+
+      <p class="text-gray-500 text-sm mt-1.5">
+        التشخيصات والنتائج والوصفات الطبية لكل زيارة للمريض.
+      </p>
     </div>
 
     @if (canManage) {
       <button
         type="button"
         (click)="openAddModal()"
-        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-green-800 text-white text-sm font-medium shadow-sm hover:bg-green-900 transition-colors">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-green-800 text-white text-sm font-medium shadow-sm hover:bg-green-900 transition-colors"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
           <path d="M12 5v14M5 12h14" />
         </svg>
-        Add Report
+
+        إضافة تقرير
       </button>
     }
   </div>
 
+
   <!-- Login / permission banner -->
   @if (needsLogin) {
-    <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-800 text-sm flex items-start gap-3">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5">
-        <path d="M12 9v4M12 17h.01" /><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.7 3.86a2 2 0 0 0-3.4 0Z" />
+    <div
+      class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-800 text-sm flex items-start gap-3"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        class="shrink-0 mt-0.5"
+      >
+        <path d="M12 9v4M12 17h.01" />
+        <path
+          d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.7 3.86a2 2 0 0 0-3.4 0Z"
+        />
       </svg>
+
       <div>
-        <p class="font-medium">You're not logged in</p>
-        <p class="text-amber-700/90 mt-0.5">Log in to view medical reports. Adding, editing and deleting reports is limited to doctors and admins.</p>
+        <p class="font-medium">
+          أنت غير مسجل الدخول
+        </p>
+
+        <p class="text-amber-700/90 mt-0.5">
+          سجل الدخول لعرض التقارير الطبية.
+          إضافة التقارير وتعديلها وحذفها متاح فقط للأطباء ومديري النظام.
+        </p>
       </div>
     </div>
   }
+
 
   <!-- Stat cards -->
   @if (!loading && reports.length > 0) {
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-      <div class="rounded-xl border border-gray-100 bg-white shadow-sm p-4">
-        <p class="text-xs text-gray-500 mb-1">Total Reports</p>
-        <p class="text-2xl font-bold text-gray-900">{{ reports.length }}</p>
+
+      <div
+        class="rounded-xl border border-gray-100 bg-white shadow-sm p-4"
+      >
+        <p class="text-xs text-gray-500 mb-1">
+          إجمالي التقارير
+        </p>
+
+        <p class="text-2xl font-bold text-gray-900">
+          {{ reports.length }}
+        </p>
       </div>
-      <div class="rounded-xl border border-gray-100 bg-white shadow-sm p-4">
-        <p class="text-xs text-gray-500 mb-1">Report Types</p>
-        <p class="text-2xl font-bold text-gray-900">{{ reportTypes.length }}</p>
+
+
+      <div
+        class="rounded-xl border border-gray-100 bg-white shadow-sm p-4"
+      >
+        <p class="text-xs text-gray-500 mb-1">
+          أنواع التقارير
+        </p>
+
+        <p class="text-2xl font-bold text-gray-900">
+          {{ reportTypes.length }}
+        </p>
       </div>
-      <div class="rounded-xl border border-gray-100 bg-white shadow-sm p-4 col-span-2 md:col-span-1">
-        <p class="text-xs text-gray-500 mb-1">Showing</p>
-        <p class="text-2xl font-bold text-gray-900">{{ filteredReports.length }}</p>
+
+
+      <div
+        class="rounded-xl border border-gray-100 bg-white shadow-sm p-4 col-span-2 md:col-span-1"
+      >
+        <p class="text-xs text-gray-500 mb-1">
+          التقارير المعروضة
+        </p>
+
+        <p class="text-2xl font-bold text-gray-900">
+          {{ filteredReports.length }}
+        </p>
       </div>
+
     </div>
   }
 
+
   <!-- Filters -->
-  <div class="flex flex-wrap gap-3 mb-6 bg-white border border-gray-100 rounded-xl p-3 shadow-sm">
+  <div
+    class="flex flex-wrap gap-3 mb-6 bg-white border border-gray-100 rounded-xl p-3 shadow-sm"
+  >
+
     <div class="relative flex-1 min-w-[220px]">
-      <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+      <svg
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <circle cx="11" cy="11" r="7" />
         <path d="m21 21-4.3-4.3" />
       </svg>
+
       <input
         type="text"
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchChange()"
-        placeholder="Search by title, diagnosis, patient or doctor..."
-        class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800" />
+        placeholder="ابحث بعنوان التقرير أو التشخيص أو المريض أو الطبيب..."
+        class="w-full pr-9 pl-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+      />
+
     </div>
+
 
     <select
       [(ngModel)]="typeFilter"
       (ngModelChange)="onTypeChange()"
-      class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800">
-      <option value="">All report types</option>
+      class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+    >
+      <option value="">
+        جميع أنواع التقارير
+      </option>
+
       @for (t of reportTypes; track t) {
-        <option [value]="t">{{ t }}</option>
+        <option [value]="t">
+          {{ t }}
+        </option>
       }
     </select>
+
   </div>
+
 
   <!-- Error -->
   @if (errorMessage) {
-    <div class="mb-4 p-3.5 rounded-xl bg-red-50 text-red-700 text-sm border border-red-100">
+    <div
+      class="mb-4 p-3.5 rounded-xl bg-red-50 text-red-700 text-sm border border-red-100"
+    >
       {{ errorMessage }}
     </div>
   }
 
+
   <!-- Loading -->
   @if (loading) {
+
     <div class="grid md:grid-cols-2 gap-4">
+
       @for (i of [1,2,3,4]; track i) {
-        <div class="h-40 rounded-xl bg-gray-100 animate-pulse"></div>
+        <div
+          class="h-40 rounded-xl bg-gray-100 animate-pulse"
+        ></div>
       }
+
     </div>
+
   } @else if (filteredReports.length === 0) {
 
-    <div class="border border-dashed border-gray-200 rounded-xl p-12 text-center text-gray-500 bg-white">
-      <svg class="mx-auto mb-3 text-gray-300" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" />
+    <div
+      class="border border-dashed border-gray-200 rounded-xl p-12 text-center text-gray-500 bg-white"
+    >
+
+      <svg
+        class="mx-auto mb-3 text-gray-300"
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <path
+          d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
+        />
+        <path d="M14 2v6h6" />
       </svg>
+
       @if (reports.length === 0) {
+
         @if (canManage) {
-          <p>No medical reports yet. Click <span class="font-medium text-gray-700">"Add Report"</span> to create the first one.</p>
+
+          <p>
+            لا توجد تقارير طبية حتى الآن.
+            اضغط على
+            <span class="font-medium text-gray-700">
+              "إضافة تقرير"
+            </span>
+            لإنشاء أول تقرير.
+          </p>
+
         } @else {
-          <p>No medical reports yet.</p>
+
+          <p>
+            لا توجد تقارير طبية حتى الآن.
+          </p>
+
         }
+
       } @else {
-        <p>No reports match your search/filter.</p>
+
+        <p>
+          لا توجد تقارير مطابقة لبحثك أو الفلاتر المحددة.
+        </p>
+
       }
+
     </div>
 
   } @else {
 
     <div class="grid md:grid-cols-2 gap-4">
+
       @for (report of filteredReports; track report._id) {
+
         <app-medical-report-card
           [report]="report"
           [patientName]="patientName(report.patient)"
@@ -120,212 +263,531 @@
           [medicineNames]="medicineNamesById"
           [showActions]="canManage"
           (edit)="openEditModal($event)"
-          (remove)="confirmDelete($event)">
+          (remove)="confirmDelete($event)"
+        >
         </app-medical-report-card>
+
       }
+
     </div>
 
   }
 
 </section>
 
+
 <!-- Add / Edit Modal -->
 @if (showModal) {
-  <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="closeModal()">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
 
-      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
+  <div
+    class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    (click)="closeModal()"
+  >
+
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl"
+      >
+
         <h3 class="text-lg font-semibold text-gray-900">
-          {{ isEditMode ? 'Edit Medical Report' : 'Add Medical Report' }}
+          {{
+            isEditMode
+              ? 'تعديل التقرير الطبي'
+              : 'إضافة تقرير طبي'
+          }}
         </h3>
-        <button type="button" (click)="closeModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
+
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
         </button>
+
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="px-6 py-5 space-y-4">
+
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="px-6 py-5 space-y-4"
+      >
 
         @if (formError) {
-          <div class="p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-100">
+          <div
+            class="p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-100"
+          >
             {{ formError }}
           </div>
         }
 
+
         <div class="grid grid-cols-2 gap-4">
 
+          <!-- Patient -->
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Patient</label>
-            <select formControlName="patient"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800">
-              <option value="" disabled>Select patient</option>
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              المريض
+            </label>
+
+            <select
+              formControlName="patient"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            >
+              <option value="" disabled>
+                اختر المريض
+              </option>
+
               @for (p of patients; track p._id) {
-                <option [value]="p._id">{{ p.name }}</option>
+                <option [value]="p._id">
+                  {{ p.name }}
+                </option>
               }
             </select>
+
             @if (f['patient'].invalid && f['patient'].touched) {
-              <p class="text-xs text-red-600 mt-1">Patient is required.</p>
+              <p class="text-xs text-red-600 mt-1">
+                يجب اختيار المريض.
+              </p>
             }
+
           </div>
 
+
+          <!-- Doctor -->
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Doctor</label>
-            <select formControlName="doctor"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800">
-              <option value="" disabled>Select doctor</option>
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              الطبيب
+            </label>
+
+            <select
+              formControlName="doctor"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            >
+              <option value="" disabled>
+                اختر الطبيب
+              </option>
+
               @for (d of doctors; track d._id) {
-                <option [value]="d._id">{{ d.name }}</option>
+                <option [value]="d._id">
+                  {{ d.name }}
+                </option>
               }
             </select>
+
             @if (f['doctor'].invalid && f['doctor'].touched) {
-              <p class="text-xs text-red-600 mt-1">Doctor is required.</p>
+              <p class="text-xs text-red-600 mt-1">
+                يجب اختيار الطبيب.
+              </p>
             }
+
           </div>
 
+
+          <!-- Report Type -->
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Report Type</label>
-            <input type="text" formControlName="reportType" placeholder="e.g. Lab, Radiology, Consultation"
-                   class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800" />
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              نوع التقرير
+            </label>
+
+            <input
+              type="text"
+              formControlName="reportType"
+              placeholder="مثال: تحليل، أشعة، استشارة"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            />
+
             @if (f['reportType'].invalid && f['reportType'].touched) {
-              <p class="text-xs text-red-600 mt-1">Report type is required.</p>
+              <p class="text-xs text-red-600 mt-1">
+                نوع التقرير مطلوب.
+              </p>
             }
+
           </div>
 
+
+          <!-- Report Date -->
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Report Date</label>
-            <input type="date" formControlName="reportDate"
-                   class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800" />
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              تاريخ التقرير
+            </label>
+
+            <input
+              type="date"
+              formControlName="reportDate"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            />
+
             @if (f['reportDate'].invalid && f['reportDate'].touched) {
-              <p class="text-xs text-red-600 mt-1">Report date is required.</p>
+              <p class="text-xs text-red-600 mt-1">
+                تاريخ التقرير مطلوب.
+              </p>
             }
+
           </div>
 
+
+          <!-- Title -->
           <div class="col-span-2">
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Title</label>
-            <input type="text" formControlName="title"
-                   class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800" />
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              عنوان التقرير
+            </label>
+
+            <input
+              type="text"
+              formControlName="title"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            />
+
             @if (f['title'].invalid && f['title'].touched) {
-              <p class="text-xs text-red-600 mt-1">Title is required.</p>
+              <p class="text-xs text-red-600 mt-1">
+                عنوان التقرير مطلوب.
+              </p>
             }
+
           </div>
 
+
+          <!-- Diagnosis -->
           <div class="col-span-2">
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Diagnosis</label>
-            <textarea formControlName="diagnosis" rows="2"
-                      class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"></textarea>
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              التشخيص
+            </label>
+
+            <textarea
+              formControlName="diagnosis"
+              rows="2"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            ></textarea>
+
             @if (f['diagnosis'].invalid && f['diagnosis'].touched) {
-              <p class="text-xs text-red-600 mt-1">Diagnosis is required.</p>
+              <p class="text-xs text-red-600 mt-1">
+                التشخيص مطلوب.
+              </p>
             }
+
           </div>
 
+
+          <!-- Findings -->
           <div class="col-span-2">
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Findings</label>
-            <textarea formControlName="findings" rows="2"
-                      class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"></textarea>
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              النتائج
+            </label>
+
+            <textarea
+              formControlName="findings"
+              rows="2"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            ></textarea>
+
           </div>
 
+
+          <!-- Recommendations -->
           <div class="col-span-2">
-            <label class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Recommendations</label>
-            <textarea formControlName="recommendations" rows="2"
-                      class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"></textarea>
+
+            <label
+              class="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide"
+            >
+              التوصيات
+            </label>
+
+            <textarea
+              formControlName="recommendations"
+              rows="2"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-800/30 focus:border-green-800"
+            ></textarea>
+
           </div>
+
         </div>
+
 
         <!-- Prescribed Medicines -->
         <div class="border-t border-gray-100 pt-4">
+
           <div class="flex items-center justify-between mb-3">
-            <h4 class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Prescribed Medicines</h4>
-            <button type="button" (click)="addMedicineRow()"
-                    class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14" /></svg>
-              Add Medicine
+
+            <h4
+              class="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+            >
+              الأدوية الموصوفة
+            </h4>
+
+            <button
+              type="button"
+              (click)="addMedicineRow()"
+              class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+
+              إضافة دواء
             </button>
+
           </div>
 
+
           @if (prescribedMedicines.length === 0) {
-            <p class="text-xs text-gray-400">No medicines prescribed yet.</p>
+            <p class="text-xs text-gray-400">
+              لا توجد أدوية موصوفة حتى الآن.
+            </p>
           }
 
+
           <div class="space-y-2.5">
-            @for (row of prescribedMedicines.controls; track $index) {
-              <div [formGroup]="$any(row)" class="grid grid-cols-12 gap-2 items-start bg-gray-50 rounded-lg p-3">
+
+            @for (
+              row of prescribedMedicines.controls;
+              track $index
+            ) {
+
+              <div
+                [formGroup]="$any(row)"
+                class="grid grid-cols-12 gap-2 items-start bg-gray-50 rounded-lg p-3"
+              >
 
                 <div class="col-span-4">
-                  <select formControlName="medicine"
-                          class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white">
-                    <option value="" disabled>Medicine</option>
+
+                  <select
+                    formControlName="medicine"
+                    class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white"
+                  >
+                    <option value="" disabled>
+                      الدواء
+                    </option>
+
                     @for (m of medicines; track m._id) {
-                      <option [value]="m._id">{{ m.name }}</option>
+                      <option [value]="m._id">
+                        {{ m.name }}
+                      </option>
                     }
                   </select>
+
                 </div>
+
 
                 <div class="col-span-3">
-                  <input type="text" formControlName="dosage" placeholder="Dosage"
-                         class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white" />
+
+                  <input
+                    type="text"
+                    formControlName="dosage"
+                    placeholder="الجرعة"
+                    class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white"
+                  />
+
                 </div>
 
-                <div class="col-span-2">
-                  <input type="text" formControlName="frequency" placeholder="Frequency"
-                         class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white" />
-                </div>
 
                 <div class="col-span-2">
-                  <input type="text" formControlName="duration" placeholder="Duration"
-                         class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white" />
+
+                  <input
+                    type="text"
+                    formControlName="frequency"
+                    placeholder="عدد المرات"
+                    class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white"
+                  />
+
                 </div>
+
+
+                <div class="col-span-2">
+
+                  <input
+                    type="text"
+                    formControlName="duration"
+                    placeholder="المدة"
+                    class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm bg-white"
+                  />
+
+                </div>
+
 
                 <div class="col-span-1 flex justify-end pt-1.5">
-                  <button type="button" (click)="removeMedicineRow($index)"
-                          class="text-gray-400 hover:text-red-600 transition-colors">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
+
+                  <button
+                    type="button"
+                    (click)="removeMedicineRow($index)"
+                    class="text-gray-400 hover:text-red-600 transition-colors"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
                   </button>
+
                 </div>
 
               </div>
+
             }
+
           </div>
+
         </div>
 
-        <div class="flex justify-end gap-3 pt-3 border-t border-gray-100 mt-2">
-          <button type="button" (click)="closeModal()"
-                  class="px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
-            Cancel
+
+        <!-- Actions -->
+        <div
+          class="flex justify-start gap-3 pt-3 border-t border-gray-100 mt-2"
+        >
+
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            إلغاء
           </button>
-          <button type="submit" [disabled]="saving"
-                  class="px-4 py-2.5 rounded-lg bg-green-800 text-white text-sm font-medium hover:bg-green-900 disabled:opacity-60 transition-colors">
-            {{ saving ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add Report') }}
+
+          <button
+            type="submit"
+            [disabled]="saving"
+            class="px-4 py-2.5 rounded-lg bg-green-800 text-white text-sm font-medium hover:bg-green-900 disabled:opacity-60 transition-colors"
+          >
+            {{
+              saving
+                ? 'جاري الحفظ...'
+                : (
+                    isEditMode
+                      ? 'حفظ التعديلات'
+                      : 'إضافة التقرير'
+                  )
+            }}
           </button>
+
         </div>
 
       </form>
 
     </div>
+
   </div>
 }
 
+
 <!-- Delete Confirm -->
 @if (deleteTarget) {
-  <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="cancelDelete()">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" (click)="$event.stopPropagation()">
-      <div class="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center mb-4">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600">
-          <path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+
+  <div
+    class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    (click)="cancelDelete()"
+  >
+
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div
+        class="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center mb-4"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          class="text-red-600"
+        >
+          <path d="M3 6h18" />
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
         </svg>
       </div>
-      <h3 class="text-lg font-semibold text-gray-900 mb-1.5">Delete Medical Report</h3>
+
+      <h3
+        class="text-lg font-semibold text-gray-900 mb-1.5"
+      >
+        حذف التقرير الطبي
+      </h3>
+
       <p class="text-sm text-gray-500 mb-6">
-        Are you sure you want to delete <span class="font-medium text-gray-800">{{ deleteTarget.title }}</span>? This cannot be undone.
+        هل أنت متأكد أنك تريد حذف التقرير
+        <span class="font-medium text-gray-800">
+          {{ deleteTarget.title }}
+        </span>
+        ؟ لا يمكن التراجع عن هذا الإجراء.
       </p>
-      <div class="flex justify-end gap-3">
-        <button type="button" (click)="cancelDelete()"
-                class="px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
-          Cancel
+
+      <div class="flex justify-start gap-3">
+
+        <button
+          type="button"
+          (click)="cancelDelete()"
+          class="px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          إلغاء
         </button>
-        <button type="button" (click)="deleteReport()" [disabled]="deleting"
-                class="px-4 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-60 transition-colors">
-          {{ deleting ? 'Deleting...' : 'Delete' }}
+
+        <button
+          type="button"
+          (click)="deleteReport()"
+          [disabled]="deleting"
+          class="px-4 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-60 transition-colors"
+        >
+          {{
+            deleting
+              ? 'جاري الحذف...'
+              : 'حذف'
+          }}
         </button>
+
       </div>
+
     </div>
+
   </div>
+
 }

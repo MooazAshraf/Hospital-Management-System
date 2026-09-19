@@ -8,6 +8,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import {
   ActivatedRoute,
   Router,
@@ -72,7 +73,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     DEPARTMENTS
+     الأقسام
   ========================================= */
 
   readonly departments = computed(() => {
@@ -94,7 +95,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     FILTERED DOCTORS
+     الأطباء بعد التصفية
   ========================================= */
 
   readonly filteredDoctors = computed(() => {
@@ -149,7 +150,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     INIT
+     التهيئة
   ========================================= */
 
   ngOnInit(): void {
@@ -166,7 +167,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     FETCH DOCTORS
+     جلب الأطباء
   ========================================= */
 
   fetchDoctors(
@@ -228,7 +229,7 @@ export class BookAppointmentComponent implements OnInit {
               error: () => {
 
                 this.errorMessage.set(
-                  'Doctor not found.'
+                  'لم يتم العثور على الطبيب.'
                 );
               },
 
@@ -243,7 +244,7 @@ export class BookAppointmentComponent implements OnInit {
 
           this.errorMessage.set(
             err?.error?.message ||
-            'Failed to load doctors. Please try again.'
+            'تعذر تحميل الأطباء. يرجى المحاولة مرة أخرى.'
           );
 
         },
@@ -253,7 +254,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     SELECT DOCTOR
+     اختيار الطبيب
   ========================================= */
 
   selectDoctor(
@@ -267,7 +268,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     CHANGE DOCTOR
+     تغيير الطبيب
   ========================================= */
 
   changeDoctor(): void {
@@ -282,7 +283,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     BOOKED
+     تم الحجز
   ========================================= */
 
   onBooked(
@@ -297,7 +298,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     IMAGE ERROR
+     خطأ في الصورة
   ========================================= */
 
   onImageError(
@@ -318,7 +319,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     ARABIC NAME
+     الاسم العربي
   ========================================= */
 
   isArabicName(
@@ -332,7 +333,7 @@ export class BookAppointmentComponent implements OnInit {
 
 
   /* =========================================
-     DEPARTMENT NAME
+     اسم القسم
   ========================================= */
 
   departmentName(
@@ -350,7 +351,7 @@ export class BookAppointmentComponent implements OnInit {
 
       return (
         (department as any).name ||
-        'N/A'
+        'غير محدد'
       );
     }
 
@@ -363,7 +364,7 @@ export class BookAppointmentComponent implements OnInit {
     }
 
 
-    return 'N/A';
+    return 'غير محدد';
   }
 
 }

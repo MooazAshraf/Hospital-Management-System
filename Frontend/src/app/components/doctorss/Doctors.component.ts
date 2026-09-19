@@ -26,26 +26,33 @@ import { DoctorCardComponent } from '../doctors/doctor-card/doctor-card.componen
 })
 export class DoctorsComponent implements OnInit {
 
-  private readonly doctorService = inject(DoctorService);
+  private readonly doctorService =
+    inject(DoctorService);
 
-  readonly doctors = signal<Doctor[]>([]);
+  readonly doctors =
+    signal<Doctor[]>([]);
 
-  readonly isLoading = signal(false);
+  readonly isLoading =
+    signal(false);
 
-  readonly errorMessage = signal('');
+  readonly errorMessage =
+    signal('');
 
-  readonly searchTerm = signal('');
+  readonly searchTerm =
+    signal('');
 
-  readonly selectedDepartment = signal('');
+  readonly selectedDepartment =
+    signal('');
 
 
-  // Get departments from doctors
+  // الحصول على الأقسام من قائمة الأطباء
   readonly departments = computed(() => {
 
     const names = this.doctors()
       .map((doctor) => {
 
-        const department = doctor.department;
+        const department =
+          doctor.department;
 
         if (
           department &&
@@ -54,7 +61,9 @@ export class DoctorsComponent implements OnInit {
           return department.name || '';
         }
 
-        if (typeof department === 'string') {
+        if (
+          typeof department === 'string'
+        ) {
           return department;
         }
 
@@ -66,10 +75,11 @@ export class DoctorsComponent implements OnInit {
   });
 
 
-  // Search + Department Filter
+  // البحث + فلترة الأقسام
   readonly filteredDoctors = computed(() => {
 
-    const doctors = this.doctors();
+    const doctors =
+      this.doctors();
 
     const search =
       this.searchTerm()
@@ -94,23 +104,25 @@ export class DoctorsComponent implements OnInit {
 
 
       const doctorName =
-        (doctor.name || '').toLowerCase();
+        (doctor.name || '')
+          .toLowerCase();
 
       const departmentName =
         department.toLowerCase();
 
 
-      // Search by doctor name OR department
+      // البحث باسم الطبيب أو القسم
       const matchesSearch =
         !search ||
         doctorName.includes(search) ||
         departmentName.includes(search);
 
 
-      // Selected department
+      // القسم المحدد
       const matchesDepartment =
         !selectedDepartment ||
-        departmentName === selectedDepartment;
+        departmentName ===
+          selectedDepartment;
 
 
       return (
@@ -133,32 +145,34 @@ export class DoctorsComponent implements OnInit {
     this.errorMessage.set('');
 
 
-    this.doctorService.getDoctors().subscribe({
+    this.doctorService
+      .getDoctors()
+      .subscribe({
 
-      next: (doctors: Doctor[]) => {
+        next: (doctors: Doctor[]) => {
 
-        this.doctors.set(doctors);
+          this.doctors.set(doctors);
 
-        this.isLoading.set(false);
-      },
+          this.isLoading.set(false);
+        },
 
 
-      error: (error: any) => {
+        error: (error: any) => {
 
-        console.error(
-          'Error loading doctors:',
-          error
-        );
+          console.error(
+            'Error loading doctors:',
+            error
+          );
 
-        this.errorMessage.set(
-          error?.error?.message ||
-          'Failed to load doctors. Please try again.'
-        );
+          this.errorMessage.set(
+            error?.error?.message ||
+            'فشل تحميل الأطباء. يرجى المحاولة مرة أخرى.'
+          );
 
-        this.isLoading.set(false);
-      },
+          this.isLoading.set(false);
+        },
 
-    });
+      });
   }
 
 

@@ -89,6 +89,108 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   // ==========================================
+  // Translate notification title
+  // ==========================================
+
+  translateNotificationTitle(
+    title: string
+  ): string {
+
+    const value = String(title || '').trim();
+
+    switch (value.toLowerCase()) {
+
+      case 'appointment cancelled':
+        return 'تم إلغاء الموعد';
+
+      case 'appointment booked successfully':
+        return 'تم حجز الموعد بنجاح';
+
+      default:
+        return value;
+    }
+  }
+
+  // ==========================================
+  // Translate notification message
+  // ==========================================
+
+  translateNotificationMessage(
+    message: string
+  ): string {
+
+    const value = String(message || '').trim();
+
+    if (!value) {
+      return '';
+    }
+
+    // ========================================
+    // Appointment cancelled
+    // ========================================
+
+    const cancelledMatch = value.match(
+      /^Your appointment with (.+?) on (\d{4}-\d{2}-\d{2}) at (\d{2}:\d{2}) has been cancelled\.?$/i
+    );
+
+    if (cancelledMatch) {
+
+      const doctor = cancelledMatch[1].trim();
+      const date = cancelledMatch[2];
+      const time = cancelledMatch[3];
+
+      return `تم إلغاء موعدك مع ${this.cleanDoctorName(
+        doctor
+      )} بتاريخ ${date} الساعة ${time}.`;
+    }
+
+    // ========================================
+    // Appointment booked successfully
+    // ========================================
+
+    const bookedMatch = value.match(
+      /^Your appointment with (.+?) has been booked for (\d{4}-\d{2}-\d{2}) at (\d{2}:\d{2})\.?$/i
+    );
+
+    if (bookedMatch) {
+
+      const doctor = bookedMatch[1].trim();
+      const date = bookedMatch[2];
+      const time = bookedMatch[3];
+
+      return `تم حجز موعدك مع ${this.cleanDoctorName(
+        doctor
+      )} بتاريخ ${date} الساعة ${time}.`;
+    }
+
+    // ========================================
+    // Fallback
+    // ========================================
+
+    return value;
+  }
+
+  // ==========================================
+  // Clean doctor name
+  // ==========================================
+
+  private cleanDoctorName(
+    name: string
+  ): string {
+
+    let doctorName = String(name || '').trim();
+
+    doctorName = doctorName.replace(
+      /^(doctor|dr\.?|دكتور|د\.)\s*/i,
+      ''
+    );
+
+    doctorName = doctorName.trim();
+
+    return `د. ${doctorName}`;
+  }
+
+  // ==========================================
   // Fetch dashboard data
   // ==========================================
 
@@ -247,7 +349,7 @@ export class PatientDashboardComponent implements OnInit {
 
         this.errorMessage =
           err?.error?.message ||
-          'Failed to load appointments';
+          'فشل تحميل المواعيد';
 
         this.loading = false;
 
@@ -321,7 +423,7 @@ export class PatientDashboardComponent implements OnInit {
 
     const confirmed =
       confirm(
-        'Are you sure you want to cancel this appointment?'
+        'هل أنت متأكد أنك تريد إلغاء هذا الموعد؟'
       );
 
     if (!confirmed) {
@@ -374,7 +476,7 @@ export class PatientDashboardComponent implements OnInit {
 
         this.errorMessage =
           err?.error?.message ||
-          'Failed to cancel appointment';
+          'فشل إلغاء الموعد';
 
         this.cdr.detectChanges();
       },

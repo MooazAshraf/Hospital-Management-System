@@ -3,7 +3,7 @@
 >
 
   <!-- ====================================== -->
-  <!-- Header -->
+  <!-- الرأس -->
   <!-- ====================================== -->
 
   <div
@@ -12,19 +12,19 @@
 
     <div>
 
-      <!-- Queue -->
+      <!-- رقم الانتظار -->
       <div
         *ngIf="queueNumber"
         class="text-sm text-gray-400 mb-2"
       >
-        {{ queueNumber }}
+        رقم الانتظار: {{ queueNumber }}
       </div>
 
-      <!-- Doctor -->
+      <!-- الطبيب -->
       <div
         class="text-xs text-gray-400 mb-1"
       >
-        Doctor
+        الطبيب
       </div>
 
       <h3
@@ -35,7 +35,7 @@
 
     </div>
 
-    <!-- Status -->
+    <!-- حالة الموعد -->
     <span
       *ngIf="statusLabel"
       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap"
@@ -48,14 +48,14 @@
 
 
   <!-- ====================================== -->
-  <!-- Appointment Info -->
+  <!-- معلومات الموعد -->
   <!-- ====================================== -->
 
   <div
     class="mt-5 space-y-3"
   >
 
-    <!-- Date + Time -->
+    <!-- التاريخ والوقت -->
 
     <div
       class="flex items-center gap-3 text-gray-700"
@@ -90,30 +90,30 @@
     </div>
 
 
-    <!-- Appointment Type -->
+    <!-- نوع الموعد -->
 
     <div
       *ngIf="appointmentType"
       class="text-sm text-gray-500"
     >
-      {{ appointmentType }}
+      نوع الموعد: {{ appointmentType }}
     </div>
 
 
-    <!-- Notes -->
+    <!-- الملاحظات -->
 
     <div
       *ngIf="appointment?.notes"
       class="text-sm text-gray-500"
     >
-      {{ appointment.notes }}
+      الملاحظات: {{ appointment.notes }}
     </div>
 
   </div>
 
 
   <!-- ====================================== -->
-  <!-- Cancel -->
+  <!-- إلغاء الموعد -->
   <!-- ====================================== -->
 
   <div
@@ -129,7 +129,7 @@
       (click)="cancelAppointment()"
       class="px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
     >
-      Cancel Appointment
+      إلغاء الموعد
     </button>
 
   </div>

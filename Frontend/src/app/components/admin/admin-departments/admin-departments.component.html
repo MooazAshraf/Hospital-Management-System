@@ -1,62 +1,520 @@
-<section class="p-8">
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-green-900">Departments</h1>
-      <p class="text-gray-600 text-sm">Manage the hospital's departments.</p>
-    </div>
-    <button
-      (click)="showAddForm = !showAddForm"
-      class="bg-green-900 text-white text-sm px-4 py-2 rounded-lg"
+<section
+  dir="rtl"
+  class="min-h-screen bg-gray-50/50 p-6 md:p-8"
+>
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
-      {{ showAddForm ? 'Cancel' : '+ Add Department' }}
-    </button>
+      <div>
+        <h1
+          class="text-2xl md:text-3xl font-bold text-green-900"
+        >
+          الأقسام الطبية
+        </h1>
+
+        <p class="text-gray-600 text-sm mt-1">
+          إدارة أقسام المستشفى وإضافة الأقسام وتعديلها وحذفها.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="showAddForm = !showAddForm"
+        class="inline-flex items-center justify-center gap-2
+               bg-green-900 text-white text-sm font-semibold
+               px-4 py-2.5 rounded-lg
+               hover:bg-green-800 transition-colors"
+      >
+        <span class="text-lg leading-none">
+          {{ showAddForm ? '×' : '+' }}
+        </span>
+
+        {{
+          showAddForm
+            ? 'إلغاء'
+            : 'إضافة قسم'
+        }}
+      </button>
+    </div>
+
+
+    <!-- Error -->
+    <div
+      *ngIf="errorMessage"
+      class="mb-5 p-4 rounded-xl
+             bg-red-50 border border-red-100
+             text-red-700 text-sm
+             flex items-center justify-between gap-4"
+    >
+      <span>
+        {{ errorMessage }}
+      </span>
+
+      <button
+        type="button"
+        (click)="errorMessage = ''"
+        class="text-red-400 hover:text-red-600
+               font-bold text-lg leading-none"
+      >
+        ×
+      </button>
+    </div>
+
+
+    <!-- Add Department Form -->
+    <div
+      *ngIf="showAddForm"
+      class="bg-white border border-gray-200
+             rounded-2xl shadow-sm p-5 mb-6
+             max-w-2xl"
+    >
+      <div class="mb-5">
+        <h2
+          class="text-lg font-bold text-green-900"
+        >
+          إضافة قسم جديد
+        </h2>
+
+        <p class="text-sm text-gray-500 mt-1">
+          أدخل بيانات القسم الجديد.
+        </p>
+      </div>
+
+      <div class="grid gap-4">
+
+        <!-- Name -->
+        <div>
+          <label
+            class="block text-xs font-semibold
+                   text-gray-600 mb-1.5"
+          >
+            اسم القسم
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="newDepartment.name"
+            placeholder="مثال: قسم القلب"
+            class="w-full border border-gray-200
+                   rounded-lg px-3 py-2.5
+                   text-sm text-gray-800
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-green-900/20
+                   focus:border-green-900"
+          />
+        </div>
+
+
+        <!-- Description -->
+        <div>
+          <label
+            class="block text-xs font-semibold
+                   text-gray-600 mb-1.5"
+          >
+            وصف القسم
+          </label>
+
+          <textarea
+            [(ngModel)]="newDepartment.description"
+            rows="3"
+            placeholder="اكتب وصفًا مختصرًا عن القسم..."
+            class="w-full border border-gray-200
+                   rounded-lg px-3 py-2.5
+                   text-sm text-gray-800
+                   resize-none
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-green-900/20
+                   focus:border-green-900"
+          ></textarea>
+        </div>
+
+
+        <!-- Image -->
+        <div>
+          <label
+            class="block text-xs font-semibold
+                   text-gray-600 mb-1.5"
+          >
+            مسار صورة القسم
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="newDepartment.image"
+            placeholder="/images/departments/cardiology.jpg"
+            class="w-full border border-gray-200
+                   rounded-lg px-3 py-2.5
+                   text-sm text-gray-800
+                   focus:outline-none
+                   focus:ring-2
+                   focus:ring-green-900/20
+                   focus:border-green-900"
+          />
+        </div>
+
+
+        <!-- Save -->
+        <div class="flex justify-start pt-2">
+          <button
+            type="button"
+            (click)="submitNewDepartment()"
+            class="bg-green-900 text-white
+                   text-sm font-semibold
+                   px-5 py-2.5 rounded-lg
+                   hover:bg-green-800
+                   transition-colors"
+          >
+            حفظ القسم
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- Loading -->
+    <div
+      *ngIf="loading"
+      class="bg-white border border-gray-100
+             rounded-2xl shadow-sm
+             text-center text-gray-500
+             py-16"
+    >
+      <div
+        class="inline-block
+               w-7 h-7
+               border-2
+               border-gray-200
+               border-t-green-900
+               rounded-full
+               animate-spin
+               mb-3"
+      ></div>
+
+      <p class="text-sm">
+        جاري تحميل الأقسام...
+      </p>
+    </div>
+
+
+    <!-- Departments Table -->
+    <div
+      *ngIf="!loading"
+      class="bg-white
+             border border-gray-100
+             rounded-2xl
+             shadow-sm
+             overflow-hidden"
+    >
+
+      <div class="overflow-x-auto">
+
+        <table
+          class="w-full text-sm text-right"
+        >
+
+          <thead
+            class="bg-gray-50
+                   border-b border-gray-100"
+          >
+            <tr>
+
+              <th
+                class="p-4
+                       text-xs font-semibold
+                       text-gray-600"
+              >
+                الصورة
+              </th>
+
+              <th
+                class="p-4
+                       text-xs font-semibold
+                       text-gray-600"
+              >
+                اسم القسم
+              </th>
+
+              <th
+                class="p-4
+                       text-xs font-semibold
+                       text-gray-600"
+              >
+                الوصف
+              </th>
+
+              <th
+                class="p-4
+                       text-xs font-semibold
+                       text-gray-600"
+              >
+                الإجراءات
+              </th>
+
+            </tr>
+          </thead>
+
+
+          <tbody
+            class="divide-y divide-gray-100"
+          >
+
+            <tr
+              *ngFor="let dept of departments"
+              class="hover:bg-gray-50/60
+                     transition-colors"
+            >
+
+              <!-- Normal Row -->
+              <ng-container
+                *ngIf="
+                  editingId !== dept._id;
+                  else editRow
+                "
+              >
+
+                <!-- Image -->
+                <td class="p-4">
+                  <img
+                    [src]="dept.image | imagePath"
+                    [alt]="dept.name"
+                    class="w-12 h-12
+                           object-cover
+                           rounded-xl
+                           border border-gray-100"
+                  />
+                </td>
+
+
+                <!-- Name -->
+                <td
+                  class="p-4
+                         font-semibold
+                         text-gray-900"
+                >
+                  {{ dept.name }}
+                </td>
+
+
+                <!-- Description -->
+                <td
+                  class="p-4
+                         text-gray-600
+                         max-w-md"
+                >
+                  {{ dept.description }}
+                </td>
+
+
+                <!-- Actions -->
+                <td class="p-4">
+                  <div
+                    class="flex items-center
+                           gap-4"
+                  >
+
+                    <button
+                      type="button"
+                      (click)="startEdit(dept)"
+                      class="text-green-900
+                             font-semibold
+                             hover:text-green-700
+                             transition-colors"
+                    >
+                      تعديل
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="deleteDepartment(dept)"
+                      class="text-red-600
+                             font-semibold
+                             hover:text-red-700
+                             transition-colors"
+                    >
+                      حذف
+                    </button>
+
+                  </div>
+                </td>
+
+              </ng-container>
+
+
+              <!-- Edit Row -->
+              <ng-template #editRow>
+
+                <!-- Image -->
+                <td class="p-4">
+                  <input
+                    type="text"
+                    [(ngModel)]="editDraft.image"
+                    class="border border-gray-200
+                           rounded-lg
+                           px-2.5 py-2
+                           text-xs
+                           w-full
+                           focus:outline-none
+                           focus:ring-2
+                           focus:ring-green-900/20
+                           focus:border-green-900"
+                  />
+                </td>
+
+
+                <!-- Name -->
+                <td class="p-4">
+                  <input
+                    type="text"
+                    [(ngModel)]="editDraft.name"
+                    class="border border-gray-200
+                           rounded-lg
+                           px-2.5 py-2
+                           text-sm
+                           w-full
+                           focus:outline-none
+                           focus:ring-2
+                           focus:ring-green-900/20
+                           focus:border-green-900"
+                  />
+                </td>
+
+
+                <!-- Description -->
+                <td class="p-4">
+                  <input
+                    type="text"
+                    [(ngModel)]="editDraft.description"
+                    class="border border-gray-200
+                           rounded-lg
+                           px-2.5 py-2
+                           text-sm
+                           w-full
+                           focus:outline-none
+                           focus:ring-2
+                           focus:ring-green-900/20
+                           focus:border-green-900"
+                  />
+                </td>
+
+
+                <!-- Edit Actions -->
+                <td class="p-4">
+                  <div
+                    class="flex items-center
+                           gap-4"
+                  >
+
+                    <button
+                      type="button"
+                      (click)="saveEdit(dept)"
+                      [disabled]="
+                        savingId === dept._id
+                      "
+                      class="text-green-900
+                             font-semibold
+                             hover:text-green-700
+                             disabled:opacity-50
+                             transition-colors"
+                    >
+                      {{
+                        savingId === dept._id
+                          ? 'جاري الحفظ...'
+                          : 'حفظ'
+                      }}
+                    </button>
+
+
+                    <button
+                      type="button"
+                      (click)="cancelEdit()"
+                      class="text-gray-500
+                             font-semibold
+                             hover:text-gray-700
+                             transition-colors"
+                    >
+                      إلغاء
+                    </button>
+
+                  </div>
+                </td>
+
+              </ng-template>
+
+            </tr>
+
+
+            <!-- Empty -->
+            <tr
+              *ngIf="
+                departments.length === 0 &&
+                !loading
+              "
+            >
+              <td
+                colspan="4"
+                class="py-16
+                       text-center
+                       text-gray-500"
+              >
+
+                <div
+                  class="inline-flex
+                         items-center
+                         justify-center
+                         w-14 h-14
+                         rounded-full
+                         bg-green-50
+                         text-green-900
+                         mb-4"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      d="M4 5h16v14H4z"
+                    />
+                    <path
+                      d="M8 9h8M8 13h5"
+                    />
+                  </svg>
+                </div>
+
+                <p
+                  class="font-semibold
+                         text-gray-800"
+                >
+                  لا توجد أقسام حتى الآن
+                </p>
+
+                <p
+                  class="text-xs
+                         text-gray-400
+                         mt-1"
+                >
+                  اضغط على "إضافة قسم"
+                  لإنشاء قسم جديد.
+                </p>
+
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+
   </div>
-
-  <div *ngIf="errorMessage" class="text-red-600 text-sm mb-4">{{ errorMessage }}</div>
-
-  <!-- Add form -->
-  <div *ngIf="showAddForm" class="border border-gray-200 rounded-lg p-5 mb-6 grid gap-3 max-w-lg">
-    <input [(ngModel)]="newDepartment.name" placeholder="Name" class="border rounded px-3 py-2 text-sm" />
-    <textarea [(ngModel)]="newDepartment.description" placeholder="Description" class="border rounded px-3 py-2 text-sm"></textarea>
-    <input [(ngModel)]="newDepartment.image" placeholder="Image path, e.g. /images/departments/cardiology.jpg" class="border rounded px-3 py-2 text-sm" />
-    <button (click)="submitNewDepartment()" class="bg-green-900 text-white text-sm px-4 py-2 rounded-lg w-fit">Save</button>
-  </div>
-
-  <div *ngIf="loading" class="text-center text-gray-500 py-10">Loading departments...</div>
-
-  <table *ngIf="!loading" class="w-full text-sm border border-gray-100 rounded-lg overflow-hidden">
-    <thead class="bg-gray-50 text-left">
-      <tr>
-        <th class="p-3">Image</th>
-        <th class="p-3">Name</th>
-        <th class="p-3">Description</th>
-        <th class="p-3">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let dept of departments" class="border-t border-gray-100">
-        <ng-container *ngIf="editingId !== dept._id; else editRow">
-          <td class="p-3"><img [src]="dept.image | imagePath" [alt]="dept.name" class="w-12 h-12 object-cover rounded" /></td>
-          <td class="p-3">{{ dept.name }}</td>
-          <td class="p-3 text-gray-600">{{ dept.description }}</td>
-          <td class="p-3 space-x-2">
-            <button (click)="startEdit(dept)" class="text-green-900 font-medium">Edit</button>
-            <button (click)="deleteDepartment(dept)" class="text-red-600 font-medium">Delete</button>
-          </td>
-        </ng-container>
-
-        <ng-template #editRow>
-          <td class="p-3"><input [(ngModel)]="editDraft.image" class="border rounded px-2 py-1 text-xs w-full" /></td>
-          <td class="p-3"><input [(ngModel)]="editDraft.name" class="border rounded px-2 py-1 text-xs w-full" /></td>
-          <td class="p-3"><input [(ngModel)]="editDraft.description" class="border rounded px-2 py-1 text-xs w-full" /></td>
-          <td class="p-3 space-x-2">
-            <button (click)="saveEdit(dept)" [disabled]="savingId === dept._id" class="text-green-900 font-medium">
-              {{ savingId === dept._id ? 'Saving...' : 'Save' }}
-            </button>
-            <button (click)="cancelEdit()" class="text-gray-500 font-medium">Cancel</button>
-          </td>
-        </ng-template>
-      </tr>
-    </tbody>
-  </table>
 </section>

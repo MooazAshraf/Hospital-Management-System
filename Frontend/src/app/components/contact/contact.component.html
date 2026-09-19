@@ -17,7 +17,6 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   }
 
-  /* Header */
   .contact-header {
     text-align: center;
     margin-bottom: 35px;
@@ -49,7 +48,6 @@
     font-size: 16px;
   }
 
-  /* Form */
   .contact-form {
     display: flex;
     flex-direction: column;
@@ -103,14 +101,12 @@
     box-shadow: 0 0 0 3px rgba(11, 143, 120, 0.1);
   }
 
-  /* Validation errors */
   .error {
     color: #dc2626;
     font-size: 13px;
     margin-top: 2px;
   }
 
-  /* Success message */
   .success-message {
     display: flex;
     align-items: center;
@@ -136,7 +132,6 @@
     font-weight: bold;
   }
 
-  /* Error message */
   .error-message {
     display: flex;
     align-items: center;
@@ -162,7 +157,6 @@
     font-weight: bold;
   }
 
-  /* Submit button */
   .submit-btn {
     width: 100%;
     height: 50px;
@@ -190,7 +184,6 @@
     cursor: not-allowed;
   }
 
-  /* Responsive */
   @media (max-width: 768px) {
     .contact-page {
       padding: 30px 15px;
@@ -225,12 +218,11 @@
   }
 </style>
 
-
-<div class="contact-page">
+<div class="contact-page" dir="rtl">
 
   <div class="contact-container">
 
-    <!-- Header -->
+    <!-- العنوان -->
     <div class="contact-header">
 
       <div class="icon-box">
@@ -238,145 +230,145 @@
       </div>
 
       <h1>
-        Contact Us
+        تواصل معنا
       </h1>
 
       <p>
-        Have a question or need help? Send us a message.
+        هل لديك سؤال أو تحتاج إلى مساعدة؟ أرسل لنا رسالة.
       </p>
 
     </div>
 
-    <!-- Form -->
+    <!-- النموذج -->
     <form
       [formGroup]="contactForm"
       (ngSubmit)="sendMessage()"
       class="contact-form"
     >
 
-      <!-- Name -->
+      <!-- الاسم -->
       <div class="form-group">
 
         <label for="name">
-          Name
+          الاسم
         </label>
 
         <input
           id="name"
           type="text"
           formControlName="name"
-          placeholder="Enter your name"
+          placeholder="أدخل اسمك"
         />
 
         <small
           class="error"
           *ngIf="name?.touched && name?.hasError('required')"
         >
-          Name is required.
+          الاسم مطلوب.
         </small>
 
       </div>
 
-      <!-- Email -->
+      <!-- البريد الإلكتروني -->
       <div class="form-group">
 
         <label for="email">
-          Email
+          البريد الإلكتروني
         </label>
 
         <input
           id="email"
           type="email"
           formControlName="email"
-          placeholder="Enter your email"
+          placeholder="أدخل بريدك الإلكتروني"
         />
 
         <small
           class="error"
           *ngIf="email?.touched && email?.hasError('required')"
         >
-          Email is required.
+          البريد الإلكتروني مطلوب.
         </small>
 
         <small
           class="error"
           *ngIf="email?.touched && email?.hasError('email')"
         >
-          Please enter a valid email.
+          يرجى إدخال بريد إلكتروني صحيح.
         </small>
 
       </div>
 
-      <!-- Phone -->
+      <!-- الهاتف -->
       <div class="form-group">
 
         <label for="phone">
-          Phone
+          رقم الهاتف
         </label>
 
         <input
           id="phone"
           type="tel"
           formControlName="phone"
-          placeholder="Enter your phone number"
+          placeholder="أدخل رقم هاتفك"
         />
 
       </div>
 
-      <!-- Subject -->
+      <!-- الموضوع -->
       <div class="form-group">
 
         <label for="subject">
-          Subject
+          الموضوع
         </label>
 
         <input
           id="subject"
           type="text"
           formControlName="subject"
-          placeholder="Enter message subject"
+          placeholder="أدخل موضوع الرسالة"
         />
 
         <small
           class="error"
           *ngIf="subject?.touched && subject?.hasError('required')"
         >
-          Subject is required.
+          الموضوع مطلوب.
         </small>
 
       </div>
 
-      <!-- Message -->
+      <!-- الرسالة -->
       <div class="form-group">
 
         <label for="message">
-          Message
+          الرسالة
         </label>
 
         <textarea
           id="message"
           rows="6"
           formControlName="message"
-          placeholder="Write your message..."
+          placeholder="اكتب رسالتك هنا..."
         ></textarea>
 
         <small
           class="error"
           *ngIf="message?.touched && message?.hasError('required')"
         >
-          Message is required.
+          الرسالة مطلوبة.
         </small>
 
         <small
           class="error"
           *ngIf="message?.touched && message?.hasError('minlength')"
         >
-          Message must be at least 10 characters.
+          يجب ألا تقل الرسالة عن 10 أحرف.
         </small>
 
       </div>
 
-      <!-- Success -->
+      <!-- رسالة النجاح -->
       <div
         class="success-message"
         *ngIf="successMessage"
@@ -386,7 +378,7 @@
         {{ successMessage }}
       </div>
 
-      <!-- Error -->
+      <!-- رسالة الخطأ -->
       <div
         class="error-message"
         *ngIf="errorMessage"
@@ -396,7 +388,7 @@
         {{ errorMessage }}
       </div>
 
-      <!-- Submit -->
+      <!-- زر الإرسال -->
       <button
         type="submit"
         class="submit-btn"
@@ -404,11 +396,11 @@
       >
 
         <span *ngIf="!isLoading">
-          Send Message
+          إرسال الرسالة
         </span>
 
         <span *ngIf="isLoading">
-          Sending...
+          جاري الإرسال...
         </span>
 
       </button>
@@ -417,4 +409,4 @@
 
   </div>
 
-</div>  
+</div>

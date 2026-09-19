@@ -1,20 +1,37 @@
-
-<main class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+<main
+  dir="rtl"
+  class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8"
+>
   <div class="max-w-7xl mx-auto space-y-6">
-    <!-- Header Section -->
+
+    <!-- Header -->
     <div
       class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200/80 pb-6"
     >
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-[#1B3B2B]">Manage Patients</h1>
-        <p class="text-sm text-gray-500 mt-1">View, add, edit, or delete patient records.</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-[#1B3B2B]">
+          إدارة المرضى
+        </h1>
+
+        <p class="text-sm text-gray-500 mt-1">
+          عرض وإضافة وتعديل وحذف بيانات المرضى.
+        </p>
       </div>
+
       <div class="flex items-center gap-3">
+
+        <!-- Add Staff -->
         <button
+          type="button"
           (click)="openAddStaffModal()"
           class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#1B3B2B] text-[#1B3B2B] font-semibold text-sm rounded-xl hover:bg-emerald-50 shadow-sm transition-all"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -22,13 +39,22 @@
               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          Add Staff
+
+          إضافة موظف
         </button>
+
+        <!-- Add Patient -->
         <button
+          type="button"
           (click)="openAddPatientModal()"
           class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1B3B2B] text-white font-semibold text-sm rounded-xl hover:bg-emerald-900 shadow-sm transition-all"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -36,17 +62,20 @@
               d="M12 4v16m8-8H4"
             />
           </svg>
-          Add Patient
+
+          إضافة مريض
         </button>
+
       </div>
     </div>
 
-    <!-- Error Alert Banner -->
+    <!-- Error Alert -->
     <div
       *ngIf="errorMessage"
       class="bg-red-50 border border-red-200/80 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center justify-between shadow-sm"
     >
       <div class="flex items-center gap-2.5">
+
         <svg
           class="w-5 h-5 text-red-500 shrink-0"
           fill="none"
@@ -60,79 +89,187 @@
             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span class="font-medium">{{ errorMessage }}</span>
+
+        <span class="font-medium">
+          {{ errorMessage }}
+        </span>
+
       </div>
-      <button (click)="errorMessage = ''" class="text-red-400 hover:text-red-600 font-bold text-lg">
+
+      <button
+        type="button"
+        (click)="errorMessage = ''"
+        class="text-red-400 hover:text-red-600 font-bold text-lg"
+      >
         &times;
       </button>
     </div>
 
-    <!-- Patients Table Container -->
-    <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm overflow-hidden">
+    <!-- Patients Table -->
+    <div
+      class="bg-white border border-gray-200/80 rounded-2xl shadow-sm overflow-hidden"
+    >
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+
+        <table class="w-full text-right border-collapse">
+
           <thead>
             <tr
-              class="bg-gray-50/80 border-b border-gray-200/80 text-xs font-bold text-[#1B3B2B] uppercase tracking-wider"
+              class="bg-gray-50/80 border-b border-gray-200/80 text-xs font-bold text-[#1B3B2B]"
             >
-              <th class="py-4 px-6">Name</th>
-              <th class="py-4 px-6">Email</th>
-              <th class="py-4 px-6">Phone</th>
-              <th class="py-4 px-6">Gender</th>
-              <th class="py-4 px-6">Date of Birth</th>
-              <th class="py-4 px-6">Blood Group</th>
-              <th class="py-4 px-6 text-right">Actions</th>
+              <th class="py-4 px-6">
+                الاسم
+              </th>
+
+              <th class="py-4 px-6">
+                البريد الإلكتروني
+              </th>
+
+              <th class="py-4 px-6">
+                رقم الهاتف
+              </th>
+
+              <th class="py-4 px-6">
+                الجنس
+              </th>
+
+              <th class="py-4 px-6">
+                تاريخ الميلاد
+              </th>
+
+              <th class="py-4 px-6">
+                فصيلة الدم
+              </th>
+
+              <th class="py-4 px-6">
+                الإجراءات
+              </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
-            <tr *ngFor="let patient of patients" class="hover:bg-gray-50/50 transition-colors">
-              <td class="py-4 px-6 font-semibold text-gray-900">{{ patient.name }}</td>
-              <td class="py-4 px-6 text-gray-600">{{ patient.email }}</td>
-              <td class="py-4 px-6 text-gray-600">{{ patient.phone || 'N/A' }}</td>
-              <td class="py-4 px-6 capitalize">{{ patient.gender || 'N/A' }}</td>
-              <td class="py-4 px-6">
-                {{ patient.dateOfBirth ? (patient.dateOfBirth | date: 'mediumDate') : 'N/A' }}
+
+          <tbody
+            class="divide-y divide-gray-100 text-sm text-gray-700"
+          >
+
+            <!-- Patients -->
+            <tr
+              *ngFor="let patient of patients"
+              class="hover:bg-gray-50/50 transition-colors"
+            >
+
+              <!-- Name -->
+              <td class="py-4 px-6 font-semibold text-gray-900">
+                {{ patient.name }}
               </td>
+
+              <!-- Email -->
+              <td class="py-4 px-6 text-gray-600">
+                {{ patient.email }}
+              </td>
+
+              <!-- Phone -->
+              <td
+                class="py-4 px-6 text-gray-600"
+                dir="ltr"
+              >
+                {{ patient.phone || 'غير متوفر' }}
+              </td>
+
+              <!-- Gender -->
+              <td class="py-4 px-6">
+                {{
+                  patient.gender === 'male'
+                    ? 'ذكر'
+                    : patient.gender === 'female'
+                    ? 'أنثى'
+                    : 'غير متوفر'
+                }}
+              </td>
+
+              <!-- Date of Birth -->
+              <td class="py-4 px-6">
+                {{
+                  patient.dateOfBirth
+                    ? (patient.dateOfBirth | date: 'dd/MM/yyyy')
+                    : 'غير متوفر'
+                }}
+              </td>
+
+              <!-- Blood Group -->
               <td class="py-4 px-6">
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-[#1B3B2B]"
                 >
-                  {{ patient.bloodGroup || 'N/A' }}
+                  {{ patient.bloodGroup || 'غير متوفر' }}
                 </span>
               </td>
-              <td class="py-4 px-6 text-right space-x-3">
-                <button
-                  (click)="editPatient(patient)"
-                  class="text-gray-500 hover:text-[#1B3B2B] font-medium transition-colors"
-                >
-                  Edit
-                </button>
-                <button
-                  (click)="deletePatient(patient._id)"
-                  class="text-red-500 hover:text-red-700 font-medium transition-colors"
-                >
-                  Delete
-                </button>
+
+              <!-- Actions -->
+              <td class="py-4 px-6">
+
+                <div class="flex items-center gap-4">
+
+                  <button
+                    type="button"
+                    (click)="editPatient(patient)"
+                    class="text-gray-500 hover:text-[#1B3B2B] font-medium transition-colors"
+                  >
+                    تعديل
+                  </button>
+
+                  <button
+                    type="button"
+                    (click)="deletePatient(patient._id)"
+                    class="text-red-500 hover:text-red-700 font-medium transition-colors"
+                  >
+                    حذف
+                  </button>
+
+                </div>
+
               </td>
+
             </tr>
 
-            <!-- Loading State -->
+            <!-- Loading -->
             <tr *ngIf="loading">
-              <td colspan="7" class="py-12 text-center text-gray-500">
+              <td
+                colspan="7"
+                class="py-12 text-center text-gray-500"
+              >
+
                 <div
                   class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-[#1B3B2B] rounded-full mb-2"
                 ></div>
-                <p class="text-xs">Loading patients...</p>
+
+                <p class="text-xs">
+                  جاري تحميل المرضى...
+                </p>
+
               </td>
             </tr>
 
-            <!-- Empty State -->
-            <tr *ngIf="!loading && (!patients || patients.length === 0)">
-              <td colspan="7" class="py-12 text-center text-gray-500">
+            <!-- Empty -->
+            <tr
+              *ngIf="
+                !loading &&
+                (!patients || patients.length === 0)
+              "
+            >
+              <td
+                colspan="7"
+                class="py-12 text-center text-gray-500"
+              >
+
                 <div
                   class="inline-flex items-center justify-center w-12 h-12 bg-emerald-50 text-[#1B3B2B] rounded-full mb-3"
                 >
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -141,51 +278,90 @@
                     />
                   </svg>
                 </div>
-                <p class="font-bold text-gray-800">No patients found</p>
-                <p class="text-xs text-gray-400 mt-1">
-                  Click "Add Patient" to create a new patient record.
+
+                <p class="font-bold text-gray-800">
+                  لم يتم العثور على مرضى
                 </p>
+
+                <p class="text-xs text-gray-400 mt-1">
+                  اضغط على "إضافة مريض" لإنشاء سجل مريض جديد.
+                </p>
+
               </td>
             </tr>
+
           </tbody>
         </table>
       </div>
     </div>
+
   </div>
 </main>
 
-<!-- Add / Edit Patient Modal Overlay -->
+
+<!-- Add / Edit Patient Modal -->
 <div
   *ngIf="showModal"
+  dir="rtl"
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
 >
   <div
     class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100"
   >
-    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+
+    <!-- Header -->
+    <div
+      class="px-6 py-4 border-b border-gray-100 flex items-center justify-between"
+    >
       <h3 class="text-lg font-bold text-[#1B3B2B]">
-        {{ isEditMode ? 'Edit Patient Details' : 'Add New Patient' }}
+        {{
+          isEditMode
+            ? 'تعديل بيانات المريض'
+            : 'إضافة مريض جديد'
+        }}
       </h3>
-      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">
+
+      <button
+        type="button"
+        (click)="closeModal()"
+        class="text-gray-400 hover:text-gray-600 font-bold text-xl"
+      >
         &times;
       </button>
     </div>
 
-    <form (ngSubmit)="savePatient()" class="p-6 space-y-4">
+    <!-- Form -->
+    <form
+      (ngSubmit)="savePatient()"
+      class="p-6 space-y-4"
+    >
+
+      <!-- Full Name -->
       <div>
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Full Name</label>
+        <label
+          class="block text-xs font-semibold text-gray-700 mb-1"
+        >
+          الاسم الكامل
+        </label>
+
         <input
           type="text"
           [(ngModel)]="patientForm.name"
           name="name"
           required
           class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
-          placeholder="e.g. John Doe"
+          placeholder="مثال: أحمد محمد"
         />
       </div>
 
+      <!-- Email -->
       <div>
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Email</label>
+        <label
+          class="block text-xs font-semibold text-gray-700 mb-1"
+        >
+          البريد الإلكتروني
+        </label>
+
         <input
           type="email"
           [(ngModel)]="patientForm.email"
@@ -196,8 +372,14 @@
         />
       </div>
 
+      <!-- Password -->
       <div>
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Account Password</label>
+        <label
+          class="block text-xs font-semibold text-gray-700 mb-1"
+        >
+          كلمة مرور الحساب
+        </label>
+
         <input
           type="password"
           [(ngModel)]="patientForm.password"
@@ -205,38 +387,67 @@
           minlength="8"
           [required]="!isEditMode"
           class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
-          placeholder="At least 8 characters"
+          placeholder="8 أحرف على الأقل"
         />
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
+      <!-- Phone / Gender -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Phone</label>
+          <label
+            class="block text-xs font-semibold text-gray-700 mb-1"
+          >
+            رقم الهاتف
+          </label>
+
           <input
             type="text"
             [(ngModel)]="patientForm.phone"
             name="phone"
             class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
-            placeholder="+123456789"
+            placeholder="01012345678"
           />
         </div>
+
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Gender</label>
+          <label
+            class="block text-xs font-semibold text-gray-700 mb-1"
+          >
+            الجنس
+          </label>
+
           <select
             [(ngModel)]="patientForm.gender"
             name="gender"
             class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
           >
-            <option value="">Select</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="">
+              اختر
+            </option>
+
+            <option value="male">
+              ذكر
+            </option>
+
+            <option value="female">
+              أنثى
+            </option>
           </select>
         </div>
+
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
+      <!-- Date / Blood Group -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Date of Birth</label>
+          <label
+            class="block text-xs font-semibold text-gray-700 mb-1"
+          >
+            تاريخ الميلاد
+          </label>
+
           <input
             type="date"
             [(ngModel)]="patientForm.dateOfBirth"
@@ -244,14 +455,23 @@
             class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
           />
         </div>
+
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Blood Group</label>
+          <label
+            class="block text-xs font-semibold text-gray-700 mb-1"
+          >
+            فصيلة الدم
+          </label>
+
           <select
             [(ngModel)]="patientForm.bloodGroup"
             name="bloodGroup"
             class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
           >
-            <option value="">Select</option>
+            <option value="">
+              اختر
+            </option>
+
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -262,38 +482,61 @@
             <option value="AB-">AB-</option>
           </select>
         </div>
+
       </div>
 
-      <div class="pt-4 flex items-center justify-end gap-3 border-t border-gray-100 mt-6">
+      <!-- Footer -->
+      <div
+        class="pt-4 flex items-center justify-start gap-3 border-t border-gray-100 mt-6"
+      >
+
         <button
           type="button"
           (click)="closeModal()"
           class="px-4 py-2 text-sm text-gray-600 font-medium hover:bg-gray-100 rounded-xl transition"
         >
-          Cancel
+          إلغاء
         </button>
+
         <button
           type="submit"
           [disabled]="saving"
           class="px-5 py-2 text-sm bg-[#1B3B2B] text-white font-semibold rounded-xl hover:bg-emerald-900 transition disabled:opacity-50"
         >
-          {{ saving ? 'Saving...' : 'Save Patient' }}
+          {{
+            saving
+              ? 'جاري الحفظ...'
+              : 'حفظ بيانات المريض'
+          }}
         </button>
+
       </div>
+
     </form>
   </div>
 </div>
-<!-- Add Staff (Doctor/Admin) Modal Overlay -->
+
+
+<!-- Add Staff Modal -->
 <div
   *ngIf="showStaffModal"
+  dir="rtl"
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
 >
   <div
     class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100"
   >
-    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-      <h3 class="text-lg font-bold text-[#1B3B2B]">Add Doctor / Admin Account</h3>
+
+    <!-- Header -->
+    <div
+      class="px-6 py-4 border-b border-gray-100 flex items-center justify-between"
+    >
+      <h3 class="text-lg font-bold text-[#1B3B2B]">
+        إضافة حساب طبيب أو مسؤول
+      </h3>
+
       <button
+        type="button"
         (click)="closeStaffModal()"
         class="text-gray-400 hover:text-gray-600 font-bold text-xl"
       >
@@ -301,6 +544,7 @@
       </button>
     </div>
 
+    <!-- Staff Error -->
     <div
       *ngIf="staffErrorMessage"
       class="mx-6 mt-4 bg-red-50 border border-red-200/80 text-red-700 px-4 py-3 rounded-xl text-sm"
@@ -308,21 +552,38 @@
       {{ staffErrorMessage }}
     </div>
 
-    <form (ngSubmit)="saveStaff()" class="p-6 space-y-4">
+    <!-- Staff Form -->
+    <form
+      (ngSubmit)="saveStaff()"
+      class="p-6 space-y-4"
+    >
+
+      <!-- Name -->
       <div>
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Full Name</label>
+        <label
+          class="block text-xs font-semibold text-gray-700 mb-1"
+        >
+          الاسم الكامل
+        </label>
+
         <input
           type="text"
           [(ngModel)]="staffForm.name"
           name="staffName"
           required
           class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
-          placeholder="e.g. Dr. Ahmed Ali"
+          placeholder="مثال: د. أحمد علي"
         />
       </div>
 
+      <!-- Email -->
       <div>
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Email</label>
+        <label
+          class="block text-xs font-semibold text-gray-700 mb-1"
+        >
+          البريد الإلكتروني
+        </label>
+
         <input
           type="email"
           [(ngModel)]="staffForm.email"
@@ -333,9 +594,16 @@
         />
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
+      <!-- Phone / Role -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Phone</label>
+          <label
+            class="block text-xs font-semibold text-gray-700 mb-1"
+          >
+            رقم الهاتف
+          </label>
+
           <input
             type="text"
             [(ngModel)]="staffForm.phone"
@@ -345,22 +613,40 @@
             placeholder="01012345678"
           />
         </div>
+
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Role</label>
+          <label
+            class="block text-xs font-semibold text-gray-700 mb-1"
+          >
+            الصلاحية
+          </label>
+
           <select
             [(ngModel)]="staffForm.role"
             name="staffRole"
             required
             class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
           >
-            <option value="doctor">Doctor</option>
-            <option value="admin">Admin</option>
+            <option value="doctor">
+              طبيب
+            </option>
+
+            <option value="admin">
+              مسؤول
+            </option>
           </select>
         </div>
+
       </div>
 
+      <!-- Password -->
       <div>
-        <label class="block text-xs font-semibold text-gray-700 mb-1">Password</label>
+        <label
+          class="block text-xs font-semibold text-gray-700 mb-1"
+        >
+          كلمة المرور
+        </label>
+
         <input
           type="password"
           [(ngModel)]="staffForm.password"
@@ -368,26 +654,37 @@
           required
           minlength="8"
           class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B3B2B]"
-          placeholder="At least 8 characters"
+          placeholder="8 أحرف على الأقل"
         />
       </div>
 
-      <div class="pt-4 flex items-center justify-end gap-3 border-t border-gray-100 mt-6">
+      <!-- Footer -->
+      <div
+        class="pt-4 flex items-center justify-start gap-3 border-t border-gray-100 mt-6"
+      >
+
         <button
           type="button"
           (click)="closeStaffModal()"
           class="px-4 py-2 text-sm text-gray-600 font-medium hover:bg-gray-100 rounded-xl transition"
         >
-          Cancel
+          إلغاء
         </button>
+
         <button
           type="submit"
           [disabled]="savingStaff"
           class="px-5 py-2 text-sm bg-[#1B3B2B] text-white font-semibold rounded-xl hover:bg-emerald-900 transition disabled:opacity-50"
         >
-          {{ savingStaff ? 'Saving...' : 'Save Account' }}
+          {{
+            savingStaff
+              ? 'جاري الحفظ...'
+              : 'حفظ الحساب'
+          }}
         </button>
+
       </div>
+
     </form>
   </div>
 </div>

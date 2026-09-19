@@ -1,4 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectorRef,
+} from '@angular/core';
 
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -25,62 +30,62 @@ export class AdminDashboardComponent implements OnInit {
 
   overview: OverviewCard[] = [
     {
-      label: 'Total Patients',
+      label: 'إجمالي المرضى',
       value: '—',
     },
     {
-      label: 'Total Doctors',
+      label: 'إجمالي الأطباء',
       value: '—',
     },
     {
-      label: 'Appointments Today',
+      label: 'مواعيد اليوم',
       value: '—',
     },
     {
-      label: 'Pending Appointments',
+      label: 'المواعيد قيد الانتظار',
       value: '—',
     },
   ];
 
   sections = [
     {
-      title: 'Doctors',
-      desc: 'Add, edit, remove doctors.',
+      title: 'الأطباء',
+      desc: 'إضافة الأطباء وتعديلهم وحذفهم.',
       link: '/admin/doctors',
     },
     {
-      title: 'Patients',
-      desc: 'View and manage patient records.',
+      title: 'المرضى',
+      desc: 'عرض وإدارة سجلات المرضى.',
       link: '/admin/patients',
     },
     {
-      title: 'Departments',
-      desc: 'Add, edit, remove departments.',
+      title: 'الأقسام',
+      desc: 'إضافة الأقسام وتعديلها وحذفها.',
       link: '/admin/departments',
     },
     {
-      title: 'Appointments',
-      desc: 'Confirm, cancel, update status.',
+      title: 'المواعيد',
+      desc: 'تأكيد المواعيد وإلغاؤها وتحديث حالتها.',
       link: '/admin/appointments',
     },
     {
-      title: 'Users & Roles',
-      desc: 'Manage accounts and role assignment.',
+      title: 'المستخدمون والصلاحيات',
+      desc: 'إدارة الحسابات وتعيين الصلاحيات.',
       link: '/admin/users',
     },
     {
-      title: 'Audit Logs',
-      desc: 'Track every admin action.',
+      title: 'سجلات التدقيق',
+      desc: 'متابعة جميع إجراءات المسؤول.',
       link: '/admin/audit-logs',
     },
     {
-      title: 'Payments',
-      desc: 'Review payment history and invoices.',
+      title: 'المدفوعات',
+      desc: 'مراجعة سجل المدفوعات والفواتير.',
       link: '/admin/payments',
     },
     {
-      title: 'Medicine',
-      desc: 'Pharmacy / inventory management.',
+      title: 'الأدوية',
+      desc: 'إدارة الصيدلية والمخزون.',
       link: '/admin/medicine',
       owner: 'Person 3',
     },
@@ -93,19 +98,19 @@ export class AdminDashboardComponent implements OnInit {
 
         this.overview = [
           {
-            label: 'Total Patients',
+            label: 'إجمالي المرضى',
             value: stats.totalPatients.toString(),
           },
           {
-            label: 'Total Doctors',
+            label: 'إجمالي الأطباء',
             value: stats.totalDoctors.toString(),
           },
           {
-            label: 'Appointments Today',
+            label: 'مواعيد اليوم',
             value: stats.appointmentsToday.toString(),
           },
           {
-            label: 'Pending Appointments',
+            label: 'المواعيد قيد الانتظار',
             value: stats.pendingAppointments.toString(),
           },
         ];
@@ -115,8 +120,11 @@ export class AdminDashboardComponent implements OnInit {
       },
 
       error: (err) => {
-        console.error('Failed to load admin stats:', err);
+        console.error(
+          'Failed to load admin stats:',
+          err
+        );
       },
     });
   }
-}
+} 

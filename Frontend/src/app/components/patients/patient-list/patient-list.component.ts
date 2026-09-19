@@ -1,10 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { PatientService } from '../../../services/patient.service';
 import { UserServices } from '../../../services/users.service';
-import { FooterComponent } from '../../shared/footer/footer.component';
-import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-patient-list',
@@ -32,7 +31,7 @@ export class PatientListComponent implements OnInit {
   };
 
   // ==========================
-  // Staff (Doctor/Admin) Modal
+  // نافذة إضافة موظف (طبيب / مسؤول)
   // ==========================
   showStaffModal = false;
   savingStaff = false;
@@ -79,9 +78,14 @@ export class PatientListComponent implements OnInit {
         this.loading = false;
         this.cdr.detectChanges();
       },
+
       error: (error: any) => {
         console.error('Error fetching patients:', error);
-        this.errorMessage = error?.error?.message || 'فشل في جلب قائمة المرضى';
+
+        this.errorMessage =
+          error?.error?.message ||
+          'فشل في تحميل قائمة المرضى.';
+
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -102,7 +106,9 @@ export class PatientListComponent implements OnInit {
 
     this.patientForm = {
       ...patient,
-      dateOfBirth: patient?.dateOfBirth ? String(patient.dateOfBirth).substring(0, 10) : '',
+      dateOfBirth: patient?.dateOfBirth
+        ? String(patient.dateOfBirth).substring(0, 10)
+        : '',
     };
 
     this.showModal = true;
@@ -125,7 +131,10 @@ export class PatientListComponent implements OnInit {
     if (this.isEditMode && payload._id) {
       const update$ = this.patientService.updatePatient
         ? this.patientService.updatePatient(payload._id, payload)
-        : (this.patientService as any).updateProfile(payload._id, payload);
+        : (this.patientService as any).updateProfile(
+            payload._id,
+            payload
+          );
 
       update$.subscribe({
         next: () => {
@@ -133,9 +142,14 @@ export class PatientListComponent implements OnInit {
           this.closeModal();
           this.loadPatients();
         },
+
         error: (err: any) => {
           console.error('Error updating patient:', err);
-          this.errorMessage = err?.error?.message || 'فشل في تعديل بيانات المريض';
+
+          this.errorMessage =
+            err?.error?.message ||
+            'فشل في تعديل بيانات المريض.';
+
           this.saving = false;
           this.cdr.detectChanges();
         },
@@ -153,9 +167,14 @@ export class PatientListComponent implements OnInit {
           this.closeModal();
           this.loadPatients();
         },
+
         error: (err: any) => {
           console.error('Error adding patient:', err);
-          this.errorMessage = err?.error?.message || 'فشل في إضافة المريض';
+
+          this.errorMessage =
+            err?.error?.message ||
+            'فشل في إضافة المريض.';
+
           this.saving = false;
           this.cdr.detectChanges();
         },
@@ -173,15 +192,20 @@ export class PatientListComponent implements OnInit {
           (this.patientService as any).removePatient?.(id));
 
       if (!delete$) {
-        alert('لا توجد طريقة حذف متاحة لهذا المريض');
+        alert('لا توجد طريقة حذف متاحة لهذا المريض.');
         return;
       }
 
       delete$.subscribe({
         next: () => this.loadPatients(),
+
         error: (err: any) => {
           console.error('Error deleting patient:', err);
-          alert(err?.error?.message || 'فشل في حذف المريض');
+
+          alert(
+            err?.error?.message ||
+              'فشل في حذف المريض.'
+          );
         },
       });
     }
@@ -201,8 +225,9 @@ export class PatientListComponent implements OnInit {
   }
 
   // ==========================
-  // Staff (Doctor/Admin) Methods
+  // وظائف إضافة موظف
   // ==========================
+
   openAddStaffModal(): void {
     this.staffErrorMessage = '';
     this.resetStaffForm();
@@ -226,9 +251,14 @@ export class PatientListComponent implements OnInit {
         this.savingStaff = false;
         this.closeStaffModal();
       },
+
       error: (err: any) => {
         console.error('Error adding staff account:', err);
-        this.staffErrorMessage = err?.error?.message || 'فشل في إضافة الحساب';
+
+        this.staffErrorMessage =
+          err?.error?.message ||
+          'فشل في إضافة الحساب.';
+
         this.savingStaff = false;
         this.cdr.detectChanges();
       },

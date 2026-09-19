@@ -3,22 +3,53 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  return auth.isLoggedIn() ? true : router.createUrlTree(['/login']);
+  if (authService.isLoggedIn()) {
+    return true;
+  }
+
+  return router.createUrlTree(['/login']);
 };
 
-export const roleGuard = (roles: Array<'user' | 'doctor' | 'admin'>): CanActivateFn => {
+export const roleGuard = (
+  allowedRoles: string[]
+): CanActivateFn => {
+
   return () => {
-    const auth = inject(AuthService);
+
+    const authService = inject(AuthService);
     const router = inject(Router);
-    const user = auth.getUser();
+
+    // لازم يكون عامل Login
+    if (!authService.isLoggedIn()) {
+      return router.createUrlTree(['/login']);
+    }
+
+    const user = authService.getUser();
 
     if (!user) {
       return router.createUrlTree(['/login']);
     }
 
-    return roles.includes(user.role) ? true : router.createUrlTree(['/']);
+    // هل الـ role مسموح؟
+    if (allowedRoles.includes(user.role)) {
+      return true;
+    }
+
+    // Admin
+    if (user.role === 'admin') {
+      return router.createUrlTree(['/admin-dashboard']);
+    }
+
+    // Doctor
+    if (user.role === 'doctor') {
+      return router.createUrlTree(['/doctor-dashboard']);
+    }
+
+    // User / Patient
+    return router.createUrlTree(['/patient-dashboard']);
   };
 };

@@ -1,10 +1,11 @@
-
-<section class="min-h-screen bg-gray-50 py-12 px-4">
+<section class="min-h-screen bg-gray-50 py-12 px-4" dir="rtl">
   <div class="max-w-2xl mx-auto">
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      <!-- Header -->
+
+      <!-- العنوان -->
       <div class="bg-green-900 px-8 py-8">
         <div class="flex items-center gap-5">
+
           <div
             class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-green-900 text-2xl font-bold"
           >
@@ -12,115 +13,164 @@
           </div>
 
           <div>
-            <h1 class="text-white text-2xl font-semibold">
+            <h1 class="!text-white text-2xl font-semibold">
               {{ user?.name }}
             </h1>
 
-            <p class="text-green-100 text-sm mt-1">Personal Information</p>
+            <p class="text-green-100 text-sm mt-1">
+              المعلومات الشخصية
+            </p>
           </div>
+
         </div>
       </div>
 
-      <!-- Content -->
+      <!-- المحتوى -->
       <div class="p-8">
-        <!-- Loading -->
+
+        <!-- التحميل -->
         <div *ngIf="loadingProfile" class="py-12 text-center">
+
           <div
             class="inline-block w-6 h-6 border-2 border-gray-300 border-t-green-700 rounded-full animate-spin mb-3"
           ></div>
 
-          <p class="text-gray-500 text-sm">Loading profile...</p>
+          <p class="text-gray-500 text-sm">
+            جاري تحميل الملف الشخصي...
+          </p>
+
         </div>
 
-        <!-- Loaded Content -->
+        <!-- المحتوى بعد التحميل -->
         <ng-container *ngIf="!loadingProfile">
-          <!-- ========================= -->
-          <!-- VIEW MODE -->
-          <!-- ========================= -->
+
+          <!-- وضع العرض -->
           <ng-container *ngIf="!editMode">
-            <!-- Patient exists -->
+
+            <!-- يوجد ملف مريض -->
             <ng-container *ngIf="hasPatient">
-              <!-- Name -->
+
+              <!-- الاسم -->
               <div class="border border-gray-200 rounded-xl p-5">
-                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Full Name</p>
+
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                  الاسم الكامل
+                </p>
 
                 <p class="text-gray-900 font-medium mt-2">
                   {{ patient?.name }}
                 </p>
+
               </div>
 
-              <!-- Email -->
+              <!-- البريد الإلكتروني -->
               <div class="border border-gray-200 rounded-xl p-5 mt-4">
+
                 <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
-                  Email Address
+                  البريد الإلكتروني
                 </p>
 
                 <p class="text-gray-900 font-medium mt-2 break-all">
                   {{ patient?.email }}
                 </p>
+
               </div>
 
-              <!-- Phone -->
+              <!-- رقم الهاتف -->
               <div class="border border-gray-200 rounded-xl p-5 mt-4">
+
                 <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
-                  Phone Number
+                  رقم الهاتف
                 </p>
 
                 <p class="text-gray-900 font-medium mt-2">
                   {{ patient?.phone }}
                 </p>
+
               </div>
 
-              <!-- Gender -->
+              <!-- النوع -->
               <div class="border border-gray-200 rounded-xl p-5 mt-4">
-                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Gender</p>
 
-                <p class="text-gray-900 font-medium mt-2">
-                  {{ patient?.gender || 'Not provided' }}
-                </p>
-              </div>
-
-              <!-- Date of Birth -->
-              <div class="border border-gray-200 rounded-xl p-5 mt-4">
                 <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
-                  Date of Birth
+                  النوع
                 </p>
 
                 <p class="text-gray-900 font-medium mt-2">
-                  {{ patient?.dateOfBirth ? (patient.dateOfBirth | date) : 'Not provided' }}
+                  {{
+                    patient?.gender === 'Male'
+                      ? 'ذكر'
+                      : patient?.gender === 'Female'
+                        ? 'أنثى'
+                        : 'غير متوفر'
+                  }}
                 </p>
+
               </div>
 
-              <!-- Blood Group -->
+              <!-- تاريخ الميلاد -->
               <div class="border border-gray-200 rounded-xl p-5 mt-4">
-                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Blood Group</p>
+
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                  تاريخ الميلاد
+                </p>
 
                 <p class="text-gray-900 font-medium mt-2">
-                  {{ patient?.bloodGroup || 'Not provided' }}
+                  {{
+                    patient?.dateOfBirth
+                      ? (patient.dateOfBirth | date)
+                      : 'غير متوفر'
+                  }}
                 </p>
+
               </div>
 
-              <!-- Address -->
+              <!-- فصيلة الدم -->
               <div class="border border-gray-200 rounded-xl p-5 mt-4">
-                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">Address</p>
+
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                  فصيلة الدم
+                </p>
 
                 <p class="text-gray-900 font-medium mt-2">
-                  {{ patient?.address?.street || 'Not provided' }}
+                  {{ patient?.bloodGroup || 'غير متوفر' }}
+                </p>
 
-                  <span *ngIf="patient?.address?.street && patient?.address?.city"> , </span>
+              </div>
+
+              <!-- العنوان -->
+              <div class="border border-gray-200 rounded-xl p-5 mt-4">
+
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                  العنوان
+                </p>
+
+                <p class="text-gray-900 font-medium mt-2">
+
+                  {{ patient?.address?.street || 'غير متوفر' }}
+
+                  <span
+                    *ngIf="patient?.address?.street && patient?.address?.city"
+                  >
+                    ،
+                  </span>
 
                   {{ patient?.address?.city }}
+
                 </p>
+
               </div>
 
-              <!-- Emergency Contact -->
+              <!-- جهة اتصال للطوارئ -->
               <div class="border border-gray-200 rounded-xl p-5 mt-4">
+
                 <p class="text-xs font-medium text-gray-400 uppercase tracking-wide">
-                  Emergency Contact
+                  جهة اتصال للطوارئ
                 </p>
 
                 <p class="text-gray-900 font-medium mt-2">
-                  {{ patient?.emergencyContact?.name || 'Not provided' }}
+
+                  {{ patient?.emergencyContact?.name || 'غير متوفر' }}
 
                   <span *ngIf="patient?.emergencyContact?.relationship">
                     ({{ patient?.emergencyContact?.relationship }})
@@ -129,41 +179,53 @@
                   <span *ngIf="patient?.emergencyContact?.phone">
                     — {{ patient?.emergencyContact?.phone }}
                   </span>
+
                 </p>
+
               </div>
+
             </ng-container>
 
-            <!-- No Patient -->
+            <!-- لا يوجد ملف مريض -->
             <div
               *ngIf="!hasPatient"
               class="border border-dashed border-gray-300 rounded-xl p-8 text-center"
             >
-              <p class="text-gray-500 text-sm">No patient profile yet.</p>
+
+              <p class="text-gray-500 text-sm">
+                لا يوجد ملف مريض حتى الآن.
+              </p>
 
               <p class="text-gray-400 text-xs mt-1">
-                Complete your profile to add your medical information.
+                أكمل ملفك الشخصي لإضافة معلوماتك الطبية.
               </p>
+
             </div>
 
-            <!-- Edit / Complete Button -->
+            <!-- زر التعديل / إكمال الملف -->
             <div class="flex justify-end mt-6">
+
               <button
                 type="button"
                 (click)="toggleEdit()"
                 class="bg-green-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-green-800 transition"
               >
-                {{ hasPatient ? 'Edit Profile' : 'Complete Profile' }}
+                {{ hasPatient ? 'تعديل الملف الشخصي' : 'إكمال الملف الشخصي' }}
               </button>
+
             </div>
+
           </ng-container>
 
-          <!-- ========================= -->
-          <!-- EDIT MODE -->
-          <!-- ========================= -->
+          <!-- وضع التعديل -->
           <div *ngIf="editMode" class="space-y-5">
-            <!-- Name -->
+
+            <!-- الاسم -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"> Full Name </label>
+
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                الاسم الكامل
+              </label>
 
               <input
                 type="text"
@@ -171,11 +233,15 @@
                 name="name"
                 class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
               />
+
             </div>
 
-            <!-- Email -->
+            <!-- البريد الإلكتروني -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"> Email Address </label>
+
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                البريد الإلكتروني
+              </label>
 
               <input
                 type="email"
@@ -183,11 +249,15 @@
                 name="email"
                 class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
               />
+
             </div>
 
-            <!-- Phone -->
+            <!-- رقم الهاتف -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"> Phone Number </label>
+
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                رقم الهاتف
+              </label>
 
               <input
                 type="text"
@@ -196,28 +266,45 @@
                 placeholder="01xxxxxxxxx"
                 class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
               />
+
             </div>
 
-            <!-- Gender + DOB -->
+            <!-- النوع + تاريخ الميلاد -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Gender </label>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  النوع
+                </label>
 
                 <select
                   [(ngModel)]="editableGender"
                   name="gender"
                   class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
                 >
-                  <option value="" disabled>Select gender</option>
 
-                  <option value="Male">Male</option>
+                  <option value="" disabled>
+                    اختر النوع
+                  </option>
 
-                  <option value="Female">Female</option>
+                  <option value="Male">
+                    ذكر
+                  </option>
+
+                  <option value="Female">
+                    أنثى
+                  </option>
+
                 </select>
+
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Date of Birth </label>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  تاريخ الميلاد
+                </label>
 
                 <input
                   type="date"
@@ -225,42 +312,49 @@
                   name="dateOfBirth"
                   class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
                 />
+
               </div>
+
             </div>
 
-            <!-- Blood Group -->
+            <!-- فصيلة الدم -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"> Blood Group </label>
+
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                فصيلة الدم
+              </label>
 
               <select
                 [(ngModel)]="editableBloodGroup"
                 name="bloodGroup"
                 class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
               >
-                <option value="" disabled>Select blood group</option>
+
+                <option value="" disabled>
+                  اختر فصيلة الدم
+                </option>
 
                 <option value="A+">A+</option>
-
                 <option value="A-">A-</option>
-
                 <option value="B+">B+</option>
-
                 <option value="B-">B-</option>
-
                 <option value="AB+">AB+</option>
-
                 <option value="AB-">AB-</option>
-
                 <option value="O+">O+</option>
-
                 <option value="O-">O-</option>
+
               </select>
+
             </div>
 
-            <!-- Address -->
+            <!-- العنوان -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"> Street </label>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  الشارع
+                </label>
 
                 <input
                   type="text"
@@ -268,10 +362,14 @@
                   name="street"
                   class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
                 />
+
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"> City </label>
+
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  المدينة
+                </label>
 
                 <input
                   type="text"
@@ -279,16 +377,25 @@
                   name="city"
                   class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
                 />
+
               </div>
+
             </div>
 
-            <!-- Emergency Contact -->
+            <!-- جهة اتصال للطوارئ -->
             <div class="border-t border-gray-100 pt-5">
-              <p class="text-sm font-semibold text-gray-800 mb-4">Emergency Contact</p>
+
+              <p class="text-sm font-semibold text-gray-800 mb-4">
+                جهة اتصال للطوارئ
+              </p>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2"> Name </label>
+
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    الاسم
+                  </label>
 
                   <input
                     type="text"
@@ -296,10 +403,14 @@
                     name="emergencyName"
                     class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
                   />
+
                 </div>
 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2"> Phone </label>
+
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    رقم الهاتف
+                  </label>
 
                   <input
                     type="text"
@@ -308,10 +419,14 @@
                     placeholder="01xxxxxxxxx"
                     class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
                   />
+
                 </div>
 
                 <div class="sm:col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 mb-2"> Relationship </label>
+
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    صلة القرابة
+                  </label>
 
                   <input
                     type="text"
@@ -319,19 +434,23 @@
                     name="emergencyRelationship"
                     class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-green-700"
                   />
+
                 </div>
+
               </div>
+
             </div>
 
-            <!-- Buttons -->
+            <!-- الأزرار -->
             <div class="flex justify-end gap-3 pt-3">
+
               <button
                 type="button"
                 (click)="toggleEdit()"
                 [disabled]="savingProfile"
                 class="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition disabled:opacity-50"
               >
-                Cancel
+                إلغاء
               </button>
 
               <button
@@ -340,12 +459,17 @@
                 [disabled]="savingProfile"
                 class="bg-green-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-green-800 transition disabled:opacity-50"
               >
-                {{ savingProfile ? 'Saving...' : 'Save Changes' }}
+                {{ savingProfile ? 'جاري الحفظ...' : 'حفظ التغييرات' }}
               </button>
+
             </div>
+
           </div>
+
         </ng-container>
+
       </div>
+
     </div>
   </div>
 </section>

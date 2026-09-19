@@ -113,7 +113,7 @@ export class ContactComponent {
 
           this.successMessage =
             response.message ||
-            'Your message has been sent successfully.';
+            'تم إرسال رسالتك بنجاح.';
 
           this.contactForm.reset({
             name: '',
@@ -128,13 +128,13 @@ export class ContactComponent {
           this.isLoading = false;
 
           console.error(
-            'Contact message error:',
+            'خطأ في إرسال رسالة التواصل:',
             error
           );
 
           this.errorMessage =
             error?.error?.message ||
-            'Failed to send your message. Please try again.';
+            'فشل إرسال رسالتك. يرجى المحاولة مرة أخرى.';
         },
       });
   }

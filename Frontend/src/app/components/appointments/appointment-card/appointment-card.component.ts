@@ -14,10 +14,11 @@ import { CommonModule } from '@angular/common';
   templateUrl: './appointment-card.component.html',
 })
 export class AppointmentCardComponent {
+
   @Input() appointment: any = null;
 
-  @Output() cancel =
-    new EventEmitter<string>();
+  @Output() cancel = new EventEmitter<string>();
+
 
   // =====================================================
   // Doctor Name
@@ -27,7 +28,7 @@ export class AppointmentCardComponent {
     const doctor = this.appointment?.doctor;
 
     if (!doctor) {
-      return 'Doctor';
+      return 'الطبيب';
     }
 
     let name = '';
@@ -46,18 +47,20 @@ export class AppointmentCardComponent {
     return this.cleanDoctorName(name);
   }
 
+
   // =====================================================
   // Clean Doctor Name
   // =====================================================
 
   private cleanDoctorName(name: string): string {
+
     if (!name) {
-      return 'Doctor';
+      return 'الطبيب';
     }
 
     let cleanName = String(name).trim();
 
-    // Remove prefixes
+    // إزالة ألقاب الطبيب
     cleanName = cleanName.replace(
       /^(doctor|dr\.?|دكتور|د\.?)\s*/i,
       ''
@@ -66,39 +69,39 @@ export class AppointmentCardComponent {
     cleanName = cleanName.trim();
 
     if (!cleanName) {
-      return 'Doctor';
+      return 'الطبيب';
     }
 
-    // Arabic
+    // الاسم العربي
     if (/[\u0600-\u06FF]/.test(cleanName)) {
       return `د. ${cleanName}`;
     }
 
-    // English
+    // الاسم الإنجليزي
     return `Dr. ${cleanName}`;
   }
+
 
   // =====================================================
   // Date
   // =====================================================
 
   get formattedDate(): string {
+
     const date = this.appointment?.date;
 
     if (!date) {
       return '';
     }
 
-    const parsed = new Date(
-      `${date}T00:00:00`
-    );
+    const parsed = new Date(`${date}T00:00:00`);
 
     if (isNaN(parsed.getTime())) {
       return date;
     }
 
     return new Intl.DateTimeFormat(
-      'en-CA',
+      'ar-EG',
       {
         year: 'numeric',
         month: '2-digit',
@@ -106,6 +109,7 @@ export class AppointmentCardComponent {
       }
     ).format(parsed);
   }
+
 
   // =====================================================
   // Time
@@ -115,35 +119,40 @@ export class AppointmentCardComponent {
     return this.appointment?.time || '';
   }
 
+
   // =====================================================
   // Appointment Type
   // =====================================================
 
   get appointmentType(): string {
-    const type =
-      this.appointment?.appointmentType;
+
+    const type = this.appointment?.appointmentType;
 
     switch (type) {
+
       case 'Consultation':
-        return 'Consultation';
+        return 'استشارة';
 
       case 'Follow-up':
-        return 'Follow-up';
+        return 'متابعة';
 
       case 'Check-up':
-        return 'Check-up';
+        return 'فحص';
 
       default:
         return type || '';
     }
   }
 
+
   // =====================================================
   // Status
   // =====================================================
 
   get statusLabel(): string {
+
     switch (this.appointment?.status) {
+
       case 'Pending':
         return 'قيد الانتظار';
 
@@ -161,12 +170,15 @@ export class AppointmentCardComponent {
     }
   }
 
+
   // =====================================================
   // Status Class
   // =====================================================
 
   get statusClass(): string {
+
     switch (this.appointment?.status) {
+
       case 'Confirmed':
         return 'bg-emerald-50 text-emerald-700';
 
@@ -184,11 +196,13 @@ export class AppointmentCardComponent {
     }
   }
 
+
   // =====================================================
   // Queue Number
   // =====================================================
 
   get queueNumber(): string {
+
     if (
       this.appointment?.queueNumber === undefined ||
       this.appointment?.queueNumber === null
@@ -196,14 +210,16 @@ export class AppointmentCardComponent {
       return '';
     }
 
-    return `#${this.appointment.queueNumber}`;
+    return `رقم الانتظار: ${this.appointment.queueNumber}`;
   }
+
 
   // =====================================================
   // Cancel
   // =====================================================
 
   cancelAppointment(): void {
+
     const id =
       this.appointment?._id ||
       this.appointment?.id;

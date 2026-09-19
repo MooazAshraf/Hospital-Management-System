@@ -2,20 +2,27 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Iuser } from '../models/users.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  private readonly currentUserSubject = new BehaviorSubject<Iuser | null>(this.getUser());
+
+  private readonly currentUserSubject =
+    new BehaviorSubject<Iuser | null>(this.getUser());
+
   readonly currentUser$ = this.currentUserSubject.asObservable();
 
   login(token: string, user: Iuser): void {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
+
     this.currentUserSubject.next(user);
   }
 
   getUser(): Iuser | null {
     try {
       const raw = localStorage.getItem('user');
+
       return raw ? (JSON.parse(raw) as Iuser) : null;
     } catch {
       this.logout();
@@ -33,12 +40,30 @@ export class AuthService {
 
   hasRole(...roles: Array<Iuser['role']>): boolean {
     const role = this.getUser()?.role;
+
     return !!role && roles.includes(role);
+  }
+
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
+  isDoctor(): boolean {
+    return this.hasRole('doctor');
+  }
+
+  isPatient(): boolean {
+    return this.hasRole('user');
+  }
+
+  canAccess(...roles: Array<Iuser['role']>): boolean {
+    return this.isLoggedIn() && this.hasRole(...roles);
   }
 
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+
     this.currentUserSubject.next(null);
   }
 }

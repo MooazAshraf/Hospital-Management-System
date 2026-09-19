@@ -10,7 +10,8 @@ import { Appointment } from '../../../models/appointment.model';
   templateUrl: './doctor-dashboard.component.html',
 })
 export class DoctorDashboardComponent implements OnInit {
-  private readonly appointmentService = inject(AppointmentService);
+  private readonly appointmentService =
+    inject(AppointmentService);
 
   appointments: Appointment[] = [];
   loading = false;
@@ -18,32 +19,70 @@ export class DoctorDashboardComponent implements OnInit {
 
   get today(): string {
     const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    return `${d.getFullYear()}-${String(
+      d.getMonth() + 1
+    ).padStart(2, '0')}-${String(
+      d.getDate()
+    ).padStart(2, '0')}`;
   }
 
   get todayAppointments(): Appointment[] {
-    return this.appointments.filter((a) => a.date === this.today);
+    return this.appointments.filter(
+      (a) => a.date === this.today
+    );
   }
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
   load(): void {
     this.loading = true;
+
     this.appointmentService.getAll().subscribe({
-      next: (res) => { this.appointments = res.data || []; this.loading = false; },
-      error: (err) => { this.errorMessage = err?.error?.message || 'Failed to load appointments'; this.loading = false; },
+      next: (res) => {
+        this.appointments = res.data || [];
+        this.loading = false;
+      },
+
+      error: (err) => {
+        this.errorMessage =
+          err?.error?.message ||
+          'فشل تحميل المواعيد';
+
+        this.loading = false;
+      },
     });
   }
 
   patientName(a: Appointment): string {
-    if (typeof a.patient === 'object') return a.patient.user?.name || 'Patient';
-    return 'Patient';
+    if (typeof a.patient === 'object') {
+      return (
+        a.patient.user?.name ||
+        'المريض'
+      );
+    }
+
+    return 'المريض';
   }
 
-  setStatus(a: Appointment, status: 'Confirmed' | 'Completed' | 'Cancelled'): void {
-    this.appointmentService.update(a._id, { status }).subscribe({
-      next: () => this.load(),
-      error: (err) => this.errorMessage = err?.error?.message || 'Failed to update appointment',
-    });
+  setStatus(
+    a: Appointment,
+    status:
+      | 'Confirmed'
+      | 'Completed'
+      | 'Cancelled'
+  ): void {
+    this.appointmentService
+      .update(a._id, { status })
+      .subscribe({
+        next: () => this.load(),
+
+        error: (err) =>
+          (this.errorMessage =
+            err?.error?.message ||
+            'فشل تحديث حالة الموعد'),
+      });
   }
 }

@@ -1,13 +1,26 @@
 import { Component, HostListener } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+
+import {
+  RouterLink,
+  RouterLinkActive,
+  Router,
+} from '@angular/router';
+
 import { AuthService } from '../../../services/auth.service';
+
 import { NotificationBellComponent } from '../../notifications/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, NotificationBellComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    RouterLinkActive,
+    NotificationBellComponent,
+  ],
   templateUrl: './navbar.component.html',
 })
 export class NavbarComponent {
@@ -52,13 +65,16 @@ export class NavbarComponent {
 
   goToDashboard() {
     const role = this.authService.getUser()?.role;
+
     switch (role) {
       case 'admin':
         this.router.navigate(['/admin-dashboard']);
         break;
+
       case 'doctor':
         this.router.navigate(['/doctor-dashboard']);
         break;
+
       default:
         this.router.navigate(['/patient-dashboard']);
     }

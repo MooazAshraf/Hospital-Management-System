@@ -1,7 +1,8 @@
 <nav
-  class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-4 bg-white shadow-sm"
+  dir="rtl"
+  class="fixed top-0 right-0 w-full z-50 flex items-center justify-between px-8 py-4 bg-white shadow-sm"
 >
-  <!-- Logo -->
+  <!-- الشعار -->
   <a
     routerLink="/"
     class="flex items-center gap-2 text-green-900 font-bold text-xl"
@@ -15,61 +16,86 @@
     urCare
   </a>
 
-  <!-- Links -->
+  <!-- الروابط -->
   <div class="flex items-center gap-8">
 
-    <!-- Home -->
+    <!-- الرئيسية -->
     <a
       routerLink="/"
       routerLinkActive="text-green-900 font-semibold"
       [routerLinkActiveOptions]="{ exact: true }"
       class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
     >
-      Home
+      الرئيسية
     </a>
 
-    <!-- Dashboard -->
+    <!-- لوحة التحكم - للمستخدمين المسجلين فقط -->
     <a
+      *ngIf="authService.isLoggedIn()"
       (click)="goToDashboard()"
       class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1 cursor-pointer"
     >
-      Dashboard
+      لوحة التحكم
     </a>
 
-    <!-- Doctors -->
+    <!-- الأطباء -->
     <a
       routerLink="/doctors"
       routerLinkActive="text-green-900 font-semibold"
       class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
     >
-      Doctors
+      الأطباء
     </a>
 
-      <a routerLink="/medicines" class="hover:text-green-900"> Pharmacy </a>
+    <!-- الصيدلية -->
+    <a
+      routerLink="/medicines"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
+    >
+      الصيدلية
+    </a>
 
-      <a routerLink="/medical-reports" class="hover:text-green-900"> Reports </a>
+    <!-- التقارير -->
+    <a
+      routerLink="/medical-reports"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
+    >
+      التقارير
+    </a>
 
-      <a routerLink="/about" class="hover:text-green-900"> About </a>
+    <!-- من نحن -->
+    <a
+      routerLink="/about"
+      class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
+    >
+      من نحن
+    </a>
 
-    <!-- Contact -->
+    <!-- تواصل معنا -->
     <a
       routerLink="/contact"
       routerLinkActive="text-green-900 font-semibold"
       class="text-gray-700 transition-all duration-200 hover:text-green-900 hover:-translate-y-1"
     >
-      Contact
+      تواصل معنا
     </a>
   </div>
 
-  <!-- Right -->
+  <!-- الجانب الأيمن -->
   <div class="flex items-center gap-5">
 
-    <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
+    <!-- ========================= -->
+    <!-- USER LOGGED IN -->
+    <!-- ========================= -->
 
-      <!-- Notifications -->
+    <ng-container
+      *ngIf="currentUser$ | async as user; else guestLinks"
+    >
+
+      <!-- الإشعارات -->
       <app-notification-bell></app-notification-bell>
 
-      <!-- User Dropdown -->
+      <!-- قائمة المستخدم -->
       <div class="relative">
 
         <button
@@ -102,35 +128,47 @@
           </svg>
         </button>
 
-        <!-- Dropdown -->
+        <!-- القائمة المنسدلة -->
         <div
           *ngIf="isDropdownOpen"
           (click)="$event.stopPropagation()"
-          class="absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50"
+          class="absolute left-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50"
         >
 
-          <!-- Profile -->
+          <!-- الملف الشخصي -->
           <a
             routerLink="/profile"
             class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-900"
           >
-            Profile
+            الملف الشخصي
           </a>
 
-          <!-- Dashboard -->
+          <!-- لوحة التحكم -->
           <button
             (click)="goToDashboard()"
-            class="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-900"
+            class="w-full text-right block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-900"
           >
-            Dashboard
+            لوحة التحكم
           </button>
 
-          <!-- Logout -->
+          <!-- ========================= -->
+          <!-- ADMIN ONLY -->
+          <!-- ========================= -->
+
+          <a
+            *ngIf="authService.isAdmin()"
+            routerLink="/admin/audit-logs"
+            class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-900"
+          >
+            سجل العمليات
+          </a>
+
+          <!-- تسجيل الخروج -->
           <button
             (click)="onLogout()"
-            class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+            class="w-full text-right px-4 py-2 text-red-600 hover:bg-red-50"
           >
-            Log out
+            تسجيل الخروج
           </button>
 
         </div>
@@ -138,23 +176,26 @@
 
     </ng-container>
 
-    <!-- Guest -->
+    <!-- ========================= -->
+    <!-- GUEST -->
+    <!-- ========================= -->
+
     <ng-template #guestLinks>
 
-      <!-- Login -->
+      <!-- تسجيل الدخول -->
       <a
         routerLink="/login"
         class="text-gray-700 font-medium hover:text-green-900 transition"
       >
-        Log in
+        تسجيل الدخول
       </a>
 
-      <!-- Book Appointment -->
+      <!-- التسجيل -->
       <a
-        routerLink="/book-appointment"
-        class="px-5 py-3 rounded-lg bg-green-900 text-white font-semibold transition-all duration-200 hover:bg-green-950 hover:-translate-y-1"
+        routerLink="/register"
+        class="text-gray-700 font-medium hover:text-green-900 transition"
       >
-        Book appointment
+        إنشاء حساب
       </a>
 
     </ng-template>

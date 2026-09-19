@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { MedicalReport } from '../medical-report.model';
 
@@ -6,34 +12,53 @@ import { MedicalReport } from '../medical-report.model';
   selector: 'app-medical-report-card',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './medical-report-card.component.html'
+  templateUrl: './medical-report-card.component.html',
 })
 export class MedicalReportCardComponent {
-  @Input() report!: MedicalReport;
+  @Input() report: MedicalReport | null = null;
 
-  // Resolved display names (passed in by the parent, since the backend
-  // only stores raw ObjectIds for patient/doctor/medicines).
-  @Input() patientName = 'Unknown patient';
-  @Input() doctorName = 'Unknown doctor';
+  @Input() patientName = 'مريض غير معروف';
+
+  @Input() doctorName = 'طبيب غير معروف';
+
   @Input() medicineNames: Record<string, string> = {};
 
-  // Set to true by pages (e.g. an admin/doctor report list) that allow
-  // editing; left false when the card is just used for display.
   @Input() showActions = false;
 
   @Output() edit = new EventEmitter<MedicalReport>();
+
   @Output() remove = new EventEmitter<MedicalReport>();
 
   medicineName(value: any): string {
-    if (value && typeof value === 'object') return value.name || 'Unknown medicine';
-    return this.medicineNames[String(value)] || 'Unknown medicine';
+    if (
+      value &&
+      typeof value === 'object'
+    ) {
+      return (
+        value.name ||
+        'دواء غير معروف'
+      );
+    }
+
+    return (
+      this.medicineNames[String(value)] ||
+      'دواء غير معروف'
+    );
   }
 
   onEdit(): void {
+    if (!this.report) {
+      return;
+    }
+
     this.edit.emit(this.report);
   }
 
   onRemove(): void {
+    if (!this.report) {
+      return;
+    }
+
     this.remove.emit(this.report);
   }
 }

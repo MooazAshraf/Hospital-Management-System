@@ -12,16 +12,28 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { MedicalReportCardComponent } from '../medical-report-card/medical-report-card.component';
-import { MedicalReportService, SimpleUser } from '../services/medical-report.service';
+import {
+  MedicalReportService,
+  SimpleUser,
+} from '../services/medical-report.service';
+
 import { MedicineService } from '../../medicine/services/medicine.service';
 import { Medicine } from '../../medicine/medicine.model';
 import { AuthService } from '../../../services/auth.service';
-import { emptyReport, MedicalReport } from '../medical-report.model';
+import {
+  emptyReport,
+  MedicalReport,
+} from '../medical-report.model';
 
 @Component({
   selector: 'app-medical-reports-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MedicalReportCardComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MedicalReportCardComponent,
+  ],
   templateUrl: './medical-reports-list.component.html',
 })
 export class MedicalReportsListComponent implements OnInit {
@@ -29,9 +41,6 @@ export class MedicalReportsListComponent implements OnInit {
   reports: MedicalReport[] = [];
   filteredReports: MedicalReport[] = [];
 
-  // True when /api/users or /api/medicalReports could not be loaded
-  // (e.g. no one is logged in). The page still works, it just falls
-  // back gracefully.
   needsLogin = false;
   canManage = false;
 
@@ -50,14 +59,12 @@ export class MedicalReportsListComponent implements OnInit {
   searchTerm = '';
   typeFilter = '';
 
-  // Modal state
   showModal = false;
   isEditMode = false;
   editingId: string | null = null;
   saving = false;
   formError = '';
 
-  // Delete confirm state
   deleteTarget: MedicalReport | null = null;
   deleting = false;
 
@@ -84,7 +91,9 @@ export class MedicalReportsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.canManage = this.authService.hasRole('doctor', 'admin');
+    this.canManage =
+      this.authService.hasRole('doctor', 'admin');
+
     this.loadAll();
   }
 
@@ -93,7 +102,9 @@ export class MedicalReportsListComponent implements OnInit {
   }
 
   get prescribedMedicines(): FormArray {
-    return this.form.get('prescribedMedicines') as FormArray;
+    return this.form.get(
+      'prescribedMedicines'
+    ) as FormArray;
   }
 
   loadAll(): void {
@@ -106,75 +117,168 @@ export class MedicalReportsListComponent implements OnInit {
           if (error?.status === 401) {
             this.needsLogin = true;
           } else {
-            this.errorMessage = error?.error?.message || 'Failed to load medical reports.';
+            this.errorMessage =
+              error?.error?.message ||
+              'فشل تحميل التقارير الطبية.';
           }
+
           return of([] as MedicalReport[]);
         })
       ),
+
       users: this.reportService.getUsers().pipe(
         catchError((error) => {
           if (error?.status === 401) {
             this.needsLogin = true;
           }
-          return of({ message: '', users: [] as SimpleUser[] });
+
+          return of({
+            message: '',
+            users: [] as SimpleUser[],
+          });
         })
       ),
-      medicines: this.medicineService.getMedicines().pipe(
-        catchError(() => of([] as Medicine[]))
-      ),
-    }).subscribe(({ reports, users, medicines }) => {
-      this.reports = reports || [];
 
-      const allUsers = users?.users || [];
-      this.patients = allUsers.filter((u) => u.role === 'user');
-      this.doctors = allUsers.filter((u) => u.role === 'doctor');
-      this.usersById = {};
-      allUsers.forEach((u) => (this.usersById[u._id] = u.name));
+      medicines: this.medicineService
+        .getMedicines()
+        .pipe(
+          catchError(() =>
+            of([] as Medicine[])
+          )
+        ),
+    }).subscribe(
+      ({
+        reports,
+        users,
+        medicines,
+      }) => {
 
-      this.medicines = medicines || [];
-      this.medicineNamesById = {};
-      this.medicines.forEach((m) => {
-        if (m._id) this.medicineNamesById[m._id] = m.name;
-      });
+        this.reports = reports || [];
 
-      this.reportTypes = Array.from(
-        new Set(this.reports.map((r) => r.reportType).filter(Boolean))
-      ).sort();
+        const allUsers =
+          users?.users || [];
 
-      this.applyFilters();
-      this.loading = false;
-      // The app runs without zone.js, so async work (like this HTTP
-      // response) doesn't automatically trigger a view refresh —
-      // force one explicitly.
-      this.cdr.detectChanges();
-    });
+        this.patients =
+          allUsers.filter(
+            (u) => u.role === 'user'
+          );
+
+        this.doctors =
+          allUsers.filter(
+            (u) => u.role === 'doctor'
+          );
+
+        this.usersById = {};
+
+        allUsers.forEach(
+          (u) =>
+            (this.usersById[u._id] = u.name)
+        );
+
+        this.medicines =
+          medicines || [];
+
+        this.medicineNamesById = {};
+
+        this.medicines.forEach((m) => {
+          if (m._id) {
+            this.medicineNamesById[m._id] =
+              m.name;
+          }
+        });
+
+        this.reportTypes =
+          Array.from(
+            new Set(
+              this.reports
+                .map(
+                  (r) => r.reportType
+                )
+                .filter(Boolean)
+            )
+          ).sort();
+
+        this.applyFilters();
+
+        this.loading = false;
+
+        this.cdr.detectChanges();
+      }
+    );
   }
 
   patientName(value: any): string {
-    if (value && typeof value === 'object') return value.name || 'Unknown patient';
-    return this.usersById[String(value)] || 'Unknown patient';
+    if (
+      value &&
+      typeof value === 'object'
+    ) {
+      return (
+        value.name ||
+        'مريض غير معروف'
+      );
+    }
+
+    return (
+      this.usersById[String(value)] ||
+      'مريض غير معروف'
+    );
   }
 
   doctorName(value: any): string {
-    if (value && typeof value === 'object') return value.name || 'Unknown doctor';
-    return this.usersById[String(value)] || 'Unknown doctor';
+    if (
+      value &&
+      typeof value === 'object'
+    ) {
+      return (
+        value.name ||
+        'طبيب غير معروف'
+      );
+    }
+
+    return (
+      this.usersById[String(value)] ||
+      'طبيب غير معروف'
+    );
   }
 
   applyFilters(): void {
-    const term = this.searchTerm.trim().toLowerCase();
+    const term =
+      this.searchTerm
+        .trim()
+        .toLowerCase();
 
-    this.filteredReports = this.reports.filter((r) => {
-      const matchesSearch =
-        !term ||
-        r.title?.toLowerCase().includes(term) ||
-        r.diagnosis?.toLowerCase().includes(term) ||
-        this.patientName(r.patient).toLowerCase().includes(term) ||
-        this.doctorName(r.doctor).toLowerCase().includes(term);
+    this.filteredReports =
+      this.reports.filter((r) => {
 
-      const matchesType = !this.typeFilter || r.reportType === this.typeFilter;
+        const matchesSearch =
+          !term ||
+          r.title
+            ?.toLowerCase()
+            .includes(term) ||
+          r.diagnosis
+            ?.toLowerCase()
+            .includes(term) ||
+          this.patientName(
+            r.patient
+          )
+            .toLowerCase()
+            .includes(term) ||
+          this.doctorName(
+            r.doctor
+          )
+            .toLowerCase()
+            .includes(term);
 
-      return matchesSearch && matchesType;
-    });
+        const matchesType =
+          !this.typeFilter ||
+          r.reportType ===
+            this.typeFilter;
+
+        return (
+          matchesSearch &&
+          matchesType
+        );
+      });
   }
 
   onSearchChange(): void {
@@ -187,63 +291,140 @@ export class MedicalReportsListComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // ---------- Prescribed medicines FormArray ----------
-
   addMedicineRow(): void {
     this.prescribedMedicines.push(
       this.fb.group({
-        medicine: ['', Validators.required],
-        dosage: ['', Validators.required],
-        frequency: ['', Validators.required],
-        duration: ['', Validators.required],
+        medicine: [
+          '',
+          Validators.required,
+        ],
+        dosage: [
+          '',
+          Validators.required,
+        ],
+        frequency: [
+          '',
+          Validators.required,
+        ],
+        duration: [
+          '',
+          Validators.required,
+        ],
       })
     );
   }
 
-  removeMedicineRow(index: number): void {
-    this.prescribedMedicines.removeAt(index);
+  removeMedicineRow(
+    index: number
+  ): void {
+    this.prescribedMedicines.removeAt(
+      index
+    );
   }
 
-  // ---------- Modal (Add / Edit) ----------
-
   openAddModal(): void {
-    if (!this.canManage) return;
+    if (!this.canManage) {
+      return;
+    }
+
     this.isEditMode = false;
     this.editingId = null;
     this.formError = '';
+
     this.prescribedMedicines.clear();
 
-    this.form.reset(emptyReport());
+    this.form.reset(
+      emptyReport()
+    );
+
     this.showModal = true;
   }
 
-  openEditModal(report: MedicalReport): void {
-    if (!this.canManage) return;
+  openEditModal(
+    report: MedicalReport
+  ): void {
+
+    if (!this.canManage) {
+      return;
+    }
+
     this.isEditMode = true;
-    this.editingId = report._id ?? null;
+    this.editingId =
+      report._id ?? null;
+
     this.formError = '';
 
     this.prescribedMedicines.clear();
-    (report.prescribedMedicines || []).forEach((pm) => {
+
+    (
+      report.prescribedMedicines ||
+      []
+    ).forEach((pm) => {
+
       this.prescribedMedicines.push(
         this.fb.group({
-          medicine: [typeof pm.medicine === 'object' ? (pm.medicine as any)._id : pm.medicine, Validators.required],
-          dosage: [pm.dosage, Validators.required],
-          frequency: [pm.frequency, Validators.required],
-          duration: [pm.duration, Validators.required],
+          medicine: [
+            typeof pm.medicine ===
+            'object'
+              ? (pm.medicine as any)._id
+              : pm.medicine,
+            Validators.required,
+          ],
+
+          dosage: [
+            pm.dosage,
+            Validators.required,
+          ],
+
+          frequency: [
+            pm.frequency,
+            Validators.required,
+          ],
+
+          duration: [
+            pm.duration,
+            Validators.required,
+          ],
         })
       );
     });
 
     this.form.patchValue({
-      patient: typeof report.patient === 'object' ? (report.patient as any)._id : report.patient,
-      doctor: typeof report.doctor === 'object' ? (report.doctor as any)._id : report.doctor,
-      reportType: report.reportType,
-      title: report.title,
-      diagnosis: report.diagnosis,
-      findings: report.findings || '',
-      recommendations: report.recommendations || '',
-      reportDate: report.reportDate ? report.reportDate.substring(0, 10) : '',
+      patient:
+        typeof report.patient ===
+        'object'
+          ? (report.patient as any)._id
+          : report.patient,
+
+      doctor:
+        typeof report.doctor ===
+        'object'
+          ? (report.doctor as any)._id
+          : report.doctor,
+
+      reportType:
+        report.reportType,
+
+      title:
+        report.title,
+
+      diagnosis:
+        report.diagnosis,
+
+      findings:
+        report.findings || '',
+
+      recommendations:
+        report.recommendations ||
+        '',
+
+      reportDate:
+        report.reportDate
+          ? report.reportDate.substring(
+              0,
+              10
+            )
+          : '',
     });
 
     this.showModal = true;
@@ -256,40 +437,70 @@ export class MedicalReportsListComponent implements OnInit {
   }
 
   onSubmit(): void {
+
     this.formError = '';
 
     if (this.form.invalid) {
+
       this.form.markAllAsTouched();
-      this.formError = 'Please fill in all required fields.';
+
+      this.formError =
+        'من فضلك املأ جميع الحقول المطلوبة.';
+
       this.cdr.detectChanges();
+
       return;
     }
 
     this.saving = true;
-    const payload: MedicalReport = this.form.value;
 
-    const request$ = this.isEditMode && this.editingId
-      ? this.reportService.updateReport(this.editingId, payload)
-      : this.reportService.createReport(payload);
+    const payload: MedicalReport =
+      this.form.value;
+
+    const request$ =
+      this.isEditMode &&
+      this.editingId
+        ? this.reportService.updateReport(
+            this.editingId,
+            payload
+          )
+        : this.reportService.createReport(
+            payload
+          );
 
     request$.subscribe({
+
       next: () => {
+
         this.saving = false;
+
         this.closeModal();
+
         this.loadAll();
       },
+
       error: (error) => {
+
         this.saving = false;
-        this.formError = error?.error?.message || 'Something went wrong. Please check your input and try again.';
+
+        this.formError =
+          error?.error?.message ||
+          'حدث خطأ ما. يرجى مراجعة البيانات والمحاولة مرة أخرى.';
+
         this.cdr.detectChanges();
       },
+
     });
   }
 
-  // ---------- Delete ----------
+  confirmDelete(
+    report: MedicalReport
+  ): void {
 
-  confirmDelete(report: MedicalReport): void {
-    if (!this.canManage) return;
+    if (!this.canManage) {
+      return;
+    }
+
     this.deleteTarget = report;
   }
 
@@ -298,22 +509,40 @@ export class MedicalReportsListComponent implements OnInit {
   }
 
   deleteReport(): void {
-    if (!this.deleteTarget?._id) return;
+
+    if (!this.deleteTarget?._id) {
+      return;
+    }
 
     this.deleting = true;
 
-    this.reportService.deleteReport(this.deleteTarget._id).subscribe({
-      next: () => {
-        this.deleting = false;
-        this.deleteTarget = null;
-        this.loadAll();
-      },
-      error: (error) => {
-        this.deleting = false;
-        this.errorMessage = error?.error?.message || 'Failed to delete report.';
-        this.deleteTarget = null;
-        this.cdr.detectChanges();
-      },
-    });
+    this.reportService
+      .deleteReport(
+        this.deleteTarget._id
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.deleting = false;
+          this.deleteTarget = null;
+
+          this.loadAll();
+        },
+
+        error: (error) => {
+
+          this.deleting = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'فشل حذف التقرير الطبي.';
+
+          this.deleteTarget = null;
+
+          this.cdr.detectChanges();
+        },
+
+      });
   }
 }

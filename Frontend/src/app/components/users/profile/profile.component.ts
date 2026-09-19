@@ -49,32 +49,35 @@ export class ProfileComponent {
 
     this.patientService.getMyProfile().subscribe({
       next: (response) => {
-        console.log('GET /api/patients/me response:', response);
+        console.log('استجابة GET /api/patients/me:', response);
 
-        const normalizedPatient = this.normalizePatientResponse(response);
+        const normalizedPatient =
+          this.normalizePatientResponse(response);
 
         this.patient = normalizedPatient;
-        this.hasPatient = this.checkHasPatient(normalizedPatient);
+        this.hasPatient =
+          this.checkHasPatient(normalizedPatient);
 
         if (normalizedPatient) {
           this.fillEditableFields(normalizedPatient);
         }
 
-        // إيقاف التحميل وتحديث الواجهة فوراً
         this.loadingProfile = false;
         this.cdr.detectChanges();
 
-        console.log('Normalized patient:', this.patient);
-        console.log('hasPatient:', this.hasPatient);
+        console.log('بيانات المريض بعد المعالجة:', this.patient);
+        console.log('هل يوجد ملف مريض:', this.hasPatient);
       },
 
       error: (error) => {
-        console.error('GET /api/patients/me failed:', error);
+        console.error(
+          'فشل طلب GET /api/patients/me:',
+          error
+        );
 
         this.patient = null;
         this.hasPatient = false;
 
-        // إيقاف التحميل وتحديث الواجهة عند الفشل
         this.loadingProfile = false;
         this.cdr.detectChanges();
       },
@@ -101,8 +104,13 @@ export class ProfileComponent {
       return response.data;
     }
 
-    // Direct patient object
-    if (response._id || response.name || response.email || response.phone) {
+    // كائن المريض مباشرة
+    if (
+      response._id ||
+      response.name ||
+      response.email ||
+      response.phone
+    ) {
       return response;
     }
 
@@ -110,25 +118,52 @@ export class ProfileComponent {
   }
 
   private checkHasPatient(patient: any): boolean {
-    return !!(patient && (patient._id || patient.name || patient.email || patient.phone));
+    return !!(
+      patient &&
+      (
+        patient._id ||
+        patient.name ||
+        patient.email ||
+        patient.phone
+      )
+    );
   }
 
   private fillEditableFields(patient: any): void {
-    this.editableName = patient?.name ?? this.user?.name ?? '';
-    this.editableEmail = patient?.email ?? this.user?.email ?? '';
-    this.editablePhone = patient?.phone ?? this.user?.phone ?? '';
-    this.editableGender = patient?.gender ?? '';
+    this.editableName =
+      patient?.name ?? this.user?.name ?? '';
 
-    this.editableDateOfBirth = patient?.dateOfBirth
-      ? String(patient.dateOfBirth).substring(0, 10)
-      : '';
+    this.editableEmail =
+      patient?.email ?? this.user?.email ?? '';
 
-    this.editableBloodGroup = patient?.bloodGroup ?? '';
-    this.editableStreet = patient?.address?.street ?? '';
-    this.editableCity = patient?.address?.city ?? '';
-    this.editableEmergencyName = patient?.emergencyContact?.name ?? '';
-    this.editableEmergencyPhone = patient?.emergencyContact?.phone ?? '';
-    this.editableEmergencyRelationship = patient?.emergencyContact?.relationship ?? '';
+    this.editablePhone =
+      patient?.phone ?? this.user?.phone ?? '';
+
+    this.editableGender =
+      patient?.gender ?? '';
+
+    this.editableDateOfBirth =
+      patient?.dateOfBirth
+        ? String(patient.dateOfBirth).substring(0, 10)
+        : '';
+
+    this.editableBloodGroup =
+      patient?.bloodGroup ?? '';
+
+    this.editableStreet =
+      patient?.address?.street ?? '';
+
+    this.editableCity =
+      patient?.address?.city ?? '';
+
+    this.editableEmergencyName =
+      patient?.emergencyContact?.name ?? '';
+
+    this.editableEmergencyPhone =
+      patient?.emergencyContact?.phone ?? '';
+
+    this.editableEmergencyRelationship =
+      patient?.emergencyContact?.relationship ?? '';
   }
 
   toggleEdit(): void {
@@ -143,20 +178,31 @@ export class ProfileComponent {
 
     this.patientService.getMyProfile().subscribe({
       next: (response) => {
-        console.log('Latest patient profile for edit:', response);
+        console.log(
+          'أحدث بيانات للمريض قبل التعديل:',
+          response
+        );
 
-        const latestPatient = this.normalizePatientResponse(response);
+        const latestPatient =
+          this.normalizePatientResponse(response);
 
         if (latestPatient) {
           this.patient = latestPatient;
-          this.hasPatient = this.checkHasPatient(latestPatient);
+          this.hasPatient =
+            this.checkHasPatient(latestPatient);
+
           this.fillEditableFields(latestPatient);
         }
+
         this.cdr.detectChanges();
       },
 
       error: (error) => {
-        console.warn('Could not refresh patient before edit:', error);
+        console.warn(
+          'تعذر تحديث بيانات المريض قبل التعديل:',
+          error
+        );
+
         this.fillEditableFields(this.patient);
         this.cdr.detectChanges();
       },
@@ -171,10 +217,12 @@ export class ProfileComponent {
       gender: this.editableGender,
       dateOfBirth: this.editableDateOfBirth,
       bloodGroup: this.editableBloodGroup,
+
       address: {
         street: this.editableStreet,
         city: this.editableCity,
       },
+
       emergencyContact: {
         name: this.editableEmergencyName,
         phone: this.editableEmergencyPhone,
@@ -186,30 +234,47 @@ export class ProfileComponent {
 
     this.patientService.saveMyProfile(payload).subscribe({
       next: (response) => {
-        console.log('Save response:', response);
-        const updatedPatient = this.normalizePatientResponse(response);
+        console.log(
+          'استجابة حفظ الملف الشخصي:',
+          response
+        );
+
+        const updatedPatient =
+          this.normalizePatientResponse(response);
 
         if (updatedPatient) {
           this.patient = updatedPatient;
-          this.hasPatient = this.checkHasPatient(updatedPatient);
+          this.hasPatient =
+            this.checkHasPatient(updatedPatient);
         }
 
-        const currentUser = this.authService.getUser();
+        const currentUser =
+          this.authService.getUser();
+
         if (currentUser) {
-          this.authService.login(this.authService.getToken() || '', {
-            ...currentUser,
-            name: this.editableName,
-            email: this.editableEmail,
-            phone: this.editablePhone,
-          });
+          this.authService.login(
+            this.authService.getToken() || '',
+            {
+              ...currentUser,
+              name: this.editableName,
+              email: this.editableEmail,
+              phone: this.editablePhone,
+            }
+          );
         }
 
         this.editMode = false;
         this.savingProfile = false;
+
         this.cdr.detectChanges();
       },
+
       error: (error) => {
-        console.error('Save profile failed:', error);
+        console.error(
+          'فشل حفظ الملف الشخصي:',
+          error
+        );
+
         this.savingProfile = false;
         this.cdr.detectChanges();
       },

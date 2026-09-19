@@ -35,10 +35,12 @@ import {
 
 import { AuthService } from '../../../services/auth.service';
 
+
 interface Slot {
   time: string;
   booked: boolean;
 }
+
 
 interface AvailableSlotsResponse {
   success: boolean;
@@ -54,6 +56,7 @@ interface AvailableSlotsResponse {
 
   availableSlots?: string[];
 }
+
 
 @Component({
   selector: 'app-booking-steps',
@@ -78,15 +81,22 @@ export class BookingStepsComponent
 
   @Output() booked = new EventEmitter<string>();
 
-  private readonly fb = inject(FormBuilder);
 
-  private readonly http = inject(HttpClient);
+  private readonly fb =
+    inject(FormBuilder);
 
-  private readonly authService = inject(AuthService);
+  private readonly http =
+    inject(HttpClient);
 
-  private readonly destroy$ = new Subject<void>();
+  private readonly authService =
+    inject(AuthService);
+
+  private readonly destroy$ =
+    new Subject<void>();
+
 
   detailsForm: FormGroup;
+
 
   step = signal(1);
 
@@ -96,19 +106,24 @@ export class BookingStepsComponent
 
   errorMessage = signal('');
 
-  availableSlots = signal<Slot[]>([]);
+  availableSlots =
+    signal<Slot[]>([]);
+
 
   stepLabels = [
-    'Patient',
-    'Appointment',
-    'Details',
-    'Confirm',
+    'المريض',
+    'الموعد',
+    'التفاصيل',
+    'التأكيد',
   ];
+
 
   minDate = '';
 
+
   morningSlots = computed(() =>
     this.availableSlots().filter((slot) => {
+
       const hour = Number(
         slot.time.split(':')[0]
       );
@@ -117,8 +132,10 @@ export class BookingStepsComponent
     })
   );
 
+
   afternoonSlots = computed(() =>
     this.availableSlots().filter((slot) => {
+
       const hour = Number(
         slot.time.split(':')[0]
       );
@@ -127,8 +144,11 @@ export class BookingStepsComponent
     })
   );
 
+
   constructor() {
+
     this.detailsForm = this.fb.group({
+
       patientName: [
         '',
         Validators.required,
@@ -171,19 +191,25 @@ export class BookingStepsComponent
     });
   }
 
+
   // =====================================================
-  // Init
+  // التهيئة
   // =====================================================
 
   ngOnInit(): void {
+
     const today = new Date();
 
-    this.minDate = this.formatDate(today);
+    this.minDate =
+      this.formatDate(today);
+
 
     const currentUser =
       this.authService.getUser();
 
+
     if (!currentUser) {
+
       this.errorMessage.set(
         'يجب تسجيل الدخول أولاً لحجز موعد.'
       );
@@ -191,11 +217,13 @@ export class BookingStepsComponent
       return;
     }
 
+
     // -------------------------------------------------
-    // Fill logged-in user information
+    // بيانات المستخدم المسجل
     // -------------------------------------------------
 
     this.detailsForm.patchValue({
+
       patientName:
         (currentUser as any).name ||
         (currentUser as any).fullName ||
@@ -210,8 +238,9 @@ export class BookingStepsComponent
         '',
     });
 
+
     // -------------------------------------------------
-    // Date changes
+    // تغيير التاريخ
     // -------------------------------------------------
 
     this.detailsForm
@@ -223,7 +252,7 @@ export class BookingStepsComponent
         takeUntil(this.destroy$)
       )
       .subscribe((date: string) => {
-        // Reset selected time
+
         this.detailsForm.patchValue(
           {
             time: '',
@@ -233,31 +262,44 @@ export class BookingStepsComponent
           }
         );
 
+
         if (
           date &&
           date.length === 10
         ) {
+
           this.loadSlots(date);
+
         } else {
+
           this.availableSlots.set([]);
+
         }
+
       });
   }
 
+
   // =====================================================
-  // Destroy
+  // إنهاء المكون
   // =====================================================
 
   ngOnDestroy(): void {
+
     this.destroy$.next();
+
     this.destroy$.complete();
   }
 
+
   // =====================================================
-  // Format Date
+  // تنسيق التاريخ
   // =====================================================
 
-  private formatDate(date: Date): string {
+  private formatDate(
+    date: Date
+  ): string {
+
     const year =
       date.getFullYear();
 
@@ -274,24 +316,32 @@ export class BookingStepsComponent
     return `${year}-${month}-${day}`;
   }
 
+
   // =====================================================
-  // Load Available Slots
+  // تحميل المواعيد المتاحة
   // =====================================================
 
-  loadSlots(date: string): void {
+  loadSlots(
+    date: string
+  ): void {
+
     if (
       !this.doctorId ||
       !date
     ) {
+
       this.availableSlots.set([]);
+
       return;
     }
+
 
     this.loadingSlots.set(true);
 
     this.errorMessage.set('');
 
     this.availableSlots.set([]);
+
 
     const params =
       new HttpParams()
@@ -304,6 +354,7 @@ export class BookingStepsComponent
           date
         );
 
+
     this.http
       .get<AvailableSlotsResponse>(
         'http://localhost:5000/api/appointments/available-slots',
@@ -315,11 +366,14 @@ export class BookingStepsComponent
         takeUntil(this.destroy$)
       )
       .subscribe({
+
         next: (res) => {
+
           console.log(
             'Available slots response:',
             res
           );
+
 
           const availableTimes =
             res?.data?.availableTimes ??
@@ -327,6 +381,7 @@ export class BookingStepsComponent
             res?.availableSlots ??
             res?.slots ??
             [];
+
 
           const slots: Slot[] =
             availableTimes.map(
@@ -336,44 +391,61 @@ export class BookingStepsComponent
               })
             );
 
+
           this.availableSlots.set(
             slots
           );
 
+
           this.loadingSlots.set(false);
 
+
           if (!slots.length) {
+
             this.errorMessage.set(
               'لا توجد مواعيد متاحة لهذا اليوم.'
             );
+
           } else {
+
             this.errorMessage.set('');
+
           }
         },
 
+
         error: (error) => {
+
           console.error(
             'Available slots error:',
             error
           );
 
+
           this.availableSlots.set([]);
 
           this.loadingSlots.set(false);
+
 
           this.errorMessage.set(
             error?.error?.message ||
             'حدث خطأ أثناء تحميل المواعيد المتاحة.'
           );
+
         },
+
       });
   }
 
+
   // =====================================================
-  // Date Chosen
+  // اختيار التاريخ
   // =====================================================
 
-  onDateChosen(date: string): void {
+  onDateChosen(
+    date: string
+  ): void {
+
     this.detailsForm.patchValue({
       date,
       time: '',
@@ -381,17 +453,22 @@ export class BookingStepsComponent
 
     this.step.set(2);
 
-    // valueChanges will load slots
+    // valueChanges سيقوم بتحميل المواعيد
   }
 
+
   // =====================================================
-  // Choose Time
+  // اختيار الوقت
   // =====================================================
 
-  chooseTime(slot: Slot): void {
+  chooseTime(
+    slot: Slot
+  ): void {
+
     if (slot.booked) {
       return;
     }
+
 
     this.detailsForm.patchValue({
       time: slot.time,
@@ -400,32 +477,40 @@ export class BookingStepsComponent
     this.step.set(3);
   }
 
+
   // =====================================================
-  // Slot Title
+  // عنوان الموعد
   // =====================================================
 
-  slotTitle(slot: Slot): string {
+  slotTitle(
+    slot: Slot
+  ): string {
+
     return slot.booked
       ? 'هذا الموعد محجوز'
       : 'اختيار هذا الموعد';
   }
 
+
   // =====================================================
-  // Has Available Slot
+  // التحقق من وجود موعد متاح
   // =====================================================
 
   hasAnyAvailableSlot(): boolean {
+
     return this.availableSlots()
       .some(
         (slot) => !slot.booked
       );
   }
 
+
   // =====================================================
-  // Review
+  // المراجعة
   // =====================================================
 
   goToReview(): void {
+
     const appointmentType =
       this.detailsForm.get(
         'appointmentType'
@@ -434,14 +519,19 @@ export class BookingStepsComponent
     const time =
       this.detailsForm.get('time');
 
+
     if (
       appointmentType?.invalid
     ) {
+
       appointmentType.markAsTouched();
+
       return;
     }
 
+
     if (time?.invalid) {
+
       time.markAsTouched();
 
       this.errorMessage.set(
@@ -451,36 +541,46 @@ export class BookingStepsComponent
       return;
     }
 
+
     this.step.set(4);
   }
 
+
   // =====================================================
-  // Back
+  // الرجوع
   // =====================================================
 
   back(): void {
+
     if (this.step() > 1) {
+
       this.step.update(
         (value) => value - 1
       );
+
     }
   }
 
+
   // =====================================================
-  // Confirm Booking
+  // تأكيد الحجز
   // =====================================================
 
   confirm(): void {
+
     this.errorMessage.set('');
+
 
     const currentUser =
       this.authService.getUser();
 
+
     // -------------------------------------------------
-    // Authentication
+    // تسجيل الدخول
     // -------------------------------------------------
 
     if (!currentUser) {
+
       this.errorMessage.set(
         'يجب تسجيل الدخول أولاً لحجز موعد.'
       );
@@ -488,11 +588,13 @@ export class BookingStepsComponent
       return;
     }
 
+
     // -------------------------------------------------
-    // Doctor
+    // الطبيب
     // -------------------------------------------------
 
     if (!this.doctorId) {
+
       this.errorMessage.set(
         'بيانات الطبيب غير موجودة.'
       );
@@ -500,13 +602,15 @@ export class BookingStepsComponent
       return;
     }
 
+
     // -------------------------------------------------
-    // Form validation
+    // التحقق من النموذج
     // -------------------------------------------------
 
     if (
       this.detailsForm.invalid
     ) {
+
       this.detailsForm.markAllAsTouched();
 
       this.errorMessage.set(
@@ -516,11 +620,13 @@ export class BookingStepsComponent
       return;
     }
 
+
     const formValue =
       this.detailsForm.getRawValue();
 
+
     // -------------------------------------------------
-    // Check selected slot
+    // التحقق من الموعد المختار
     // -------------------------------------------------
 
     const selectedSlot =
@@ -530,47 +636,52 @@ export class BookingStepsComponent
           !slot.booked
       );
 
+
     if (!selectedSlot) {
+
       this.errorMessage.set(
         'هذا الموعد غير متاح. من فضلك اختر موعدًا آخر.'
       );
 
+
       if (formValue.date) {
+
         this.loadSlots(
           formValue.date
         );
+
       }
 
       return;
     }
 
+
     // -------------------------------------------------
-    // Prevent double submit
+    // منع الإرسال المتكرر
     // -------------------------------------------------
 
     if (this.submitting()) {
       return;
     }
 
+
     this.submitting.set(true);
 
+
     // -------------------------------------------------
-    // Do NOT send patient id from frontend.
-    //
-    // Backend gets:
-    // req.user.userId
-    //       ↓
-    // Patient.user
-    //       ↓
-    // Patient._id
+    // لا يتم إرسال معرف المريض من الواجهة
     // -------------------------------------------------
 
     const payload = {
-      doctor: this.doctorId,
 
-      date: formValue.date,
+      doctor:
+        this.doctorId,
 
-      time: formValue.time,
+      date:
+        formValue.date,
+
+      time:
+        formValue.time,
 
       appointmentType:
         formValue.appointmentType,
@@ -579,13 +690,15 @@ export class BookingStepsComponent
         formValue.notes || '',
     };
 
+
     console.log(
       'Booking payload:',
       payload
     );
 
+
     // -------------------------------------------------
-    // Create appointment
+    // إنشاء الموعد
     // -------------------------------------------------
 
     this.http
@@ -597,13 +710,17 @@ export class BookingStepsComponent
         takeUntil(this.destroy$)
       )
       .subscribe({
+
         next: (res) => {
+
           console.log(
             'Appointment created:',
             res
           );
 
+
           this.submitting.set(false);
+
 
           const appointmentId =
             res?.data?._id ||
@@ -611,7 +728,9 @@ export class BookingStepsComponent
             res?._id ||
             '';
 
-          // Mark current slot as booked locally
+
+          // تحديث حالة الموعد محليًا
+
           this.availableSlots.update(
             (slots) =>
               slots.map(
@@ -626,41 +745,55 @@ export class BookingStepsComponent
               )
           );
 
+
           this.booked.emit(
             appointmentId
           );
         },
 
+
         error: (error) => {
+
           console.error(
             'Booking error:',
             error
           );
 
+
           this.submitting.set(false);
+
 
           const message =
             error?.error?.message ||
             'حدث خطأ أثناء حجز الموعد.';
 
+
           this.errorMessage.set(
             message
           );
 
-          // Reload slots if conflict
+
+          // إعادة تحميل المواعيد في حالة التعارض
+
           if (
             error?.status === 400 ||
             error?.status === 409
           ) {
+
             if (
               formValue.date
             ) {
+
               this.loadSlots(
                 formValue.date
               );
+
             }
           }
+
         },
+
       });
   }
+
 }

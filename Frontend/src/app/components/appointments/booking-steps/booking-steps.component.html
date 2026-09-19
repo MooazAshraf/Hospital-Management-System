@@ -1,9 +1,9 @@
-<div class="booking-page">
+<div class="booking-page" dir="rtl">
 
   <div class="booking-card">
 
     <!-- ================================================= -->
-    <!-- Doctor Header -->
+    <!-- بيانات الطبيب -->
     <!-- ================================================= -->
 
     <div class="doctor-header">
@@ -38,8 +38,8 @@
             doctorFees !== undefined
           "
         >
-          Consultation Fee:
-          {{ doctorFees }} EGP
+          سعر الكشف:
+          {{ doctorFees }} جنيه
         </span>
 
       </div>
@@ -51,7 +51,7 @@
 
 
     <!-- ================================================= -->
-    <!-- Booking Form -->
+    <!-- نموذج الحجز -->
     <!-- ================================================= -->
 
     <form
@@ -61,43 +61,42 @@
     >
 
       <h1>
-        Book an Appointment
+        حجز موعد
       </h1>
 
       <p class="form-subtitle">
-        Fill in your information to book an
-        appointment with this doctor.
+        أدخل بياناتك لحجز موعد مع هذا الطبيب.
       </p>
 
 
       <!-- ================================================= -->
-      <!-- Patient Information -->
+      <!-- بيانات المريض -->
       <!-- ================================================= -->
 
       <div class="section-title">
 
         <span>1</span>
 
-        Patient Information
+        بيانات المريض
 
       </div>
 
 
       <div class="form-grid">
 
-        <!-- Name -->
+        <!-- الاسم -->
 
         <div class="form-group">
 
           <label for="patientName">
-            Full Name
+            الاسم بالكامل
           </label>
 
           <input
             id="patientName"
             type="text"
             formControlName="patientName"
-            placeholder="Enter your full name"
+            placeholder="أدخل اسمك بالكامل"
             readonly
           />
 
@@ -107,7 +106,7 @@
           ) {
 
             <small class="error">
-              Please enter your name.
+              من فضلك أدخل اسمك.
             </small>
 
           }
@@ -115,12 +114,12 @@
         </div>
 
 
-        <!-- Phone -->
+        <!-- الهاتف -->
 
         <div class="form-group">
 
           <label for="phone">
-            Phone Number
+            رقم الهاتف
           </label>
 
           <input
@@ -137,8 +136,7 @@
           ) {
 
             <small class="error">
-              Please enter a valid Egyptian
-              phone number.
+              من فضلك أدخل رقم هاتف مصري صحيح.
             </small>
 
           }
@@ -146,12 +144,12 @@
         </div>
 
 
-        <!-- Email -->
+        <!-- البريد الإلكتروني -->
 
         <div class="form-group full">
 
           <label for="email">
-            Email Address
+            البريد الإلكتروني
           </label>
 
           <input
@@ -168,7 +166,7 @@
           ) {
 
             <small class="error">
-              Please enter a valid email address.
+              من فضلك أدخل بريدًا إلكترونيًا صحيحًا.
             </small>
 
           }
@@ -179,14 +177,14 @@
 
 
       <!-- ================================================= -->
-      <!-- Appointment Information -->
+      <!-- بيانات الموعد -->
       <!-- ================================================= -->
 
       <div class="section-title">
 
         <span>2</span>
 
-        Appointment Details
+        تفاصيل الموعد
 
       </div>
 
@@ -195,13 +193,13 @@
 
 
         <!-- ================================================= -->
-        <!-- Date -->
+        <!-- التاريخ -->
         <!-- ================================================= -->
 
         <div class="form-group">
 
           <label for="date">
-            Appointment Date
+            تاريخ الموعد
           </label>
 
           <input
@@ -215,13 +213,13 @@
 
 
         <!-- ================================================= -->
-        <!-- Time -->
+        <!-- الوقت -->
         <!-- ================================================= -->
 
         <div class="form-group">
 
           <label for="time">
-            Appointment Time
+            وقت الموعد
           </label>
 
 
@@ -234,17 +232,17 @@
             "
           >
 
-            <!-- Default -->
+            <!-- الافتراضي -->
 
             <option value="">
 
               @if (loadingSlots()) {
 
-                Loading times...
+                جاري تحميل المواعيد...
 
               } @else {
 
-                Select a time
+                اختر وقت الموعد
 
               }
 
@@ -252,14 +250,14 @@
 
 
             <!-- ================================================= -->
-            <!-- Morning -->
+            <!-- الفترة الصباحية -->
             <!-- ================================================= -->
 
             @if (
               morningSlots().length > 0
             ) {
 
-              <optgroup label="Morning">
+              <optgroup label="الفترة الصباحية">
 
                 @for (
                   slot of morningSlots();
@@ -274,7 +272,7 @@
                     {{ slot.time }}
 
                     @if (slot.booked) {
-                      - Booked
+                      - محجوز
                     }
 
                   </option>
@@ -287,14 +285,14 @@
 
 
             <!-- ================================================= -->
-            <!-- Afternoon -->
+            <!-- الفترة المسائية -->
             <!-- ================================================= -->
 
             @if (
               afternoonSlots().length > 0
             ) {
 
-              <optgroup label="Afternoon">
+              <optgroup label="الفترة المسائية">
 
                 @for (
                   slot of afternoonSlots();
@@ -309,7 +307,7 @@
                     {{ slot.time }}
 
                     @if (slot.booked) {
-                      - Booked
+                      - محجوز
                     }
 
                   </option>
@@ -323,18 +321,18 @@
           </select>
 
 
-          <!-- Loading -->
+          <!-- جاري التحميل -->
 
           @if (loadingSlots()) {
 
             <small class="hint">
-              Loading available times...
+              جاري تحميل المواعيد المتاحة...
             </small>
 
           }
 
 
-          <!-- No Slots -->
+          <!-- لا توجد مواعيد -->
 
           @if (
             !loadingSlots() &&
@@ -343,7 +341,7 @@
           ) {
 
             <small class="no-slots">
-              No available appointments on this date.
+              لا توجد مواعيد متاحة في هذا اليوم.
             </small>
 
           }
@@ -352,13 +350,13 @@
 
 
         <!-- ================================================= -->
-        <!-- Visit Type -->
+        <!-- نوع الزيارة -->
         <!-- ================================================= -->
 
         <div class="form-group full">
 
           <label for="appointmentType">
-            Visit Type
+            نوع الزيارة
           </label>
 
           <select
@@ -367,15 +365,15 @@
           >
 
             <option value="Check-up">
-              New Check-up
+              فحص جديد
             </option>
 
             <option value="Follow-up">
-              Follow-up
+              متابعة
             </option>
 
             <option value="Consultation">
-              Consultation
+              استشارة
             </option>
 
           </select>
@@ -384,17 +382,17 @@
 
 
         <!-- ================================================= -->
-        <!-- Notes -->
+        <!-- الملاحظات -->
         <!-- ================================================= -->
 
         <div class="form-group full">
 
           <label for="notes">
 
-            Notes
+            ملاحظات
 
             <span>
-              (Optional)
+              (اختياري)
             </span>
 
           </label>
@@ -403,7 +401,7 @@
             id="notes"
             formControlName="notes"
             rows="4"
-            placeholder="Tell the doctor anything important about your visit..."
+            placeholder="اكتب أي معلومات مهمة تريد إخبار الطبيب بها عن زيارتك..."
           ></textarea>
 
         </div>
@@ -412,7 +410,7 @@
 
 
       <!-- ================================================= -->
-      <!-- Error -->
+      <!-- الخطأ -->
       <!-- ================================================= -->
 
       @if (errorMessage()) {
@@ -427,14 +425,14 @@
 
 
       <!-- ================================================= -->
-      <!-- Footer -->
+      <!-- أسفل النموذج -->
       <!-- ================================================= -->
 
       <div class="form-footer">
 
         <div class="secure-text">
 
-          Your information is kept private.
+          معلوماتك وبياناتك محفوظة وسرية.
 
         </div>
 
@@ -450,11 +448,11 @@
 
           @if (submitting()) {
 
-            Booking...
+            جاري حجز الموعد...
 
           } @else {
 
-            Book Appointment
+            تأكيد حجز الموعد
 
           }
 
@@ -475,8 +473,8 @@
   min-height: calc(100vh - 140px);
   background: #f7f9f8;
   padding: 50px 20px 70px;
+  direction: rtl;
 }
-
 
 .booking-card {
   width: min(760px, 100%);
@@ -496,7 +494,7 @@
 
 
 /* ================================================= */
-/* Doctor */
+/* الطبيب */
 /* ================================================= */
 
 .doctor-header {
@@ -507,7 +505,6 @@
 
   padding: 28px 32px;
 }
-
 
 .doctor-avatar {
   width: 76px;
@@ -528,7 +525,6 @@
   font-size: 32px;
 }
 
-
 .doctor-avatar img {
   width: 100%;
   height: 100%;
@@ -536,11 +532,9 @@
   object-fit: cover;
 }
 
-
 .doctor-info {
   flex: 1;
 }
-
 
 .doctor-info h2 {
   margin: 0 0 6px;
@@ -550,7 +544,6 @@
   font-size: 22px;
 }
 
-
 .doctor-info p {
   margin: 0 0 7px;
 
@@ -558,7 +551,6 @@
 
   font-size: 15px;
 }
-
 
 .doctor-info span {
   color: #555;
@@ -570,7 +562,7 @@
 
 
 /* ================================================= */
-/* Divider */
+/* الفاصل */
 /* ================================================= */
 
 .divider {
@@ -581,13 +573,12 @@
 
 
 /* ================================================= */
-/* Form */
+/* النموذج */
 /* ================================================= */
 
 .booking-form {
   padding: 32px;
 }
-
 
 .booking-form h1 {
   margin: 0;
@@ -596,7 +587,6 @@
 
   font-size: 26px;
 }
-
 
 .form-subtitle {
   margin: 8px 0 30px;
@@ -608,7 +598,7 @@
 
 
 /* ================================================= */
-/* Section */
+/* القسم */
 /* ================================================= */
 
 .section-title {
@@ -625,7 +615,6 @@
 
   font-weight: 700;
 }
-
 
 .section-title span {
   width: 28px;
@@ -646,7 +635,7 @@
 
 
 /* ================================================= */
-/* Grid */
+/* الشبكة */
 /* ================================================= */
 
 .form-grid {
@@ -658,7 +647,6 @@
   gap: 18px;
 }
 
-
 .form-group {
   display: flex;
 
@@ -667,11 +655,9 @@
   gap: 7px;
 }
 
-
 .form-group.full {
   grid-column: 1 / -1;
 }
-
 
 .form-group label {
   color: #34423a;
@@ -681,7 +667,6 @@
   font-weight: 600;
 }
 
-
 .form-group label span {
   color: #929a96;
 
@@ -690,7 +675,7 @@
 
 
 /* ================================================= */
-/* Inputs */
+/* الحقول */
 /* ================================================= */
 
 .form-group input,
@@ -721,7 +706,6 @@
   transition: .2s;
 }
 
-
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -733,11 +717,9 @@
     rgba(31, 111, 92, .08);
 }
 
-
 .form-group textarea {
   resize: vertical;
 }
-
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
@@ -746,7 +728,7 @@
 
 
 /* ================================================= */
-/* Disabled */
+/* الحقول المعطلة */
 /* ================================================= */
 
 .form-group select:disabled {
@@ -761,7 +743,7 @@
 
 
 /* ================================================= */
-/* Errors */
+/* الأخطاء */
 /* ================================================= */
 
 .error {
@@ -769,7 +751,6 @@
 
   font-size: 12px;
 }
-
 
 .error-box {
 
@@ -789,13 +770,11 @@
   font-size: 14px;
 }
 
-
 .hint {
   color: #89948e;
 
   font-size: 12px;
 }
-
 
 .no-slots {
   color: #c0392b;
@@ -805,7 +784,7 @@
 
 
 /* ================================================= */
-/* Footer */
+/* أسفل النموذج */
 /* ================================================= */
 
 .form-footer {
@@ -826,13 +805,11 @@
   gap: 20px;
 }
 
-
 .secure-text {
   color: #7a8580;
 
   font-size: 13px;
 }
-
 
 .book-button {
 
@@ -855,7 +832,6 @@
   transition: .2s;
 }
 
-
 .book-button:hover:not(:disabled) {
 
   background: #163722;
@@ -863,7 +839,6 @@
   transform:
     translateY(-1px);
 }
-
 
 .book-button:disabled {
 
@@ -874,7 +849,7 @@
 
 
 /* ================================================= */
-/* Mobile */
+/* الموبايل */
 /* ================================================= */
 
 @media (max-width: 650px) {
@@ -887,16 +862,13 @@
       40px;
   }
 
-
   .doctor-header {
     padding: 22px;
   }
 
-
   .booking-form {
     padding: 22px;
   }
-
 
   .form-grid {
 
@@ -904,11 +876,9 @@
       1fr;
   }
 
-
   .form-group.full {
     grid-column: auto;
   }
-
 
   .form-footer {
 
@@ -919,11 +889,10 @@
       stretch;
   }
 
-
   .book-button {
     width: 100%;
   }
 
 }
 
-</style>  
+</style>

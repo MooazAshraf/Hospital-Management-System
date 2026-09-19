@@ -52,7 +52,8 @@ export class AdminUsersComponent implements OnInit {
       },
 
       error: (err) => {
-        this.errorMessage = err?.error?.message || 'Failed to load users';
+        this.errorMessage =
+          err?.error?.message || 'فشل تحميل المستخدمين.';
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -65,7 +66,9 @@ export class AdminUsersComponent implements OnInit {
 
     this.usersService.updateProfile(user._id, { role }).subscribe({
       next: (res) => {
-        const index = this.users.findIndex((u) => u._id === user._id);
+        const index = this.users.findIndex(
+          (u) => u._id === user._id
+        );
 
         if (index >= 0) {
           this.users[index] = {
@@ -79,7 +82,8 @@ export class AdminUsersComponent implements OnInit {
       },
 
       error: (err) => {
-        this.errorMessage = err?.error?.message || 'Failed to update role';
+        this.errorMessage =
+          err?.error?.message || 'فشل تحديث صلاحية المستخدم.';
         this.savingId = '';
         this.cdr.detectChanges();
       },
@@ -96,7 +100,9 @@ export class AdminUsersComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          const index = this.users.findIndex((u) => u._id === user._id);
+          const index = this.users.findIndex(
+            (u) => u._id === user._id
+          );
 
           if (index >= 0) {
             this.users[index] = {
@@ -110,7 +116,8 @@ export class AdminUsersComponent implements OnInit {
         },
 
         error: (err) => {
-          this.errorMessage = err?.error?.message || 'Failed to update account';
+          this.errorMessage =
+            err?.error?.message || 'فشل تحديث حالة الحساب.';
           this.savingId = '';
           this.cdr.detectChanges();
         },
@@ -118,7 +125,7 @@ export class AdminUsersComponent implements OnInit {
   }
 
   deleteUser(user: Iuser): void {
-    if (!confirm(`Delete ${user.name}?`)) {
+    if (!confirm(`هل أنت متأكد من حذف المستخدم ${user.name}؟`)) {
       return;
     }
 
@@ -128,7 +135,8 @@ export class AdminUsersComponent implements OnInit {
       },
 
       error: (err) => {
-        this.errorMessage = err?.error?.message || 'Failed to delete user';
+        this.errorMessage =
+          err?.error?.message || 'فشل حذف المستخدم.';
         this.cdr.detectChanges();
       },
     });

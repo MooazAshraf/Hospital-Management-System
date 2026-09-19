@@ -9,7 +9,6 @@ import {
 } from '../../../models/appointment.model';
 
 import { AppointmentService } from '../../../services/appointment.service';
-import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
 @Component({
   selector: 'app-admin-appointments',
@@ -76,7 +75,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
         this.errorMessage =
           err?.error?.message ||
-          'Failed to load appointments. Please try again.';
+          'فشل تحميل المواعيد. يرجى المحاولة مرة أخرى.';
 
         this.loading = false;
 
@@ -143,7 +142,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
           this.errorMessage =
             err?.error?.message ||
-            'Failed to update appointment';
+            'فشل تحديث الموعد.';
 
           this.saving = false;
 
@@ -157,7 +156,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
     if (
       !confirm(
-        'Are you sure you want to delete this appointment?'
+        'هل أنت متأكد من حذف هذا الموعد؟'
       )
     ) {
       return;
@@ -176,7 +175,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
         alert(
           err?.error?.message ||
-            'Failed to delete appointment'
+            'فشل حذف الموعد.'
         );
       },
     });
@@ -187,20 +186,55 @@ export class AdminAppointmentsComponent implements OnInit {
       typeof appointment.patient === 'object' &&
       appointment.patient?.user
     ) {
-      return appointment.patient.user.name || 'N/A';
+      return appointment.patient.user.name || 'مريض غير معروف';
     }
 
-    return 'N/A';
+    return 'مريض غير معروف';
   }
 
   getDoctorName(appointment: Appointment): string {
     if (
       typeof appointment.doctor === 'object'
     ) {
-      return appointment.doctor.name || 'N/A';
+      return appointment.doctor.name || 'طبيب غير معروف';
     }
 
-    return 'N/A';
+    return 'طبيب غير معروف';
+  }
+
+  getAppointmentTypeLabel(type: AppointmentType | string): string {
+    switch (type) {
+      case 'Consultation':
+        return 'استشارة';
+
+      case 'Follow-up':
+        return 'متابعة';
+
+      case 'Check-up':
+        return 'كشف';
+
+      default:
+        return type || '';
+    }
+  }
+
+  getStatusLabel(status: AppointmentStatus | string): string {
+    switch (status) {
+      case 'Pending':
+        return 'قيد الانتظار';
+
+      case 'Confirmed':
+        return 'مؤكد';
+
+      case 'Completed':
+        return 'مكتمل';
+
+      case 'Cancelled':
+        return 'ملغي';
+
+      default:
+        return status || '';
+    }
   }
 
   private resetForm(): void {

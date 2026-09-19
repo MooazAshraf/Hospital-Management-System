@@ -1,57 +1,175 @@
-<section class="wrap py-16">
-  <h2 class="text-2xl mb-4">Audit Logs</h2>
+<div class="w-full">
 
-  <p *ngIf="loading" class="text-gray-600">
-    Loading audit logs...
-  </p>
+  <!-- Title -->
+  <div class="mb-8">
 
-  <p *ngIf="error" class="text-red-600">
+    <h1 class="text-3xl font-bold text-gray-800">
+      Audit Logs
+    </h1>
+
+    <p class="mt-2 text-gray-500">
+      سجل جميع العمليات التي تمت داخل النظام
+    </p>
+
+  </div>
+
+
+  <!-- Loading -->
+  <div
+    *ngIf="loading"
+    class="flex justify-center items-center py-20"
+  >
+
+    <div class="text-gray-500 text-lg">
+      Loading audit logs...
+    </div>
+
+  </div>
+
+
+  <!-- Error -->
+  <div
+    *ngIf="!loading && error"
+    class="rounded-lg bg-red-50 border border-red-200 p-5 text-red-700"
+  >
+
     {{ error }}
-  </p>
 
-  <div *ngIf="!loading && !error" class="overflow-x-auto">
-    <table class="w-full border-collapse border border-gray-300">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="border border-gray-300 p-3 text-left">Actor</th>
-          <th class="border border-gray-300 p-3 text-left">Action</th>
-          <th class="border border-gray-300 p-3 text-left">
-            Target Collection
+  </div>
+
+
+  <!-- Empty -->
+  <div
+    *ngIf="!loading && !error && auditLogs.length === 0"
+    class="rounded-lg bg-gray-50 border border-gray-200 p-10 text-center"
+  >
+
+    <p class="text-gray-500 text-lg">
+      لا توجد سجلات عمليات.
+    </p>
+
+  </div>
+
+
+  <!-- Table -->
+  <div
+    *ngIf="!loading && !error && auditLogs.length > 0"
+    class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm"
+  >
+
+    <table class="min-w-full bg-white">
+
+      <thead class="bg-gray-100">
+
+        <tr>
+
+          <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+            #
           </th>
-          <th class="border border-gray-300 p-3 text-left">Target ID</th>
-          <th class="border border-gray-300 p-3 text-left">Timestamp</th>
+
+          <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+            العملية
+          </th>
+
+          <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+            المستخدم
+          </th>
+
+          <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+            المورد
+          </th>
+
+          <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+            Document ID
+          </th>
+
+          <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+            الوصف
+          </th>
+
+          <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+            التاريخ
+          </th>
+
         </tr>
+
       </thead>
 
-      <tbody>
-        <tr *ngFor="let log of auditLogs">
-          <td class="border border-gray-300 p-3">
-            {{ log.performedBy?.name || 'Unknown' }}
+
+      <tbody class="divide-y divide-gray-200">
+
+        <tr
+          *ngFor="
+            let log of auditLogs;
+            let i = index;
+            trackBy: trackByLogId
+          "
+          class="hover:bg-gray-50"
+        >
+
+          <!-- Number -->
+          <td class="px-6 py-4 text-sm text-gray-600">
+            {{ i + 1 }}
           </td>
 
-          <td class="border border-gray-300 p-3">
-            {{ log.action }}
+
+          <!-- Action -->
+          <td class="px-6 py-4">
+
+            <span
+              class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"
+            >
+              {{ getActionLabel(log.action) }}
+            </span>
+
           </td>
 
-          <td class="border border-gray-300 p-3">
-            {{ log.collectionName }}
+
+          <!-- User -->
+          <td class="px-6 py-4 text-sm text-gray-700">
+
+            {{ getUserName(log) }}
+
           </td>
 
-          <td class="border border-gray-300 p-3">
-            {{ log.documentId }}
+
+          <!-- Resource -->
+          <td class="px-6 py-4 text-sm text-gray-700">
+
+            {{ getResourceLabel(log.collectionName) }}
+
           </td>
 
-          <td class="border border-gray-300 p-3">
-            {{ log.createdAt | date:'medium' }}
+
+          <!-- Document -->
+          <td class="px-6 py-4 text-xs text-gray-500">
+
+            {{ log.documentId || '-' }}
+
           </td>
+
+
+          <!-- Description -->
+          <td class="px-6 py-4 text-sm text-gray-700">
+
+            {{ log.description || '-' }}
+
+          </td>
+
+
+          <!-- Date -->
+          <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+
+            {{ formatDate(log.createdAt) }}
+
+          </td>
+
         </tr>
 
-        <tr *ngIf="auditLogs.length === 0">
-          <td colspan="5" class="p-4 text-center text-gray-500">
-            No audit logs found.
-          </td>
-        </tr>
       </tbody>
+
     </table>
+
   </div>
-</section>
+
+</div>

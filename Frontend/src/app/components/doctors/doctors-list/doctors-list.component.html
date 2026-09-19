@@ -1,20 +1,28 @@
-<section class="p-6 max-w-5xl mx-auto">
+<section
+  dir="rtl"
+  class="p-6 max-w-5xl mx-auto"
+>
 
   <div class="mb-6">
+
     <h1 class="text-2xl font-bold text-green-900">
-      Our Doctors
+      أطباؤنا
     </h1>
 
     <p class="text-gray-500 mt-1">
-      Find the right doctor for your needs.
+      ابحث عن الطبيب المناسب لاحتياجاتك.
     </p>
+
   </div>
 
 
-  <!-- Search + Filter -->
-  <div class="flex flex-col sm:flex-row gap-4 mb-8 max-w-2xl">
+  <!-- البحث + الفلترة -->
+  <div
+    class="flex flex-col sm:flex-row gap-4 mb-8 max-w-2xl"
+  >
 
     <div class="relative flex-1">
+
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
@@ -25,7 +33,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
       >
         <circle cx="11" cy="11" r="8" />
         <path d="m21 21-4.3-4.3" />
@@ -35,12 +43,14 @@
         type="text"
         [ngModel]="searchTerm()"
         (ngModelChange)="searchTerm.set($event)"
-        placeholder="Search by doctor name or department..."
-        class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200
+        placeholder="ابحث باسم الطبيب أو القسم..."
+        class="w-full pr-10 pl-4 py-3 rounded-xl border border-gray-200
                focus:outline-none focus:ring-2 focus:ring-green-900/20
                focus:border-green-900 transition"
       />
+
     </div>
+
 
     <select
       [ngModel]="selectedDepartment()"
@@ -49,25 +59,33 @@
              focus:outline-none focus:ring-2 focus:ring-green-900/20
              focus:border-green-900 transition text-gray-700"
     >
-      <option value="">All departments</option>
-      <option *ngFor="let dept of departments()" [value]="dept">
+
+      <option value="">
+        جميع الأقسام
+      </option>
+
+      <option
+        *ngFor="let dept of departments()"
+        [value]="dept"
+      >
         {{ dept }}
       </option>
+
     </select>
 
   </div>
 
 
-  <!-- Loading -->
+  <!-- جاري التحميل -->
   <div
     *ngIf="isLoading()"
     class="text-center py-10 text-gray-500"
   >
-    Loading doctors...
+    جاري تحميل الأطباء...
   </div>
 
 
-  <!-- Error -->
+  <!-- خطأ -->
   <div
     *ngIf="!isLoading() && errorMessage()"
     class="text-center py-10 text-red-600"
@@ -76,7 +94,7 @@
   </div>
 
 
-  <!-- Empty (no doctors at all) -->
+  <!-- لا يوجد أطباء -->
   <div
     *ngIf="
       !isLoading() &&
@@ -85,11 +103,11 @@
     "
     class="text-center py-10 text-gray-500"
   >
-    No doctors found.
+    لم يتم العثور على أطباء.
   </div>
 
 
-  <!-- No search/filter results -->
+  <!-- لا توجد نتائج للبحث أو الفلترة -->
   <div
     *ngIf="
       !isLoading() &&
@@ -99,11 +117,11 @@
     "
     class="text-center py-10 text-gray-500"
   >
-    No doctors match your search.
+    لا يوجد أطباء مطابقون لبحثك.
   </div>
 
 
-  <!-- Doctors -->
+  <!-- الأطباء -->
   <div
     *ngIf="
       !isLoading() &&

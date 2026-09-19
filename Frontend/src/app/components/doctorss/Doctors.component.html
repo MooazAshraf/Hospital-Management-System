@@ -1,9 +1,12 @@
-<section class="min-h-screen bg-gray-50 py-10 px-6">
+<section
+  dir="rtl"
+  class="min-h-screen bg-gray-50 py-10 px-6"
+>
 
   <div class="max-w-7xl mx-auto">
 
 
-    <!-- Header -->
+    <!-- العنوان -->
     <div class="mb-8">
 
       <h1
@@ -11,17 +14,17 @@
                font-bold
                text-green-900"
       >
-        Our Doctors
+        أطباؤنا
       </h1>
 
       <p class="text-gray-500 mt-2">
-        Find the right doctor for your needs.
+        ابحث عن الطبيب المناسب لاحتياجاتك.
       </p>
 
     </div>
 
 
-    <!-- Search & Filter -->
+    <!-- البحث والفلترة -->
     <div
       class="bg-white
              rounded-2xl
@@ -40,7 +43,7 @@
       >
 
 
-        <!-- Search -->
+        <!-- البحث -->
         <div class="md:col-span-2">
 
           <label
@@ -50,7 +53,7 @@
                    text-gray-700
                    mb-2"
           >
-            Search Doctor
+            البحث عن طبيب
           </label>
 
 
@@ -67,7 +70,7 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               class="absolute
-                     left-4
+                     right-4
                      top-1/2
                      -translate-y-1/2
                      text-gray-400"
@@ -90,10 +93,10 @@
               type="text"
               [ngModel]="searchTerm()"
               (ngModelChange)="searchTerm.set($event)"
-              placeholder="Search by doctor name or department..."
+              placeholder="ابحث باسم الطبيب أو القسم..."
               class="w-full
-                     pl-11
-                     pr-4
+                     pr-11
+                     pl-4
                      py-3
                      rounded-xl
                      border
@@ -113,7 +116,7 @@
         </div>
 
 
-        <!-- Department -->
+        <!-- القسم -->
         <div>
 
           <label
@@ -123,7 +126,7 @@
                    text-gray-700
                    mb-2"
           >
-            Department
+            القسم
           </label>
 
 
@@ -146,7 +149,7 @@
           >
 
             <option value="">
-              All Departments
+              جميع الأقسام
             </option>
 
 
@@ -164,7 +167,7 @@
       </div>
 
 
-      <!-- Filter Info -->
+      <!-- معلومات الفلترة -->
       <div
         class="flex
                items-center
@@ -177,7 +180,7 @@
 
         <p class="text-sm text-gray-500">
 
-          Showing
+          عدد الأطباء:
 
           <span
             class="font-bold
@@ -185,8 +188,6 @@
           >
             {{ filteredDoctors().length }}
           </span>
-
-          doctors
 
         </p>
 
@@ -204,7 +205,7 @@
                  hover:text-green-700
                  transition"
         >
-          Clear Filters
+          مسح الفلاتر
         </button>
 
       </div>
@@ -212,7 +213,7 @@
     </div>
 
 
-    <!-- Loading -->
+    <!-- جاري التحميل -->
     <div
       *ngIf="isLoading()"
       class="text-center
@@ -233,13 +234,13 @@
       ></div>
 
       <p>
-        Loading doctors...
+        جاري تحميل الأطباء...
       </p>
 
     </div>
 
 
-    <!-- Error -->
+    <!-- خطأ -->
     <div
       *ngIf="
         !isLoading() &&
@@ -259,7 +260,7 @@
     </div>
 
 
-    <!-- No Doctors -->
+    <!-- لا يوجد أطباء -->
     <div
       *ngIf="
         !isLoading() &&
@@ -275,12 +276,12 @@
              text-gray-500"
     >
 
-      No doctors found.
+      لم يتم العثور على أطباء.
 
     </div>
 
 
-    <!-- No Search Result -->
+    <!-- لا توجد نتائج للبحث -->
     <div
       *ngIf="
         !isLoading() &&
@@ -306,12 +307,12 @@
                font-semibold
                text-gray-800"
       >
-        No doctors found
+        لم يتم العثور على أطباء
       </h3>
 
 
       <p class="text-gray-500 mt-2">
-        Try another doctor name or department.
+        جرّب البحث باسم طبيب آخر أو قسم آخر.
       </p>
 
 
@@ -328,13 +329,13 @@
                hover:bg-green-800
                transition"
       >
-        Clear Filters
+        مسح الفلاتر
       </button>
 
     </div>
 
 
-    <!-- Doctors -->
+    <!-- الأطباء -->
     <div
       *ngIf="
         !isLoading() &&

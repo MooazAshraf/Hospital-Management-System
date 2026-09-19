@@ -1,8 +1,9 @@
 <article
+  dir="rtl"
   class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-1 transition duration-300"
 >
 
-  <!-- Doctor Image -->
+  <!-- صورة الطبيب -->
   <div class="h-52 bg-green-50 overflow-hidden">
 
     <img
@@ -23,10 +24,10 @@
   </div>
 
 
-  <!-- Content -->
+  <!-- المحتوى -->
   <div class="p-5">
 
-    <!-- Name -->
+    <!-- اسم الطبيب -->
     <div class="flex items-start justify-between gap-3">
 
       <div class="min-w-0">
@@ -35,10 +36,7 @@
           class="text-xl font-bold text-green-900 truncate"
           [dir]="isArabicName ? 'rtl' : 'ltr'"
         >
-          <ng-container *ngIf="!isArabicName">
-            Dr.
-          </ng-container>
-
+          د.
           {{ doctor.name }}
         </h2>
 
@@ -49,7 +47,7 @@
       </div>
 
 
-      <!-- Availability -->
+      <!-- حالة التوفر -->
       <span
         class="shrink-0 text-xs px-3 py-1 rounded-full font-medium"
         [class.bg-green-100]="doctor.isAvailable"
@@ -59,27 +57,27 @@
       >
         {{
           doctor.isAvailable
-            ? 'Available'
-            : 'Unavailable'
+            ? 'متاح'
+            : 'غير متاح'
         }}
       </span>
 
     </div>
 
 
-    <!-- Divider -->
+    <!-- الفاصل -->
     <div
       class="border-t border-gray-100 my-4"
     ></div>
 
 
-    <!-- Department -->
+    <!-- القسم -->
     <div
       class="flex items-center gap-2 text-sm text-gray-500 mt-3"
     >
 
       <span>
-        Department:
+        القسم:
       </span>
 
       <span class="font-medium text-gray-700">
@@ -89,61 +87,61 @@
     </div>
 
 
-    <!-- Experience -->
+    <!-- الخبرة -->
     <div
       class="flex items-center gap-2 text-sm text-gray-500 mt-3"
     >
 
       <span>
-        Experience:
+        الخبرة:
       </span>
 
       <span class="font-medium text-gray-700">
 
         {{ doctor.experienceYears }}
 
-        years
+        سنوات
 
       </span>
 
     </div>
 
 
-    <!-- Fees -->
+    <!-- الرسوم -->
     <div
       class="flex items-center gap-2 text-sm mt-3"
     >
 
       <span class="text-gray-500">
-        LE:
+        الرسوم:
       </span>
 
       <span class="font-bold text-green-900">
 
         {{ doctor.fees }}
 
-        EGP
+        جنيه مصري
 
       </span>
 
     </div>
 
 
-    <!-- Buttons -->
+    <!-- الأزرار -->
     <div
       class="grid grid-cols-2 gap-3 mt-6"
     >
 
-      <!-- View Profile -->
+      <!-- عرض الملف الطبي -->
       <a
         [routerLink]="['/doctors', doctor._id]"
         class="block text-center py-2.5 rounded-lg border border-green-900 text-green-900 text-sm font-semibold hover:bg-green-50 transition"
       >
-        View Profile
+        عرض الملف الطبي
       </a>
 
 
-      <!-- Book -->
+      <!-- حجز الموعد -->
       <a
         [routerLink]="['/book-appointment']"
         [queryParams]="{
@@ -151,7 +149,7 @@
         }"
         class="block text-center py-2.5 rounded-lg bg-green-900 text-white text-sm font-semibold hover:bg-green-800 transition"
       >
-        Book Now
+        احجز الآن
       </a>
 
     </div>

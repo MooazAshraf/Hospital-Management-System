@@ -14,6 +14,7 @@ import { ReviewsService } from '../../../services/reviews.service';
 export class ReviewsListComponent implements OnInit {
 
   reviews: IReview[] = [];
+  showAll = false;
 
   constructor(private reviewsService: ReviewsService) {}
 
@@ -26,5 +27,13 @@ export class ReviewsListComponent implements OnInit {
         console.error('Error fetching reviews:', error);
       }
     });
+  }
+
+  get displayedReviews(): IReview[] {
+    return this.showAll ? this.reviews : this.reviews.slice(0, 2);
+  }
+
+  toggleReviews(): void {
+    this.showAll = !this.showAll;
   }
 }

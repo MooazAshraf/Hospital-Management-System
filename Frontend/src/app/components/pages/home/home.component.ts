@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-
+// for review
+import { ReviewsListComponent } from '../../../components/reviews/reviews-list/reviews-list.component';
 interface Doctor {
   name: string;
   specialty: string;
@@ -25,7 +26,8 @@ interface SpecialtyPage {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    ReviewsListComponent
   ],
   templateUrl: './home.component.html'
 })

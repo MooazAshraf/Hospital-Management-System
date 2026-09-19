@@ -11,7 +11,6 @@
          duration-300"
 >
 
-
   <!-- Doctor Image -->
   <div
     class="h-52
@@ -31,7 +30,6 @@
              hover:scale-105"
     />
 
-
     <div
       *ngIf="!doctor.image"
       class="w-full
@@ -47,10 +45,8 @@
 
   </div>
 
-
   <!-- Content -->
   <div class="p-5">
-
 
     <!-- Name -->
     <div
@@ -71,7 +67,6 @@
           Dr. {{ doctor.name }}
         </h2>
 
-
         <p
           class="text-sm
                  text-green-700
@@ -82,7 +77,6 @@
 
       </div>
 
-
       <!-- Availability -->
       <span
         class="shrink-0
@@ -91,26 +85,19 @@
                py-1
                rounded-full
                font-medium"
-
         [class.bg-green-100]="doctor.isAvailable"
-
         [class.text-green-700]="doctor.isAvailable"
-
         [class.bg-red-100]="!doctor.isAvailable"
-
         [class.text-red-700]="!doctor.isAvailable"
       >
-
         {{
           doctor.isAvailable
             ? 'Available'
             : 'Unavailable'
         }}
-
       </span>
 
     </div>
-
 
     <!-- Divider -->
     <div
@@ -118,7 +105,6 @@
              border-gray-100
              my-4"
     ></div>
-
 
     <!-- Department -->
     <div
@@ -129,9 +115,6 @@
              text-gray-500
              mt-3"
     >
-
-      
-
       <span>
         Department:
       </span>
@@ -142,9 +125,7 @@
       >
         {{ departmentName }}
       </span>
-
     </div>
-
 
     <!-- Experience -->
     <div
@@ -155,9 +136,6 @@
              text-gray-500
              mt-3"
     >
-
-      
-
       <span>
         Experience:
       </span>
@@ -169,9 +147,7 @@
         {{ doctor.experienceYears }}
         years
       </span>
-
     </div>
-
 
     <!-- Fees -->
     <div
@@ -181,9 +157,6 @@
              text-sm
              mt-3"
     >
-
-      
-
       <span class="text-gray-500">
         LE :
       </span>
@@ -195,9 +168,7 @@
         {{ doctor.fees }}
         EGP
       </span>
-
     </div>
-
 
     <!-- Buttons -->
     <div
@@ -228,6 +199,27 @@
         View Profile
       </a>
 
+      <!-- NEW: Write Review -->
+      <a
+        [routerLink]="[
+          '/doctors',
+          doctor._id
+        ]"
+        fragment="reviews"
+        class="block
+               text-center
+               py-2.5
+               rounded-lg
+               border
+               border-green-700
+               text-green-700
+               text-sm
+               font-semibold
+               hover:bg-green-50
+               transition"
+      >
+        Write Review
+      </a>
 
       <!-- Book -->
       <a

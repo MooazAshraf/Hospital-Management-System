@@ -1,11 +1,12 @@
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import {
   FormBuilder,
-  FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+
+import { ContactService } from '../../services/contact.service';
 
 @Component({
   selector: 'app-contact',
@@ -17,86 +18,124 @@ import {
   templateUrl: './contact.component.html',
 })
 export class ContactComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly contactService =
+    inject(ContactService);
 
-  contactForm: FormGroup;
+  isLoading = false;
 
-  isSubmitting = false;
   successMessage = '';
 
-  constructor(
-    private fb: FormBuilder
-  ) {
+  errorMessage = '';
 
-    this.contactForm = this.fb.group({
-
-      name: [
-        '',
+  contactForm = this.fb.nonNullable.group({
+    name: [
+      '',
+      [
         Validators.required,
+        Validators.maxLength(100),
       ],
+    ],
 
-      email: [
-        '',
-        [
-          Validators.required,
-          Validators.email,
-        ],
-      ],
-
-      phone: [
-        '',
-        [
-          Validators.pattern(/^01[0125][0-9]{8}$/),
-        ],
-      ],
-
-      subject: [
-        '',
+    email: [
+      '',
+      [
         Validators.required,
+        Validators.email,
+        Validators.maxLength(150),
       ],
+    ],
 
-      message: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(10),
-        ],
+    phone: [
+      '',
+      [
+        Validators.maxLength(30),
       ],
+    ],
 
-    });
+    subject: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(200),
+      ],
+    ],
 
+    message: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(2000),
+      ],
+    ],
+  });
+
+  get name() {
+    return this.contactForm.get('name');
   }
 
+  get email() {
+    return this.contactForm.get('email');
+  }
 
-  submitForm(): void {
+  get phone() {
+    return this.contactForm.get('phone');
+  }
 
+  get subject() {
+    return this.contactForm.get('subject');
+  }
+
+  get message() {
+    return this.contactForm.get('message');
+  }
+
+  sendMessage(): void {
     this.successMessage = '';
+    this.errorMessage = '';
 
     if (this.contactForm.invalid) {
-
       this.contactForm.markAllAsTouched();
-
       return;
     }
 
-    this.isSubmitting = true;
+    this.isLoading = true;
 
-    // مؤقتًا لحد ما نعمل Backend للـ Contact
-    setTimeout(() => {
+    const formData =
+      this.contactForm.getRawValue();
 
-      console.log(
-        'Contact form:',
-        this.contactForm.value
-      );
+    this.contactService
+      .sendMessage(formData)
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
 
-      this.isSubmitting = false;
+          this.successMessage =
+            response.message ||
+            'Your message has been sent successfully.';
 
-      this.successMessage =
-        'Your message has been sent successfully. We will get back to you soon.';
+          this.contactForm.reset({
+            name: '',
+            email: '',
+            phone: '',
+            subject: '',
+            message: '',
+          });
+        },
 
-      this.contactForm.reset();
+        error: (error) => {
+          this.isLoading = false;
 
-    }, 800);
+          console.error(
+            'Contact message error:',
+            error
+          );
 
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to send your message. Please try again.';
+        },
+      });
   }
-
 }

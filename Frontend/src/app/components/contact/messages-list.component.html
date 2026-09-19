@@ -1,0 +1,131 @@
+```html
+<div class="messages-container">
+
+  <div class="messages-header">
+
+    <div>
+      <h1>Contact Messages</h1>
+
+      <p>
+        Manage messages received from users.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="loadMessages()"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? 'Loading...' : 'Refresh' }}
+    </button>
+
+  </div>
+
+  <!-- Error -->
+  <div
+    class="error-message"
+    *ngIf="errorMessage"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div
+    class="loading"
+    *ngIf="isLoading"
+  >
+    Loading messages...
+  </div>
+
+  <!-- Empty -->
+  <div
+    class="empty-message"
+    *ngIf="!isLoading && messages.length === 0"
+  >
+    No messages found.
+  </div>
+
+  <!-- Messages -->
+  <div
+    class="messages-list"
+    *ngIf="!isLoading && messages.length > 0"
+  >
+
+    <div
+      class="message-card"
+      *ngFor="let msg of messages"
+    >
+
+      <div class="message-top">
+
+        <div>
+          <h2>{{ msg.subject }}</h2>
+
+          <p class="sender">
+            <strong>{{ msg.name }}</strong>
+            —
+            {{ msg.email }}
+          </p>
+        </div>
+
+        <span
+          class="status"
+          [ngClass]="getStatusClass(msg.status)"
+        >
+          {{ msg.status }}
+        </span>
+
+      </div>
+
+      <div class="message-info">
+
+        <p *ngIf="msg.phone">
+          <strong>Phone:</strong>
+          {{ msg.phone }}
+        </p>
+
+        <p>
+          <strong>Date:</strong>
+          {{ msg.createdAt | date:'medium' }}
+        </p>
+
+      </div>
+
+      <div class="message-body">
+        {{ msg.message }}
+      </div>
+
+      <div class="message-actions">
+
+        <button
+          type="button"
+          *ngIf="msg.status === 'New'"
+          (click)="markAsRead(msg)"
+        >
+          Mark as Read
+        </button>
+
+        <button
+          type="button"
+          *ngIf="msg.status !== 'Responded'"
+          (click)="markAsResponded(msg)"
+        >
+          Mark as Responded
+        </button>
+
+        <button
+          type="button"
+          class="delete-button"
+          (click)="deleteMessage(msg._id)"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+```

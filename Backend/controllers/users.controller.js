@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users.model");
-
+const Patient = require("../models/patient.model");
 const publicUser = (user) => {
   const value = user.toObject ? user.toObject() : { ...user };
   delete value.password;
@@ -43,27 +43,89 @@ const addUser = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
 
-    const existingUser = await User.findOne({ email: String(email).toLowerCase() });
-    if (existingUser) return res.status(409).json({ success: false, message: "Email already exists" });
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
+    if (!name || !normalizedEmail || !password || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, password and phone are required",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+
+    // Create User
     const hashedPassword = await bcrypt.hash(password, 12);
+
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
       phone,
       role: "user",
     });
 
+    try {
+      // Create Patient profile automatically
+      await Patient.create({
+        user: user._id,
+        name,
+        email: normalizedEmail,
+        phone,
+      });
+    } catch (patientError) {
+      // If Patient creation fails, remove the User
+      // so we don't leave an account without a patient profile.
+      await User.findByIdAndDelete(user._id);
+
+      if (patientError.code === 11000) {
+        return res.status(409).json({
+          success: false,
+          message: "Patient profile already exists for this email or user",
+        });
+      }
+
+      throw patientError;
+    }
+
     res.status(201).json({
       success: true,
-      message: "User created successfully",
+      message: "User and patient profile created successfully",
       user: publicUser(user),
     });
   } catch (error) {
-    if (error.code === 11000) return res.status(409).json({ success: false, message: "Email already exists" });
-    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    console.error("addUser error:", error);
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        error: error.message,
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 

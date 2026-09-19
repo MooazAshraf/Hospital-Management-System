@@ -3,6 +3,7 @@
   <!-- =========================
        STEP 1: CHOOSE DOCTOR
   ========================== -->
+
   <div *ngIf="!selectedDoctor()" class="doctor-selection">
 
     <div class="page-header">
@@ -13,7 +14,11 @@
       </p>
     </div>
 
-    <!-- Search + Filter -->
+
+    <!-- =========================
+         SEARCH + FILTER
+    ========================== -->
+
     <div class="search-filter-row">
 
       <div class="search-box">
@@ -42,13 +47,20 @@
 
       </div>
 
+
       <select
         class="department-select"
         [ngModel]="selectedDepartment()"
         (ngModelChange)="selectedDepartment.set($event)"
       >
-        <option value="">All departments</option>
-        <option *ngFor="let dept of departments()" [value]="dept">
+        <option value="">
+          All departments
+        </option>
+
+        <option
+          *ngFor="let dept of departments()"
+          [value]="dept"
+        >
           {{ dept }}
         </option>
       </select>
@@ -56,7 +68,10 @@
     </div>
 
 
-    <!-- Loading -->
+    <!-- =========================
+         LOADING
+    ========================== -->
+
     <div
       *ngIf="isLoading()"
       class="status-message"
@@ -65,7 +80,10 @@
     </div>
 
 
-    <!-- Error -->
+    <!-- =========================
+         ERROR
+    ========================== -->
+
     <div
       *ngIf="!isLoading() && errorMessage()"
       class="status-message error-message"
@@ -74,7 +92,10 @@
     </div>
 
 
-    <!-- No doctors -->
+    <!-- =========================
+         NO DOCTORS
+    ========================== -->
+
     <div
       *ngIf="
         !isLoading() &&
@@ -87,7 +108,10 @@
     </div>
 
 
-    <!-- Doctors -->
+    <!-- =========================
+         DOCTORS
+    ========================== -->
+
     <div
       *ngIf="
         !isLoading() &&
@@ -103,35 +127,57 @@
         (click)="selectDoctor(doctor)"
       >
 
-        <!-- Doctor Image -->
+        <!-- =========================
+             DOCTOR IMAGE
+        ========================== -->
+
         <div class="doctor-image">
 
           <img
-            *ngIf="doctor.image && !failedImages().has(doctor._id)"
+            *ngIf="
+              doctor.image &&
+              !failedImages().has(doctor._id)
+            "
             [src]="doctor.image"
             [alt]="doctor.name"
             (error)="onImageError(doctor._id)"
           />
 
           <div
-            *ngIf="!doctor.image || failedImages().has(doctor._id)"
+            *ngIf="
+              !doctor.image ||
+              failedImages().has(doctor._id)
+            "
             class="doctor-placeholder"
-          >
-            👨‍⚕️
-          </div>
+          ></div>
 
         </div>
 
 
-        <!-- Doctor Info -->
+        <!-- =========================
+             DOCTOR INFO
+        ========================== -->
+
         <div class="doctor-content">
 
           <div class="doctor-top">
 
-            <div>
+            <div class="doctor-heading">
 
-              <h2 [dir]="isArabicName(doctor.name) ? 'rtl' : 'ltr'">
-                <ng-container *ngIf="!isArabicName(doctor.name)">Dr. </ng-container>{{ doctor.name }}
+              <h2
+                [dir]="
+                  isArabicName(doctor.name)
+                    ? 'rtl'
+                    : 'ltr'
+                "
+              >
+                <ng-container
+                  *ngIf="!isArabicName(doctor.name)"
+                >
+                  Dr.
+                </ng-container>
+
+                {{ doctor.name }}
               </h2>
 
               <p>
@@ -141,35 +187,71 @@
             </div>
 
 
+            <!-- Availability -->
+
             <span
               class="availability"
               [class.available]="doctor.isAvailable"
               [class.unavailable]="!doctor.isAvailable"
             >
-              {{ doctor.isAvailable ? 'Available' : 'Unavailable' }}
+              {{
+                doctor.isAvailable
+                  ? 'Available'
+                  : 'Unavailable'
+              }}
             </span>
 
           </div>
 
 
+          <!-- =========================
+               DETAILS
+          ========================== -->
+
           <div class="detail-divider"></div>
 
-
           <div class="detail-row">
-            <span class="detail-label">Department:</span>
-            <span class="detail-value">{{ departmentName(doctor) }}</span>
+
+            <span class="detail-label">
+              Department:
+            </span>
+
+            <span class="detail-value">
+              {{ departmentName(doctor) }}
+            </span>
+
           </div>
 
-          <div class="detail-row">
-            <span class="detail-label">Experience:</span>
-            <span class="detail-value">{{ doctor.experienceYears }} years</span>
-          </div>
 
           <div class="detail-row">
-            <span class="detail-label">Fee:</span>
-            <span class="detail-value fee-value">{{ doctor.fees }} EGP</span>
+
+            <span class="detail-label">
+              Experience:
+            </span>
+
+            <span class="detail-value">
+              {{ doctor.experienceYears }} years
+            </span>
+
           </div>
 
+
+          <div class="detail-row">
+
+            <span class="detail-label">
+              Fee:
+            </span>
+
+            <span class="detail-value fee-value">
+              {{ doctor.fees }} EGP
+            </span>
+
+          </div>
+
+
+          <!-- =========================
+               ACTIONS
+          ========================== -->
 
           <div class="doctor-actions">
 
@@ -181,10 +263,14 @@
               View Profile
             </a>
 
+
             <button
               type="button"
               class="select-button"
-              (click)="$event.stopPropagation(); selectDoctor(doctor)"
+              (click)="
+                $event.stopPropagation();
+                selectDoctor(doctor)
+              "
             >
               Book Now
             </button>
@@ -200,7 +286,6 @@
   </div>
 
 
-
   <!-- =========================
        STEP 2: BOOK APPOINTMENT
   ========================== -->
@@ -210,18 +295,20 @@
     class="booking-container"
   >
 
-    <!-- Back / Change Doctor -->
     <button
       type="button"
       class="change-doctor-button"
       (click)="changeDoctor()"
     >
       <span>←</span>
+
       Choose a different doctor
     </button>
 
 
-    <!-- Booking Form Component -->
+    <!-- IMPORTANT:
+         BookingStepsComponent is used here -->
+
     <app-booking-steps
       [doctorId]="doctor._id"
       [doctorName]="doctor.name"
@@ -246,8 +333,11 @@
 .booking-page {
   width: 100%;
   min-height: 100vh;
+
   background: #ffffff;
-  padding: 50px 30px 80px;
+
+  padding: 18px 30px 80px;
+
   box-sizing: border-box;
 }
 
@@ -257,7 +347,8 @@
 ========================================= */
 
 .doctor-selection {
-  width: min(950px, 100%);
+  width: min(1100px, 100%);
+
   margin: 0 auto;
 }
 
@@ -272,30 +363,35 @@
 
 .page-header h1 {
   margin: 0;
+
   color: #173f29;
+
   font-size: 32px;
+
   font-weight: 800;
 }
 
 .page-header p {
   margin: 8px 0 0;
+
   color: #7a8580;
+
   font-size: 15px;
 }
 
 
 /* =========================================
-   SEARCH + FILTER ROW
+   SEARCH + FILTER
 ========================================= */
 
 .search-filter-row {
   display: flex;
 
-  flex-wrap: wrap;
+  align-items: center;
 
-  gap: 15px;
+  gap: 18px;
 
-  margin-bottom: 35px;
+  margin-bottom: 36px;
 }
 
 
@@ -304,20 +400,20 @@
 ========================================= */
 
 .search-box {
-  width: min(500px, 100%);
-  height: 48px;
+  width: 488px;
+  height: 56px;
 
   display: flex;
+
   align-items: center;
 
-  gap: 10px;
+  gap: 12px;
 
   padding: 0 15px;
 
-  flex: 1;
+  border: 1px solid #dfe5e1;
 
-  border: 1px solid #dfe6e1;
-  border-radius: 12px;
+  border-radius: 13px;
 
   background: #ffffff;
 
@@ -328,11 +424,14 @@
 
 .search-box:focus-within {
   border-color: #1f6f5c;
-  box-shadow: 0 0 0 3px rgba(31, 111, 92, 0.08);
+
+  box-shadow:
+    0 0 0 3px rgba(31, 111, 92, 0.08);
 }
 
 .search-box svg {
-  color: #9aa49f;
+  color: #9aa8a1;
+
   flex-shrink: 0;
 }
 
@@ -340,38 +439,43 @@
   width: 100%;
 
   border: none;
+
   outline: none;
 
   background: transparent;
 
   font-family: inherit;
-  font-size: 14px;
+
+  font-size: 17px;
 
   color: #26352d;
 }
 
 .search-box input::placeholder {
-  color: #a4aca8;
+  color: #9aa3ae;
 }
 
 
 /* =========================================
-   DEPARTMENT FILTER
+   DEPARTMENT
 ========================================= */
 
 .department-select {
-  width: 220px;
-  height: 48px;
+  width: 253px;
 
-  padding: 0 15px;
+  height: 56px;
 
-  border: 1px solid #dfe6e1;
-  border-radius: 12px;
+  padding: 0 20px;
+
+  border: 1px solid #dfe5e1;
+
+  border-radius: 13px;
 
   background: #ffffff;
 
   font-family: inherit;
-  font-size: 14px;
+
+  font-size: 16px;
 
   color: #26352d;
 
@@ -386,7 +490,9 @@
   outline: none;
 
   border-color: #1f6f5c;
-  box-shadow: 0 0 0 3px rgba(31, 111, 92, 0.08);
+
+  box-shadow:
+    0 0 0 3px rgba(31, 111, 92, 0.08);
 }
 
 
@@ -419,7 +525,7 @@
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
 
-  gap: 20px;
+  gap: 26px;
 }
 
 
@@ -432,9 +538,9 @@
 
   background: #ffffff;
 
-  border: 1px solid #e3e9e5;
+  border: 1px solid #e4e9e6;
 
-  border-radius: 18px;
+  border-radius: 17px;
 
   cursor: pointer;
 
@@ -445,30 +551,32 @@
 }
 
 .doctor-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 
-  border-color: #cbdad1;
+  border-color: #d3ded7;
 
   box-shadow:
-    0 12px 30px rgba(20, 83, 45, 0.10);
+    0 8px 22px rgba(20, 83, 45, 0.09);
 }
 
 
 /* =========================================
-   DOCTOR IMAGE
+   IMAGE
 ========================================= */
 
 .doctor-image {
   width: 100%;
-  height: 140px;
 
-  background: #f4f8f5;
+  height: 163px;
+
+  background: #effaf3;
 
   overflow: hidden;
 }
 
 .doctor-image img {
   width: 100%;
+
   height: 100%;
 
   display: block;
@@ -478,24 +586,19 @@
 
 .doctor-placeholder {
   width: 100%;
+
   height: 100%;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 36px;
-
-  background: #f1f7f3;
+  background: #effaf3;
 }
 
 
 /* =========================================
-   DOCTOR CONTENT
+   CONTENT
 ========================================= */
 
 .doctor-content {
-  padding: 20px;
+  padding: 20px 23px 22px;
 }
 
 
@@ -510,7 +613,13 @@
 
   justify-content: space-between;
 
-  gap: 15px;
+  gap: 12px;
+
+  min-height: 57px;
+}
+
+.doctor-heading {
+  min-width: 0;
 }
 
 .doctor-top h2 {
@@ -518,17 +627,21 @@
 
   color: #173f29;
 
-  font-size: 18px;
+  font-size: 17px;
 
   font-weight: 800;
+
+  line-height: 1.5;
 }
 
 .doctor-top p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
 
   color: #39745b;
 
-  font-size: 14px;
+  font-size: 13px;
+
+  line-height: 1.5;
 }
 
 
@@ -539,39 +652,43 @@
 .availability {
   flex-shrink: 0;
 
-  padding: 5px 9px;
+  padding: 6px 13px;
 
   border-radius: 999px;
 
-  font-size: 11px;
+  font-size: 12px;
 
-  font-weight: 700;
+  font-weight: 500;
+
+  line-height: 1;
 }
 
 .availability.available {
   color: #18794e;
-  background: #e9f7ef;
+
+  background: #dff9e9;
 }
 
 .availability.unavailable {
   color: #b42318;
+
   background: #fff0ef;
 }
 
 
 /* =========================================
-   DETAIL DIVIDER
+   DIVIDER
 ========================================= */
 
 .detail-divider {
   border-top: 1px solid #edf0ee;
 
-  margin: 16px 0;
+  margin: 14px 0 15px;
 }
 
 
 /* =========================================
-   DETAIL ROWS
+   DETAILS
 ========================================= */
 
 .detail-row {
@@ -579,11 +696,13 @@
 
   align-items: center;
 
-  gap: 8px;
+  gap: 7px;
 
-  margin-top: 10px;
+  margin-top: 11px;
 
   font-size: 14px;
+
+  line-height: 1.4;
 }
 
 .detail-row:first-of-type {
@@ -591,7 +710,7 @@
 }
 
 .detail-label {
-  color: #7a8580;
+  color: #718078;
 }
 
 .detail-value {
@@ -601,14 +720,14 @@
 }
 
 .fee-value {
-  color: #1d432b;
+  color: #173f29;
 
   font-weight: 800;
 }
 
 
 /* =========================================
-   DOCTOR ACTIONS
+   ACTIONS
 ========================================= */
 
 .doctor-actions {
@@ -616,30 +735,46 @@
 
   grid-template-columns: 1fr 1fr;
 
-  gap: 10px;
+  gap: 13px;
 
-  margin-top: 20px;
+  margin-top: 28px;
 }
+
+
+/* =========================================
+   VIEW PROFILE
+========================================= */
 
 .view-profile-button {
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
 
-  padding: 10px 14px;
+  height: 50px;
 
-  border: 1.5px solid #1d432b;
+  padding: 0 14px;
+
+  border: 2px solid #1d432b;
+
   border-radius: 9px;
+
+  background: #ffffff;
 
   color: #1d432b;
 
   font-family: inherit;
-  font-size: 13px;
+
+  font-size: 14px;
+
   font-weight: 700;
 
   text-decoration: none;
 
   cursor: pointer;
+
+  box-sizing: border-box;
 
   transition: 0.2s;
 }
@@ -650,13 +785,15 @@
 
 
 /* =========================================
-   BOOK NOW BUTTON
+   BOOK NOW
 ========================================= */
 
 .select-button {
+  height: 50px;
+
   border: none;
 
-  padding: 10px 18px;
+  padding: 0 14px;
 
   border-radius: 9px;
 
@@ -666,11 +803,13 @@
 
   font-family: inherit;
 
-  font-size: 13px;
+  font-size: 14px;
 
   font-weight: 700;
 
   cursor: pointer;
+
+  box-sizing: border-box;
 
   transition: 0.2s;
 }
@@ -683,7 +822,7 @@
 
 
 /* =========================================
-   BOOKING CONTAINER
+   BOOKING
 ========================================= */
 
 .booking-container {
@@ -694,7 +833,7 @@
 
 
 /* =========================================
-   CHANGE DOCTOR BUTTON
+   CHANGE DOCTOR
 ========================================= */
 
 .change-doctor-button {
@@ -744,11 +883,21 @@
    RESPONSIVE
 ========================================= */
 
-@media (max-width: 950px) {
+@media (max-width: 1000px) {
+
+  .doctor-selection {
+    width: min(720px, 100%);
+  }
 
   .doctors-grid {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
+  }
+
+  .search-box {
+    flex: 1;
+
+    width: auto;
   }
 
 }
@@ -764,6 +913,20 @@
     font-size: 27px;
   }
 
+  .search-filter-row {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .department-select {
+    width: 100%;
+  }
+
   .doctors-grid {
     grid-template-columns: 1fr;
   }
@@ -773,14 +936,6 @@
   }
 
   .booking-container {
-    width: 100%;
-  }
-
-  .search-filter-row {
-    flex-direction: column;
-  }
-
-  .department-select {
     width: 100%;
   }
 

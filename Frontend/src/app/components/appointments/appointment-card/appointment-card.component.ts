@@ -1,6 +1,11 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { Appointment } from '../../../models/appointment.model';
 
 @Component({
   selector: 'app-appointment-card',
@@ -9,52 +14,204 @@ import { Appointment } from '../../../models/appointment.model';
   templateUrl: './appointment-card.component.html',
 })
 export class AppointmentCardComponent {
-  @Input({ required: true }) appointment!: Appointment;
+  @Input() appointment: any = null;
 
-  // Pass true only for the patient's own list — a doctor/admin list should hide this.
-  @Input() canCancel = false;
+  @Output() cancel =
+    new EventEmitter<string>();
 
-  // Parent (the appointments list page) owns the actual API call, so it can
-  // remove/refresh the item and show its own success/error state.
-  @Output() cancelRequested = new EventEmitter<string>();
+  // =====================================================
+  // Doctor Name
+  // =====================================================
 
-  readonly cancelling = signal(false);
+  get doctorName(): string {
+    const doctor = this.appointment?.doctor;
 
-  get doctorLabel(): string {
-    const doctor = this.appointment.doctor;
-    if (typeof doctor === 'string') return 'الطبيب';
-    return doctor.user?.name ?? 'الطبيب';
+    if (!doctor) {
+      return 'Doctor';
+    }
+
+    let name = '';
+
+    if (typeof doctor === 'object') {
+      name =
+        doctor.name ||
+        doctor.fullName ||
+        doctor.user?.name ||
+        doctor.user?.fullName ||
+        '';
+    } else if (typeof doctor === 'string') {
+      name = doctor;
+    }
+
+    return this.cleanDoctorName(name);
   }
-  get appointmentTypeLabel(): string {
-  const map: Record<string, string> = {
-    'Consultation': 'استشارة',
-    'Follow-up': 'متابعة',
-    'Check-up': 'كشف جديد',
-  };
 
-  return (
-    map[this.appointment.appointmentType] ??
-    this.appointment.appointmentType
-  );
-}
+  // =====================================================
+  // Clean Doctor Name
+  // =====================================================
 
-  get patientLabel(): string {
-    const patient = this.appointment.patient;
-    if (typeof patient === 'string') return 'المريض';
-    return patient.user?.name ?? 'المريض';
+  private cleanDoctorName(name: string): string {
+    if (!name) {
+      return 'Doctor';
+    }
+
+    let cleanName = String(name).trim();
+
+    // Remove prefixes
+    cleanName = cleanName.replace(
+      /^(doctor|dr\.?|دكتور|د\.?)\s*/i,
+      ''
+    );
+
+    cleanName = cleanName.trim();
+
+    if (!cleanName) {
+      return 'Doctor';
+    }
+
+    // Arabic
+    if (/[\u0600-\u06FF]/.test(cleanName)) {
+      return `د. ${cleanName}`;
+    }
+
+    // English
+    return `Dr. ${cleanName}`;
   }
+
+  // =====================================================
+  // Date
+  // =====================================================
+
+  get formattedDate(): string {
+    const date = this.appointment?.date;
+
+    if (!date) {
+      return '';
+    }
+
+    const parsed = new Date(
+      `${date}T00:00:00`
+    );
+
+    if (isNaN(parsed.getTime())) {
+      return date;
+    }
+
+    return new Intl.DateTimeFormat(
+      'en-CA',
+      {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }
+    ).format(parsed);
+  }
+
+  // =====================================================
+  // Time
+  // =====================================================
+
+  get formattedTime(): string {
+    return this.appointment?.time || '';
+  }
+
+  // =====================================================
+  // Appointment Type
+  // =====================================================
+
+  get appointmentType(): string {
+    const type =
+      this.appointment?.appointmentType;
+
+    switch (type) {
+      case 'Consultation':
+        return 'Consultation';
+
+      case 'Follow-up':
+        return 'Follow-up';
+
+      case 'Check-up':
+        return 'Check-up';
+
+      default:
+        return type || '';
+    }
+  }
+
+  // =====================================================
+  // Status
+  // =====================================================
 
   get statusLabel(): string {
-    const map: Record<string, string> = {
-      Pending: 'قيد الانتظار',
-      Confirmed: 'مؤكد',
-      Completed: 'مكتمل',
-      Cancelled: 'ملغي',
-    };
-    return map[this.appointment.status] ?? this.appointment.status;
+    switch (this.appointment?.status) {
+      case 'Pending':
+        return 'قيد الانتظار';
+
+      case 'Confirmed':
+        return 'مؤكد';
+
+      case 'Completed':
+        return 'مكتمل';
+
+      case 'Cancelled':
+        return 'ملغي';
+
+      default:
+        return this.appointment?.status || '';
+    }
   }
 
-  onCancel(): void {
-    this.cancelRequested.emit(this.appointment._id);
+  // =====================================================
+  // Status Class
+  // =====================================================
+
+  get statusClass(): string {
+    switch (this.appointment?.status) {
+      case 'Confirmed':
+        return 'bg-emerald-50 text-emerald-700';
+
+      case 'Pending':
+        return 'bg-emerald-50 text-emerald-700';
+
+      case 'Completed':
+        return 'bg-gray-100 text-gray-600';
+
+      case 'Cancelled':
+        return 'bg-red-50 text-red-600';
+
+      default:
+        return 'bg-gray-100 text-gray-600';
+    }
+  }
+
+  // =====================================================
+  // Queue Number
+  // =====================================================
+
+  get queueNumber(): string {
+    if (
+      this.appointment?.queueNumber === undefined ||
+      this.appointment?.queueNumber === null
+    ) {
+      return '';
+    }
+
+    return `#${this.appointment.queueNumber}`;
+  }
+
+  // =====================================================
+  // Cancel
+  // =====================================================
+
+  cancelAppointment(): void {
+    const id =
+      this.appointment?._id ||
+      this.appointment?.id;
+
+    if (!id) {
+      return;
+    }
+
+    this.cancel.emit(id);
   }
 }

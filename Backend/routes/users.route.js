@@ -10,6 +10,7 @@ const {
 
 const {
   getUsers,
+  getUsersBasic,
   getUserById,
   addUser,
   updateUserData,
@@ -20,8 +21,14 @@ const {
 
 const userRouter = express.Router();
 
-// Get all users - authenticated users only
+// Get all users (full records) - doctor/admin only
 userRouter.get("/", authenticate, authorize("doctor", "admin"), getUsers);
+
+// Get users (id + name + role only) - any authenticated role.
+// Read-only, used to resolve patient/doctor names on things like
+// a "user" role's own medical reports. Must stay above "/:id" so
+// "/basic" isn't swallowed by the :id param.
+userRouter.get("/basic", authenticate, getUsersBasic);
 
 // Login
 userRouter.post("/login", userLogin);

@@ -102,10 +102,6 @@ export const routes: Routes = [
   // LOGGED-IN USER ROUTES
   // =========================
 
-<<<<<<< HEAD
-  { path: '**', redirectTo: '' },
-];
-=======
   {
     path: 'profile',
     component: ProfileComponent,
@@ -218,4 +214,3 @@ export const routes: Routes = [
     redirectTo: '',
   },
 ];
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1

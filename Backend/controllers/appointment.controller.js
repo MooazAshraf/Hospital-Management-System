@@ -6,13 +6,13 @@ const Doctor = require("../models/doctors.model");
 const Appointment = require("../models/appointment.model");
 const Notification = require("../models/notifications.models");
 
-<<<<<<< HEAD
 // =====================================================
-// Helpers
+// Constants
 // =====================================================
-=======
+
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 const DAY_NAMES = [
   "Sunday",
   "Monday",
@@ -22,40 +22,21 @@ const DAY_NAMES = [
   "Friday",
   "Saturday",
 ];
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+
+// =====================================================
+// Helpers
+// =====================================================
 
 const normalizeDate = (date) => {
   if (!date) return null;
 
   const value = String(date).trim();
 
-<<<<<<< HEAD
-  // YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+  if (DATE_RE.test(value)) {
     return value;
-=======
-const validDate = (value) => {
-  if (!DATE_RE.test(String(value || ""))) return false;
-  const d = new Date(`${value}T00:00:00`);
-  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
-};
-
-const generateTimes = (startTime, endTime) => {
-  const result = [];
-  const [sh, sm] = startTime.split(":").map(Number);
-  const [eh, em] = endTime.split(":").map(Number);
-  let current = sh * 60 + sm;
-  const end = eh * 60 + em;
-
-  while (current < end) {
-    result.push(
-      `${String(Math.floor(current / 60)).padStart(2, "0")}:${String(current % 60).padStart(2, "0")}`,
-    );
-    current += 30;
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   }
 
-  // DD/MM/YYYY
+  // Support DD/MM/YYYY
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
     const [day, month, year] = value.split("/");
     return `${year}-${month}-${day}`;
@@ -64,67 +45,124 @@ const generateTimes = (startTime, endTime) => {
   return value;
 };
 
-<<<<<<< HEAD
-const normalizeTime = (time) => {
-  if (!time) return "";
+// FIX: validate YYYY-MM-DD without timezone problems
+const validDate = (value) => {
+  const dateValue = String(value || "").trim();
 
-  return String(time)
-    .trim()
-    .toUpperCase()
-    .replace(/\s+/g, " ");
-=======
-const getAvailability = (doctor, date) => {
-  const day = DAY_NAMES[new Date(`${date}T00:00:00`).getDay()];
-  const availability = (doctor.availability || []).find(
-    (item) => item.day === day,
+  if (!DATE_RE.test(dateValue)) {
+    return false;
+  }
+
+  const [year, month, day] = dateValue.split("-").map(Number);
+
+  const d = new Date(year, month - 1, day);
+
+  return (
+    d.getFullYear() === year &&
+    d.getMonth() === month - 1 &&
+    d.getDate() === day
   );
-  return { day, availability };
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+};
+
+const normalizeTime = (time) => {
+  if (!time) return null;
+
+  const value = String(time).trim();
+
+  if (!TIME_RE.test(value)) {
+    return null;
+  }
+
+  return value;
+};
+
+const generateTimes = (startTime, endTime) => {
+  const result = [];
+
+  if (!startTime || !endTime) {
+    return result;
+  }
+
+  const [sh, sm] = startTime.split(":").map(Number);
+  const [eh, em] = endTime.split(":").map(Number);
+
+  let current = sh * 60 + sm;
+  const end = eh * 60 + em;
+
+  while (current < end) {
+    result.push(
+      `${String(Math.floor(current / 60)).padStart(2, "0")}:${String(
+        current % 60
+      ).padStart(2, "0")}`
+    );
+
+    current += 30;
+  }
+
+  return result;
+};
+
+const getAvailability = (doctor, date) => {
+  const [year, month, day] = String(date).split("-").map(Number);
+
+  const dateObject = new Date(year, month - 1, day);
+
+  const dayName = DAY_NAMES[dateObject.getDay()];
+
+  const availability = (doctor.availability || []).find(
+    (item) => item.day === dayName
+  );
+
+  return {
+    day: dayName,
+    availability,
+  };
 };
 
 const sameTime = (time1, time2) => {
   return normalizeTime(time1) === normalizeTime(time2);
 };
 
-<<<<<<< HEAD
-const getDoctorDisplayName = (doctor) => {
-  if (!doctor) {
-    return "Doctor";
-  }
+const createSlotKey = (doctor, date, time) => {
+  return `${String(doctor)}-${date}-${time}`;
+};
 
-  return (
-    doctor.name ||
-    doctor.fullName ||
-    doctor.doctorName ||
-    doctor.displayName ||
-    "Doctor"
-  );
-=======
-const createAppointmentNotification = async (
-  appointment,
-  doctorName,
-  patientUserId,
-  doctorUserId,
-) => {
-  await Notification.create([
-    {
-      recipient: patientUserId,
-      sender: null,
-      type: "appointment",
-      title: "Appointment booked",
-      message: `Your appointment with Dr. ${doctorName} on ${appointment.date} at ${appointment.time} has been booked successfully.`,
-      relatedAppointment: appointment._id,
+const getDoctorDisplayName = (doctor) => {
+  return doctor?.name || "Doctor";
+};
+
+const populateAppointment = (query) => {
+  return query
+    .populate("patient")
+    .populate("doctor");
+};
+
+// =====================================================
+// Queue Helper
+// =====================================================
+
+const reorderQueueNumbers = async (doctorId, date) => {
+  if (!doctorId || !date) return;
+
+  const appointments = await Appointment.find({
+    doctor: doctorId,
+    date,
+    status: {
+      $in: ["Pending", "Confirmed"],
     },
-    {
-      recipient: doctorUserId,
-      sender: patientUserId,
-      type: "appointment",
-      title: "New appointment",
-      message: `You have a new appointment on ${appointment.date} at ${appointment.time}.`,
-      relatedAppointment: appointment._id,
-    },
-  ]);
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+  }).sort({
+    time: 1,
+    createdAt: 1,
+  });
+
+  for (let index = 0; index < appointments.length; index++) {
+    const queueNumber = index + 1;
+
+    if (appointments[index].queueNumber !== queueNumber) {
+      appointments[index].queueNumber = queueNumber;
+      await appointments[index].save();
+    }
+  }
 };
 
 // =====================================================
@@ -140,13 +178,9 @@ const sendNotification = async ({
   relatedAppointment = null,
 }) => {
   try {
-<<<<<<< HEAD
-    if (!recipient) {
-      console.warn("Notification skipped: recipient is missing");
-      return null;
-    }
+    if (!recipient) return;
 
-    return await Notification.create({
+    await Notification.create({
       recipient,
       sender,
       type,
@@ -155,109 +189,43 @@ const sendNotification = async ({
       relatedAppointment,
     });
   } catch (error) {
-    // Notification failure must NOT cancel the appointment
-    console.error("Notification error:", error.message);
-    return null;
-=======
-    const { doctor: doctorId, date } = req.query;
-
-    if (!doctorId || !date) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Doctor and date are required" });
-    }
-    if (!validDate(date)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Invalid date format. Use YYYY-MM-DD",
-        });
-    }
-
-    const doctor = await Doctor.findById(doctorId).select(
-      "isAvailable availability name",
+    console.error(
+      "Notification error:",
+      error.message
     );
-    if (!doctor)
-      return res
-        .status(404)
-        .json({ success: false, message: "Doctor not found" });
+  }
+};
 
-    if (!doctor.isAvailable) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          data: {
-            doctor: doctorId,
-            date,
-            day: null,
-            startTime: null,
-            endTime: null,
-            bookedTimes: [],
-            availableTimes: [],
-          },
-        });
-    }
-
-    const { day, availability } = getAvailability(doctor, date);
-    if (!availability) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          data: {
-            doctor: doctorId,
-            date,
-            day,
-            startTime: null,
-            endTime: null,
-            bookedTimes: [],
-            availableTimes: [],
-          },
-        });
-    }
-
-    const allTimes = generateTimes(
-      availability.startTime,
-      availability.endTime,
-    );
-    const booked = await Appointment.find({
-      doctor: doctorId,
-      date,
-      status: { $ne: "Cancelled" },
-    }).select("time");
-
-    const bookedTimes = booked.map((item) => item.time);
-    const availableTimes = allTimes.filter(
-      (time) => !bookedTimes.includes(time),
-    );
-
-    res.status(200).json({
-      success: true,
-      data: {
-        doctor: doctorId,
-        date,
-        day,
-        startTime: availability.startTime,
-        endTime: availability.endTime,
-        bookedTimes,
-        availableTimes,
+const createAppointmentNotification = async (
+  appointment,
+  doctorName,
+  patientUserId,
+  doctorUserId
+) => {
+  try {
+    await Notification.create([
+      {
+        recipient: patientUserId,
+        sender: null,
+        type: "appointment",
+        title: "Appointment booked",
+        message: `Your appointment with Dr. ${doctorName} on ${appointment.date} at ${appointment.time} has been booked successfully.`,
+        relatedAppointment: appointment._id,
       },
-    });
+      {
+        recipient: doctorUserId,
+        sender: patientUserId,
+        type: "appointment",
+        title: "New appointment",
+        message: `You have a new appointment on ${appointment.date} at ${appointment.time}.`,
+        relatedAppointment: appointment._id,
+      },
+    ]);
   } catch (error) {
-    if (error.name === "CastError")
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid doctor id" });
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to fetch available slots",
-        error: error.message,
-      });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+    console.error(
+      "Appointment notification error:",
+      error.message
+    );
   }
 };
 
@@ -270,10 +238,6 @@ const getPatientForUser = async (userId) => {
     return null;
   }
 
-  // ---------------------------------------------------
-  // 1. Check existing Patient profile
-  // ---------------------------------------------------
-
   let patientProfile = await Patient.findOne({
     user: userId,
   });
@@ -281,10 +245,6 @@ const getPatientForUser = async (userId) => {
   if (patientProfile) {
     return patientProfile;
   }
-
-  // ---------------------------------------------------
-  // 2. Get logged-in User
-  // ---------------------------------------------------
 
   const user = await User.findById(userId).select(
     "name email phone role"
@@ -294,14 +254,9 @@ const getPatientForUser = async (userId) => {
     return null;
   }
 
-  // Only normal users can have Patient profiles
   if (user.role !== "user") {
     return null;
   }
-
-  // ---------------------------------------------------
-  // 3. Create Patient profile automatically
-  // ---------------------------------------------------
 
   patientProfile = await Patient.create({
     user: user._id,
@@ -319,265 +274,53 @@ const getPatientForUser = async (userId) => {
 
 const createAppointment = async (req, res) => {
   try {
-<<<<<<< HEAD
+    if (req.user.role !== "user") {
+      return res.status(403).json({
+        success: false,
+        message: "Only patient accounts can book appointments",
+      });
+    }
+
     const {
-      patient,
       doctor,
       date,
       time,
       appointmentType,
       notes,
     } = req.body;
-=======
-    if (req.user.role !== "user") {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "Only patient accounts can book appointments",
-        });
-    }
-
-    const { doctor, date, time, appointmentType, notes } = req.body;
-
-    if (!doctor || !date || !time || !appointmentType) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Doctor, date, time and appointment type are required",
-        });
-    }
-    if (!validDate(date))
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Invalid date format. Use YYYY-MM-DD",
-        });
-    if (!TIME_RE.test(time))
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid time format. Use HH:MM" });
-
-    let patient = await Patient.findOne({ user: req.user.userId });
-    if (!patient) {
-      const account = await User.findById(req.user.userId).select(
-        "name email phone",
-      );
-      if (!account)
-        return res
-          .status(404)
-          .json({ success: false, message: "User account not found" });
-
-      patient = await Patient.create({
-        user: account._id,
-        name: String(req.body.patientName || account.name).trim(),
-        email: String(req.body.email || account.email)
-          .trim()
-          .toLowerCase(),
-        phone: String(req.body.phone || account.phone).trim(),
-      });
-    }
-
-    const doctorData = await Doctor.findById(doctor);
-    if (!doctorData)
-      return res
-        .status(404)
-        .json({ success: false, message: "Doctor not found" });
-    if (!doctorData.isAvailable)
-      return res
-        .status(400)
-        .json({ success: false, message: "Doctor is not available" });
-
-    const { availability } = getAvailability(doctorData, date);
-    if (!availability)
-      return res
-        .status(400)
-        .json({ success: false, message: "Doctor does not work on this day" });
-
-    const validTimes = generateTimes(
-      availability.startTime,
-      availability.endTime,
-    );
-    if (!validTimes.includes(time))
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Selected time is outside the doctor's available slots",
-        });
-
-    const key = slotKey(doctor, date, time);
-    const conflict = await Appointment.findOne({
-      slotKey: key,
-      status: { $ne: "Cancelled" },
-    });
-    if (conflict)
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "This appointment slot has already been booked",
-        });
-
-    const patientConflict = await Appointment.findOne({
-      patient: patient._id,
-      date,
-      time,
-      status: { $ne: "Cancelled" },
-    });
-    if (patientConflict)
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "You already have an appointment at this time",
-        });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
-
-    // -------------------------------------------------
-    // Basic validation
-    // -------------------------------------------------
 
     if (!doctor || !date || !time || !appointmentType) {
       return res.status(400).json({
         success: false,
         message:
-          "doctor, date, time and appointmentType are required",
+          "Doctor, date, time and appointment type are required",
       });
-<<<<<<< HEAD
-=======
-    } catch (error) {
-      if (error.code === 11000)
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: "This appointment slot has already been booked",
-          });
-      throw error;
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
     }
 
-    // -------------------------------------------------
-    // Validate doctor ID
-    // -------------------------------------------------
-
-<<<<<<< HEAD
     if (!mongoose.Types.ObjectId.isValid(doctor)) {
       return res.status(400).json({
         success: false,
         message: "Invalid doctor id",
       });
-=======
-    const populated = await populateAppointment(
-      Appointment.findById(appointment._id),
-    );
-    const doctorUserId = doctorData.user;
-
-    try {
-      await createAppointmentNotification(
-        appointment,
-        doctorData.name,
-        req.user.userId,
-        doctorUserId,
-      );
-    } catch (notificationError) {
-      console.error(
-        "Appointment notification error:",
-        notificationError.message,
-      );
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
     }
-
-    // -------------------------------------------------
-    // Check doctor exists
-    // -------------------------------------------------
-
-    const doctorProfile = await Doctor.findById(doctor);
-
-    if (!doctorProfile) {
-      return res.status(404).json({
-        success: false,
-        message: "Doctor not found",
-      });
-    }
-
-    // -------------------------------------------------
-    // Get Patient
-    // -------------------------------------------------
-
-    let patientId = patient || null;
-
-    // For logged-in normal users:
-    // Always use the Patient profile belonging
-    // to the authenticated user.
-
-    if (req.user?.role === "user") {
-      const patientProfile = await getPatientForUser(
-        req.user.userId
-      );
-
-      if (!patientProfile) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Unable to create patient profile for the logged-in user",
-        });
-      }
-
-      patientId = patientProfile._id;
-    }
-
-    // -------------------------------------------------
-    // Validate Patient
-    // -------------------------------------------------
-
-    if (!patientId) {
-      return res.status(400).json({
-        success: false,
-        message: "Patient is required",
-      });
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(patientId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid patient id",
-      });
-    }
-
-    // -------------------------------------------------
-    // Make sure Patient exists
-    // -------------------------------------------------
-
-    const patientExists = await Patient.findById(patientId);
-
-    if (!patientExists) {
-      return res.status(404).json({
-        success: false,
-        message: "Patient not found",
-      });
-    }
-
-    // -------------------------------------------------
-    // Normalize date and time
-    // -------------------------------------------------
 
     const normalizedDate = normalizeDate(date);
-    const normalizedTime = normalizeTime(time);
 
-    if (!normalizedDate || !normalizedTime) {
+    if (!validDate(normalizedDate)) {
       return res.status(400).json({
         success: false,
-        message: "Valid date and time are required",
+        message: "Invalid date format. Use YYYY-MM-DD",
       });
     }
 
-    // -------------------------------------------------
-    // Validate appointment type
-    // -------------------------------------------------
+    const normalizedTime = normalizeTime(time);
+
+    if (!normalizedTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid time format. Use HH:MM",
+      });
+    }
 
     const allowedAppointmentTypes = [
       "Consultation",
@@ -593,90 +336,135 @@ const createAppointment = async (req, res) => {
       });
     }
 
-    // -------------------------------------------------
-    // Check booked slot
-    // -------------------------------------------------
+    let patient = await Patient.findOne({
+      user: req.user.userId,
+    });
 
-    const appointments = await Appointment.find({
-      doctor,
-      date: normalizedDate,
-      status: {
-        $in: ["Pending", "Confirmed"],
-      },
-    }).select("time");
+    if (!patient) {
+      const account = await User.findById(
+        req.user.userId
+      ).select("name email phone");
 
-    const alreadyBooked = appointments.some((appointment) =>
-      sameTime(appointment.time, normalizedTime)
+      if (!account) {
+        return res.status(404).json({
+          success: false,
+          message: "User account not found",
+        });
+      }
+
+      patient = await Patient.create({
+        user: account._id,
+        name: String(
+          req.body.patientName || account.name
+        ).trim(),
+        email: String(
+          req.body.email || account.email
+        )
+          .trim()
+          .toLowerCase(),
+        phone: String(
+          req.body.phone || account.phone
+        ).trim(),
+      });
+    }
+
+    const doctorData = await Doctor.findById(doctor);
+
+    if (!doctorData) {
+      return res.status(404).json({
+        success: false,
+        message: "Doctor not found",
+      });
+    }
+
+    if (!doctorData.isAvailable) {
+      return res.status(400).json({
+        success: false,
+        message: "Doctor is not available",
+      });
+    }
+
+    const { availability } = getAvailability(
+      doctorData,
+      normalizedDate
     );
 
-    if (alreadyBooked) {
-      return res.status(409).json({
+    if (!availability) {
+      return res.status(400).json({
         success: false,
-        message: "This appointment slot is already booked",
+        message:
+          "Doctor does not work on this day",
       });
     }
 
-    // -------------------------------------------------
-    // Unique slot key
-    // -------------------------------------------------
+    const validTimes = generateTimes(
+      availability.startTime,
+      availability.endTime
+    );
 
-    const slotKey =
-      `${doctor}-${normalizedDate}-${normalizedTime}`;
-
-    // Check active appointment using same slot
-    const existingSlot = await Appointment.findOne({
-      slotKey,
-      status: {
-        $in: ["Pending", "Confirmed"],
-      },
-    });
-
-    if (existingSlot) {
-      return res.status(409).json({
+    if (!validTimes.includes(normalizedTime)) {
+      return res.status(400).json({
         success: false,
-        message: "This appointment slot is already booked",
+        message:
+          "Selected time is outside the doctor's available slots",
       });
     }
 
-    // -------------------------------------------------
-    // Free old cancelled slot if it still owns
-    // the same slotKey
-    // -------------------------------------------------
-
-    const cancelledSlot = await Appointment.findOne({
-      slotKey,
-      status: "Cancelled",
-    });
-
-    if (cancelledSlot) {
-      cancelledSlot.slotKey = undefined;
-      await cancelledSlot.save();
-    }
-
-    // -------------------------------------------------
-    // Queue number
-    // -------------------------------------------------
-
-    const lastAppointment = await Appointment.findOne({
-      doctor,
+    const patientConflict = await Appointment.findOne({
+      patient: patient._id,
       date: normalizedDate,
+      time: normalizedTime,
       status: {
-        $in: ["Pending", "Confirmed"],
+        $ne: "Cancelled",
       },
-    }).sort({
-      queueNumber: -1,
     });
+
+    if (patientConflict) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "You already have an appointment at this time",
+      });
+    }
+
+    const appointmentSlotKey = createSlotKey(
+      doctor,
+      normalizedDate,
+      normalizedTime
+    );
+
+    const conflict = await Appointment.findOne({
+      slotKey: appointmentSlotKey,
+      status: {
+        $ne: "Cancelled",
+      },
+    });
+
+    if (conflict) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "This appointment slot has already been booked",
+      });
+    }
+
+    const lastAppointment =
+      await Appointment.findOne({
+        doctor,
+        date: normalizedDate,
+        status: {
+          $in: ["Pending", "Confirmed"],
+        },
+      }).sort({
+        queueNumber: -1,
+      });
 
     const queueNumber = lastAppointment?.queueNumber
       ? lastAppointment.queueNumber + 1
       : 1;
 
-    // -------------------------------------------------
-    // Create appointment
-    // -------------------------------------------------
-
     const appointment = await Appointment.create({
-      patient: patientId,
+      patient: patient._id,
       doctor,
       date: normalizedDate,
       time: normalizedTime,
@@ -684,59 +472,33 @@ const createAppointment = async (req, res) => {
       notes: notes || "",
       status: "Pending",
       queueNumber,
-      slotKey,
+      slotKey: appointmentSlotKey,
     });
 
-    // -------------------------------------------------
-    // Populate appointment
-    // -------------------------------------------------
-
     const populatedAppointment =
-      await Appointment.findById(appointment._id)
-        .populate("patient")
-        .populate("doctor");
+      await populateAppointment(
+        Appointment.findById(appointment._id)
+      );
 
-    // =================================================
-    // Create Notification For Patient
-    // =================================================
-
-    if (req.user?.userId) {
-      const doctorName =
-        getDoctorDisplayName(doctorProfile);
-
-      await sendNotification({
-        recipient: req.user.userId,
-        sender: null,
-        type: "appointment",
-        title: "Appointment booked successfully",
-        message:
-          `Your appointment with Dr. ${doctorName} ` +
-          `has been booked for ${normalizedDate} ` +
-          `at ${normalizedTime}.`,
-        relatedAppointment: appointment._id,
-      });
-    }
-
-    // -------------------------------------------------
-    // Response
-    // -------------------------------------------------
+    await createAppointmentNotification(
+      appointment,
+      getDoctorDisplayName(doctorData),
+      req.user.userId,
+      doctorData.user
+    );
 
     return res.status(201).json({
       success: true,
       message: "Appointment created successfully",
-
       appointment: populatedAppointment,
       data: populatedAppointment,
     });
-
   } catch (error) {
-<<<<<<< HEAD
-    console.error("Create appointment error:", error);
-
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: "This appointment slot is already booked",
+        message:
+          "This appointment slot has already been booked",
       });
     }
 
@@ -751,8 +513,7 @@ const createAppointment = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid data provided",
-        error: error.message,
+        message: "Invalid doctor id",
       });
     }
 
@@ -761,27 +522,6 @@ const createAppointment = async (req, res) => {
       message: "Failed to create appointment",
       error: error.message,
     });
-=======
-    if (error.name === "ValidationError")
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Validation failed",
-          error: error.message,
-        });
-    if (error.name === "CastError")
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid doctor id" });
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to create appointment",
-        error: error.message,
-      });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   }
 };
 
@@ -793,76 +533,56 @@ const getAllAppointments = async (req, res) => {
   try {
     const filter = {};
 
-<<<<<<< HEAD
-    // -------------------------------------------------
-    // Patient
-    // -------------------------------------------------
+    if (req.user.role === "doctor") {
+      const doctor = await Doctor.findOne({
+        user: req.user.userId,
+      }).select("_id");
 
-    if (req.user?.role === "user") {
-      const patientProfile = await getPatientForUser(
-        req.user.userId
-      );
-
-      if (!patientProfile) {
-        return res.status(200).json({
-          success: true,
-          message: "Appointments fetched successfully",
-          count: 0,
-          appointments: [],
-          data: [],
+      if (!doctor) {
+        return res.status(404).json({
+          success: false,
+          message: "Doctor profile not found",
         });
       }
 
-      filter.patient = patientProfile._id;
-=======
-    if (req.user.role === "doctor") {
-      const doctor = await Doctor.findOne({ user: req.user.userId }).select(
-        "_id",
-      );
-      if (!doctor)
-        return res
-          .status(404)
-          .json({ success: false, message: "Doctor profile not found" });
       filter.doctor = doctor._id;
     } else if (req.user.role === "user") {
-      const patient = await Patient.findOne({ user: req.user.userId }).select(
-        "_id",
-      );
-      if (!patient)
-        return res
-          .status(404)
-          .json({ success: false, message: "Patient profile not found" });
+      const patient = await Patient.findOne({
+        user: req.user.userId,
+      }).select("_id");
+
+      if (!patient) {
+        return res.status(404).json({
+          success: false,
+          message: "Patient profile not found",
+        });
+      }
+
       filter.patient = patient._id;
     } else if (req.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "You don't have permission to view appointments",
-        });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+      return res.status(403).json({
+        success: false,
+        message:
+          "You don't have permission to view appointments",
+      });
     }
-
-    // -------------------------------------------------
-    // Doctor
-    // -------------------------------------------------
-
-    if (req.user?.role === "doctor") {
-      if (req.user.doctorId) {
-        filter.doctor = req.user.doctorId;
-      }
-    }
-
-    // -------------------------------------------------
-    // Query filters
-    // -------------------------------------------------
 
     if (req.query.status) {
       filter.status = req.query.status;
     }
 
     if (req.query.date) {
-      filter.date = normalizeDate(req.query.date);
+      const normalizedDate =
+        normalizeDate(req.query.date);
+
+      if (!validDate(normalizedDate)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid date",
+        });
+      }
+
+      filter.date = normalizedDate;
     }
 
     if (req.query.doctor) {
@@ -873,58 +593,31 @@ const getAllAppointments = async (req, res) => {
       filter.patient = req.query.patient;
     }
 
-    // -------------------------------------------------
-    // Fetch appointments
-    // -------------------------------------------------
-
-    const appointments = await Appointment.find(filter)
-      .populate("patient")
-      .populate("doctor")
-      .sort({
-        date: 1,
-        time: 1,
-        createdAt: 1,
-      });
-
-    // -------------------------------------------------
-    // Response
-    // -------------------------------------------------
+    const appointments =
+      await Appointment.find(filter)
+        .populate("patient")
+        .populate("doctor")
+        .sort({
+          date: 1,
+          time: 1,
+          createdAt: 1,
+        });
 
     return res.status(200).json({
       success: true,
-      message: "Appointments fetched successfully",
+      message:
+        "Appointments fetched successfully",
       count: appointments.length,
       appointments,
       data: appointments,
     });
-
-<<<<<<< HEAD
   } catch (error) {
-    console.error("Get all appointments error:", error);
-
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch appointments",
+      message:
+        "Failed to fetch appointments",
       error: error.message,
     });
-=======
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Appointments fetched successfully",
-        count: appointments.length,
-        data: appointments,
-      });
-  } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to fetch appointments",
-        error: error.message,
-      });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   }
 };
 
@@ -934,7 +627,6 @@ const getAllAppointments = async (req, res) => {
 
 const getAppointmentById = async (req, res) => {
   try {
-<<<<<<< HEAD
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -943,43 +635,11 @@ const getAppointmentById = async (req, res) => {
         message: "Invalid appointment id",
       });
     }
-=======
-    const appointment = await populateAppointment(
-      Appointment.findById(req.params.id),
-    );
-    if (!appointment)
-      return res
-        .status(404)
-        .json({ success: false, message: "Appointment not found" });
 
-    // Read access is checked here without requiring the update/delete middleware.
-    const role = req.user.role;
-    let allowed = role === "admin";
-    if (role === "user") {
-      const patient = await Patient.findOne({ user: req.user.userId }).select(
-        "_id",
+    const appointment =
+      await populateAppointment(
+        Appointment.findById(id)
       );
-      allowed =
-        !!patient && String(appointment.patient._id) === String(patient._id);
-    } else if (role === "doctor") {
-      const doctor = await Doctor.findOne({ user: req.user.userId }).select(
-        "_id",
-      );
-      allowed =
-        !!doctor && String(appointment.doctor._id) === String(doctor._id);
-    }
-    if (!allowed)
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "You are not allowed to access this appointment",
-        });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
-
-    const appointment = await Appointment.findById(id)
-      .populate("patient")
-      .populate("doctor");
 
     if (!appointment) {
       return res.status(404).json({
@@ -988,35 +648,54 @@ const getAppointmentById = async (req, res) => {
       });
     }
 
+    const role = req.user.role;
+
+    let allowed = role === "admin";
+
+    if (role === "user") {
+      const patient = await Patient.findOne({
+        user: req.user.userId,
+      }).select("_id");
+
+      allowed =
+        !!patient &&
+        appointment.patient &&
+        String(appointment.patient._id) ===
+          String(patient._id);
+    } else if (role === "doctor") {
+      const doctor = await Doctor.findOne({
+        user: req.user.userId,
+      }).select("_id");
+
+      allowed =
+        !!doctor &&
+        appointment.doctor &&
+        String(appointment.doctor._id) ===
+          String(doctor._id);
+    }
+
+    if (!allowed) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "You are not allowed to access this appointment",
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      message: "Appointment fetched successfully",
+      message:
+        "Appointment fetched successfully",
       appointment,
       data: appointment,
     });
-
   } catch (error) {
-<<<<<<< HEAD
-    console.error("Get appointment error:", error);
-
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch appointment",
+      message:
+        "Failed to fetch appointment",
       error: error.message,
     });
-=======
-    if (error.name === "CastError")
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid appointment id" });
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to fetch appointment",
-        error: error.message,
-      });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   }
 };
 
@@ -1028,19 +707,82 @@ const updateAppointment = async (req, res) => {
   try {
     const { id } = req.params;
 
-<<<<<<< HEAD
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
         message: "Invalid appointment id",
       });
     }
-=======
-    if (!appointment || !access)
-      return res
-        .status(404)
-        .json({ success: false, message: "Appointment not found" });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+
+    let appointment = req.appointment;
+
+    if (!appointment) {
+      appointment =
+        await populateAppointment(
+          Appointment.findById(id)
+        );
+    }
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    const isAdmin = req.user.role === "admin";
+
+    let isOwnerPatient = false;
+    let isOwnerDoctor = false;
+
+    if (req.user.role === "user") {
+      const patient = await Patient.findOne({
+        user: req.user.userId,
+      }).select("_id");
+
+      isOwnerPatient =
+        !!patient &&
+        String(
+          appointment.patient?._id ||
+            appointment.patient
+        ) === String(patient._id);
+    }
+
+    if (req.user.role === "doctor") {
+      const doctor = await Doctor.findOne({
+        user: req.user.userId,
+      }).select("_id");
+
+      isOwnerDoctor =
+        !!doctor &&
+        String(
+          appointment.doctor?._id ||
+            appointment.doctor
+        ) === String(doctor._id);
+    }
+
+    const access = req.appointmentAccess || {};
+
+    const finalIsOwnerPatient =
+      access.isOwnerPatient ?? isOwnerPatient;
+
+    const finalIsOwnerDoctor =
+      access.isOwnerDoctor ?? isOwnerDoctor;
+
+    const finalIsAdmin =
+      access.isAdmin ?? isAdmin;
+
+    if (
+      !finalIsAdmin &&
+      !finalIsOwnerPatient &&
+      !finalIsOwnerDoctor
+    ) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "You are not allowed to update this appointment",
+      });
+    }
 
     const {
       doctor,
@@ -1051,62 +793,71 @@ const updateAppointment = async (req, res) => {
       status,
     } = req.body;
 
-<<<<<<< HEAD
-    // -------------------------------------------------
-    // Find appointment
-    // -------------------------------------------------
+    if (
+      finalIsOwnerPatient &&
+      !finalIsAdmin
+    ) {
+      if (
+        status !== "Cancelled" ||
+        date !== undefined ||
+        time !== undefined ||
+        doctor !== undefined ||
+        appointmentType !== undefined
+      ) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Patients can only cancel an appointment",
+        });
+      }
 
-    const appointment = await Appointment.findById(id);
-
-    if (!appointment) {
-      return res.status(404).json({
-        success: false,
-        message: "Appointment not found",
-      });
+      if (
+        appointment.status === "Completed" ||
+        appointment.status === "Cancelled"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "This appointment can no longer be cancelled",
+        });
+      }
     }
 
-    const oldStatus = appointment.status;
+    const oldDoctor =
+      appointment.doctor?._id
+        ? appointment.doctor._id
+        : appointment.doctor;
 
-    // -------------------------------------------------
-    // Validate doctor if provided
-    // -------------------------------------------------
+    const oldDate = appointment.date;
+    const oldTime = appointment.time;
 
     if (
-      doctor !== undefined &&
-      !mongoose.Types.ObjectId.isValid(doctor)
+      !finalIsAdmin &&
+      (
+        doctor !== undefined ||
+        date !== undefined ||
+        time !== undefined
+      )
     ) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
-        message: "Invalid doctor id",
+        message:
+          "Only an admin can reschedule an appointment",
       });
     }
 
-    // -------------------------------------------------
-    // New values
-    // -------------------------------------------------
-
-    const newDoctor =
-      doctor || appointment.doctor;
-
-    const newDate = date
-      ? normalizeDate(date)
-      : appointment.date;
-
-    const newTime = time
-      ? normalizeTime(time)
-      : appointment.time;
-
-    const slotChanged =
-      String(newDoctor) !== String(appointment.doctor) ||
-      newDate !== appointment.date ||
-      !sameTime(newTime, appointment.time);
-
-    // -------------------------------------------------
-    // Validate new doctor
-    // -------------------------------------------------
-
     if (doctor !== undefined) {
-      const doctorExists = await Doctor.findById(doctor);
+      if (
+        !mongoose.Types.ObjectId.isValid(doctor)
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid doctor id",
+        });
+      }
+
+      const doctorExists =
+        await Doctor.findById(doctor);
 
       if (!doctorExists) {
         return res.status(404).json({
@@ -1114,135 +865,38 @@ const updateAppointment = async (req, res) => {
           message: "Doctor not found",
         });
       }
-    }
 
-    // -------------------------------------------------
-    // Check new slot
-    // -------------------------------------------------
-
-    if (
-      slotChanged &&
-      status !== "Cancelled"
-    ) {
-      const doctorAppointments =
-        await Appointment.find({
-          _id: {
-            $ne: id,
-          },
-
-          doctor: newDoctor,
-
-          date: newDate,
-
-          status: {
-            $in: ["Pending", "Confirmed"],
-          },
-
-        }).select("time");
-
-      const booked = doctorAppointments.some((item) =>
-        sameTime(item.time, newTime)
-      );
-
-      if (booked) {
-        return res.status(409).json({
-          success: false,
-          message:
-            "The new appointment slot is already booked",
-        });
-      }
-
-      // -------------------------------------------------
-      // Check unique slotKey
-      // -------------------------------------------------
-
-      const newSlotKey =
-        `${newDoctor}-${newDate}-${newTime}`;
-
-      const existingSlot =
-        await Appointment.findOne({
-          slotKey: newSlotKey,
-
-          _id: {
-            $ne: id,
-          },
-
-          status: {
-            $in: ["Pending", "Confirmed"],
-          },
-        });
-
-      if (existingSlot) {
-        return res.status(409).json({
-          success: false,
-          message:
-            "The new appointment slot is already booked",
-        });
-      }
-=======
-    if (access.isOwnerPatient && !access.isAdmin) {
-      if (
-        status !== "Cancelled" ||
-        date !== undefined ||
-        time !== undefined ||
-        appointmentType !== undefined
-      ) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Patients can only cancel an appointment",
-          });
-      }
-      if (
-        appointment.status === "Completed" ||
-        appointment.status === "Cancelled"
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "This appointment can no longer be cancelled",
-          });
-      }
-    }
-
-    if (!access.isAdmin && !access.isOwnerPatient && !access.isOwnerDoctor) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "You are not allowed to update this appointment",
-        });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
-    }
-
-    // -------------------------------------------------
-    // Update fields
-    // -------------------------------------------------
-
-    if (doctor !== undefined) {
       appointment.doctor = doctor;
     }
 
     if (date !== undefined) {
-<<<<<<< HEAD
-      appointment.date = normalizeDate(date);
-=======
-      if (!validDate(date))
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid date format. Use YYYY-MM-DD",
-          });
-      appointment.date = date;
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+      const normalizedDate =
+        normalizeDate(date);
+
+      if (!validDate(normalizedDate)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid date format. Use YYYY-MM-DD",
+        });
+      }
+
+      appointment.date = normalizedDate;
     }
 
     if (time !== undefined) {
-<<<<<<< HEAD
-      appointment.time = normalizeTime(time);
+      const normalizedTime =
+        normalizeTime(time);
+
+      if (!normalizedTime) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid time format. Use HH:MM",
+        });
+      }
+
+      appointment.time = normalizedTime;
     }
 
     if (appointmentType !== undefined) {
@@ -1259,84 +913,13 @@ const updateAppointment = async (req, res) => {
       ) {
         return res.status(400).json({
           success: false,
-          message: "Invalid appointment type",
+          message:
+            "Invalid appointment type. Allowed values are Consultation, Follow-up, Check-up",
         });
       }
 
       appointment.appointmentType =
         appointmentType;
-=======
-      if (!TIME_RE.test(time))
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid time format. Use HH:MM" });
-      appointment.time = time;
-    }
-    if (appointmentType !== undefined)
-      appointment.appointmentType = appointmentType;
-    if (notes !== undefined) appointment.notes = notes;
-    if (status !== undefined) appointment.status = status;
-
-    if (
-      access.isOwnerDoctor &&
-      !access.isAdmin &&
-      status &&
-      !["Confirmed", "Completed", "Cancelled"].includes(status)
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid appointment status" });
-    }
-
-    // Only admins can move an appointment to a different slot/date.
-    if (!access.isAdmin && (date !== undefined || time !== undefined)) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "Only an admin can reschedule an appointment",
-        });
-    }
-
-    if (date !== undefined || time !== undefined) {
-      const doctor = await Doctor.findById(appointment.doctor);
-      if (!doctor || !doctor.isAvailable)
-        return res
-          .status(400)
-          .json({ success: false, message: "Doctor is not available" });
-      const { availability } = getAvailability(doctor, appointment.date);
-      if (
-        !availability ||
-        !generateTimes(availability.startTime, availability.endTime).includes(
-          appointment.time,
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Selected time is outside the doctor's available slots",
-          });
-      }
-
-      appointment.slotKey = slotKey(
-        appointment.doctor,
-        appointment.date,
-        appointment.time,
-      );
-      const conflict = await Appointment.findOne({
-        _id: { $ne: appointment._id },
-        slotKey: appointment.slotKey,
-        status: { $ne: "Cancelled" },
-      });
-      if (conflict)
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message: "This appointment slot is already booked",
-          });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
     }
 
     if (notes !== undefined) {
@@ -1354,51 +937,157 @@ const updateAppointment = async (req, res) => {
       if (!allowedStatuses.includes(status)) {
         return res.status(400).json({
           success: false,
-          message: "Invalid appointment status",
+          message:
+            "Invalid appointment status",
+        });
+      }
+
+      if (
+        finalIsOwnerDoctor &&
+        !finalIsAdmin &&
+        ![
+          "Confirmed",
+          "Completed",
+          "Cancelled",
+        ].includes(status)
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid appointment status",
         });
       }
 
       appointment.status = status;
     }
 
-    // -------------------------------------------------
-    // Update slot key
-    // -------------------------------------------------
+    const slotChanged =
+      String(oldDoctor) !==
+        String(
+          appointment.doctor?._id ||
+            appointment.doctor
+        ) ||
+      oldDate !== appointment.date ||
+      oldTime !== appointment.time;
 
-    if (appointment.status === "Cancelled") {
+    if (slotChanged) {
+      const doctorProfile =
+        await Doctor.findById(
+          appointment.doctor
+        );
 
-      // Free the slot completely
-      appointment.slotKey = undefined;
+      if (!doctorProfile) {
+        return res.status(404).json({
+          success: false,
+          message: "Doctor not found",
+        });
+      }
 
-    } else {
+      if (!doctorProfile.isAvailable) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Doctor is not available",
+        });
+      }
+
+      const { availability } =
+        getAvailability(
+          doctorProfile,
+          appointment.date
+        );
+
+      if (!availability) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Doctor does not work on this day",
+        });
+      }
+
+      const validTimes =
+        generateTimes(
+          availability.startTime,
+          availability.endTime
+        );
+
+      if (
+        !validTimes.includes(
+          normalizeTime(
+            appointment.time
+          )
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Selected time is outside the doctor's available slots",
+        });
+      }
+
+      const newSlotKey =
+        createSlotKey(
+          appointment.doctor,
+          appointment.date,
+          appointment.time
+        );
+
+      const conflict =
+        await Appointment.findOne({
+          _id: {
+            $ne: appointment._id,
+          },
+          slotKey: newSlotKey,
+          status: {
+            $ne: "Cancelled",
+          },
+        });
+
+      if (conflict) {
+        return res.status(409).json({
+          success: false,
+          message:
+            "This appointment slot is already booked",
+        });
+      }
 
       appointment.slotKey =
-        `${appointment.doctor}-${appointment.date}-${appointment.time}`;
-
+        newSlotKey;
     }
 
-    // -------------------------------------------------
-    // Queue number
-    // -------------------------------------------------
+    if (
+      appointment.status ===
+      "Cancelled"
+    ) {
+      appointment.slotKey =
+        undefined;
+    } else {
+      appointment.slotKey =
+        createSlotKey(
+          appointment.doctor,
+          appointment.date,
+          appointment.time
+        );
+    }
 
     if (
       slotChanged &&
-      appointment.status !== "Cancelled"
+      appointment.status !==
+        "Cancelled"
     ) {
       const lastAppointment =
         await Appointment.findOne({
           _id: {
-            $ne: id,
+            $ne: appointment._id,
           },
-
           doctor: appointment.doctor,
-
           date: appointment.date,
-
           status: {
-            $in: ["Pending", "Confirmed"],
+            $in: [
+              "Pending",
+              "Confirmed",
+            ],
           },
-
         }).sort({
           queueNumber: -1,
         });
@@ -1409,112 +1098,57 @@ const updateAppointment = async (req, res) => {
           : 1;
     }
 
-    // -------------------------------------------------
-    // Save
-    // -------------------------------------------------
-
     await appointment.save();
-<<<<<<< HEAD
-
-    // -------------------------------------------------
-    // Populate
-    // -------------------------------------------------
-
-    const updatedAppointment =
-      await Appointment.findById(id)
-        .populate("patient")
-        .populate("doctor");
-
-    // =================================================
-    // Appointment Cancelled Notification
-    // =================================================
 
     if (
-      status === "Cancelled" &&
-      oldStatus !== "Cancelled" &&
-      updatedAppointment?.patient
+      slotChanged &&
+      oldDoctor &&
+      oldDate
     ) {
-      const patientUserId =
-        updatedAppointment.patient.user;
-
-      const doctorName =
-        getDoctorDisplayName(
-          updatedAppointment.doctor
-        );
-
-      await sendNotification({
-        recipient: patientUserId,
-        sender: null,
-        type: "appointment",
-        title: "Appointment cancelled",
-        message:
-          `Your appointment with Dr. ${doctorName} ` +
-          `on ${updatedAppointment.date} ` +
-          `at ${updatedAppointment.time} ` +
-          `has been cancelled.`,
-        relatedAppointment:
-          updatedAppointment._id,
-      });
+      await reorderQueueNumbers(
+        oldDoctor,
+        oldDate
+      );
     }
-
-    // =================================================
-    // Appointment Confirmed Notification
-    // =================================================
 
     if (
-      status === "Confirmed" &&
-      oldStatus !== "Confirmed" &&
-      updatedAppointment?.patient
+      appointment.status !==
+      "Cancelled"
     ) {
-      const patientUserId =
-        updatedAppointment.patient.user;
-
-      const doctorName =
-        getDoctorDisplayName(
-          updatedAppointment.doctor
-        );
-
-      await sendNotification({
-        recipient: patientUserId,
-        sender: null,
-        type: "appointment",
-        title: "Appointment confirmed",
-        message:
-          `Your appointment with Dr. ${doctorName} ` +
-          `on ${updatedAppointment.date} ` +
-          `at ${updatedAppointment.time} ` +
-          `has been confirmed.`,
-        relatedAppointment:
-          updatedAppointment._id,
-      });
+      await reorderQueueNumbers(
+        appointment.doctor,
+        appointment.date
+      );
     }
 
-    // -------------------------------------------------
-    // Response
-    // -------------------------------------------------
+    const updated =
+      await populateAppointment(
+        Appointment.findById(
+          appointment._id
+        )
+      );
 
     return res.status(200).json({
       success: true,
-      message: "Appointment updated successfully",
-      appointment: updatedAppointment,
-      data: updatedAppointment,
+      message:
+        "Appointment updated successfully",
+      appointment: updated,
+      data: updated,
     });
-
   } catch (error) {
-    console.error("Update appointment error:", error);
-
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
         message:
-          "The appointment slot is already booked",
+          "This appointment slot is already booked",
       });
     }
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message:
+          "Validation failed",
         error: error.message,
       });
     }
@@ -1522,55 +1156,17 @@ const updateAppointment = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: "Invalid data provided",
-        error: error.message,
+        message:
+          "Invalid appointment id",
       });
     }
 
     return res.status(500).json({
       success: false,
-      message: "Failed to update appointment",
+      message:
+        "Failed to update appointment",
       error: error.message,
     });
-=======
-    await reorderQueueNumbers(oldDoctor, oldDate);
-    if (appointment.status !== "Cancelled")
-      await reorderQueueNumbers(appointment.doctor, appointment.date);
-
-    const updated = await populateAppointment(
-      Appointment.findById(appointment._id),
-    );
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Appointment updated successfully",
-        data: updated,
-      });
-  } catch (error) {
-    if (error.code === 11000)
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "This appointment slot is already booked",
-        });
-    if (error.name === "ValidationError")
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Validation failed",
-          error: error.message,
-        });
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to update appointment",
-        error: error.message,
-      });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   }
 };
 
@@ -1578,74 +1174,69 @@ const updateAppointment = async (req, res) => {
 // Delete Appointment
 // =====================================================
 
-const deleteAppointment = async (req, res) => {
+const deleteAppointment = async (
+  req,
+  res
+) => {
   try {
-<<<<<<< HEAD
-    const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
         success: false,
-        message: "Invalid appointment id",
+        message:
+          "Only admins can delete appointments",
       });
     }
-=======
-    if (req.user.role !== "admin")
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "Only admins can delete appointments",
-        });
 
-    const appointment = req.appointment;
-    if (!appointment)
-      return res
-        .status(404)
-        .json({ success: false, message: "Appointment not found" });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+    const { id } = req.params;
+
+    if (
+      !mongoose.Types.ObjectId.isValid(id)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid appointment id",
+      });
+    }
 
     const appointment =
-      await Appointment.findById(id)
-        .populate("patient")
-        .populate("doctor");
+      await Appointment.findById(id);
 
     if (!appointment) {
       return res.status(404).json({
         success: false,
-        message: "Appointment not found",
+        message:
+          "Appointment not found",
       });
     }
 
-    await Appointment.findByIdAndDelete(id);
+    const doctorId =
+      appointment.doctor;
+
+    const date =
+      appointment.date;
+
+    await Appointment.findByIdAndDelete(
+      id
+    );
+
+    await reorderQueueNumbers(
+      doctorId,
+      date
+    );
 
     return res.status(200).json({
       success: true,
-      message: "Appointment deleted successfully",
+      message:
+        "Appointment deleted successfully",
     });
-
-<<<<<<< HEAD
   } catch (error) {
-    console.error("Delete appointment error:", error);
-
     return res.status(500).json({
       success: false,
-      message: "Failed to delete appointment",
+      message:
+        "Failed to delete appointment",
       error: error.message,
     });
-=======
-    res
-      .status(200)
-      .json({ success: true, message: "Appointment deleted successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to delete appointment",
-        error: error.message,
-      });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   }
 };
 
@@ -1653,18 +1244,19 @@ const deleteAppointment = async (req, res) => {
 // Get Available Slots
 // =====================================================
 
-const getAvailableSlots = async (req, res) => {
+const getAvailableSlots = async (
+  req,
+  res
+) => {
   try {
-    const { doctor, date } = req.query;
-
-    // -------------------------------------------------
-    // Basic validation
-    // -------------------------------------------------
+    const { doctor, date } =
+      req.query;
 
     if (!doctor || !date) {
       return res.status(400).json({
         success: false,
-        message: "doctor and date are required",
+        message:
+          "doctor and date are required",
         slots: [],
         availableSlots: [],
         availableTimes: [],
@@ -1674,14 +1266,15 @@ const getAvailableSlots = async (req, res) => {
       });
     }
 
-    // -------------------------------------------------
-    // Validate doctor
-    // -------------------------------------------------
-
-    if (!mongoose.Types.ObjectId.isValid(doctor)) {
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        doctor
+      )
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Invalid doctor id",
+        message:
+          "Invalid doctor id",
         slots: [],
         availableSlots: [],
         availableTimes: [],
@@ -1691,17 +1284,34 @@ const getAvailableSlots = async (req, res) => {
       });
     }
 
-    // -------------------------------------------------
-    // Make sure doctor exists
-    // -------------------------------------------------
+    // Validate date
+    const normalizedDate =
+      normalizeDate(date);
+
+    if (!validDate(normalizedDate)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid date format. Use YYYY-MM-DD",
+        slots: [],
+        availableSlots: [],
+        availableTimes: [],
+        data: {
+          availableTimes: [],
+        },
+      });
+    }
 
     const doctorExists =
-      await Doctor.findById(doctor);
+      await Doctor.findById(
+        doctor
+      );
 
     if (!doctorExists) {
       return res.status(404).json({
         success: false,
-        message: "Doctor not found",
+        message:
+          "Doctor not found",
         slots: [],
         availableSlots: [],
         availableTimes: [],
@@ -1711,86 +1321,94 @@ const getAvailableSlots = async (req, res) => {
       });
     }
 
-    const normalizedDate =
-      normalizeDate(date);
+    if (!doctorExists.isAvailable) {
+      return res.status(200).json({
+        success: true,
+        doctor,
+        date: normalizedDate,
+        slots: [],
+        availableSlots: [],
+        availableTimes: [],
+        data: {
+          availableTimes: [],
+        },
+        count: 0,
+      });
+    }
 
-    // =================================================
-    // SAME HOSPITAL WORKING SLOTS
-    // =================================================
+    const { availability } =
+      getAvailability(
+        doctorExists,
+        normalizedDate
+      );
 
-    const allSlots = [
-      "09:00",
-      "09:30",
-      "10:00",
-      "10:30",
-      "11:00",
-      "11:30",
-      "12:00",
-      "12:30",
-      "13:00",
-      "13:30",
-      "14:00",
-      "14:30",
-      "15:00",
-      "15:30",
-      "16:00",
-      "16:30",
-    ];
+    if (!availability) {
+      return res.status(200).json({
+        success: true,
+        doctor,
+        date: normalizedDate,
+        slots: [],
+        availableSlots: [],
+        availableTimes: [],
+        data: {
+          availableTimes: [],
+        },
+        count: 0,
+      });
+    }
 
-    // -------------------------------------------------
-    // Get booked appointments
-    // -------------------------------------------------
+    const allSlots =
+      generateTimes(
+        availability.startTime,
+        availability.endTime
+      );
 
     const appointments =
       await Appointment.find({
         doctor,
         date: normalizedDate,
         status: {
-          $in: ["Pending", "Confirmed"],
+          $in: [
+            "Pending",
+            "Confirmed",
+          ],
         },
       }).select("time");
 
-    // -------------------------------------------------
-    // Normalize booked times
-    // -------------------------------------------------
-
-    const bookedTimes = appointments.map(
-      (appointment) =>
-        normalizeTime(appointment.time)
-    );
-
-    // -------------------------------------------------
-    // Get available times
-    // -------------------------------------------------
+    const bookedTimes =
+      appointments.map(
+        (appointment) =>
+          normalizeTime(
+            appointment.time
+          )
+      );
 
     const availableTimes =
       allSlots.filter(
         (slot) =>
-          !bookedTimes.some((booked) =>
-            sameTime(booked, slot)
+          !bookedTimes.some(
+            (booked) =>
+              sameTime(
+                booked,
+                slot
+              )
           )
       );
-
-    // -------------------------------------------------
-    // Response
-    // -------------------------------------------------
 
     return res.status(200).json({
       success: true,
       doctor,
       date: normalizedDate,
-
       slots: availableTimes,
-      availableSlots: availableTimes,
+      availableSlots:
+        availableTimes,
       availableTimes,
-
       data: {
         availableTimes,
       },
-
-      count: availableTimes.length,
+      count:
+        availableTimes.length,
     });
-
   } catch (error) {
     console.error(
       "Get available slots error:",
@@ -1801,15 +1419,12 @@ const getAvailableSlots = async (req, res) => {
       success: false,
       message:
         "Failed to fetch available slots",
-
       slots: [],
       availableSlots: [],
       availableTimes: [],
-
       data: {
         availableTimes: [],
       },
-
       error: error.message,
     });
   }
@@ -1819,93 +1434,88 @@ const getAvailableSlots = async (req, res) => {
 // Get Appointments Count
 // =====================================================
 
-const getAppointmentsCount = async (req, res) => {
+const getAppointmentsCount = async (
+  req,
+  res
+) => {
   try {
     const filter = {};
-<<<<<<< HEAD
 
-    // -------------------------------------------------
-    // Doctor
-    // -------------------------------------------------
-
-    if (
-      req.user?.role === "doctor" &&
-      req.user.doctorId
-    ) {
-      filter.doctor = req.user.doctorId;
-=======
     if (req.query.status) {
+      const allowedStatuses = [
+        "Pending",
+        "Confirmed",
+        "Completed",
+        "Cancelled",
+      ];
+
       if (
-        !["Pending", "Confirmed", "Completed", "Cancelled"].includes(
-          req.query.status,
+        !allowedStatuses.includes(
+          req.query.status
         )
       ) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid status" });
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid status",
+        });
       }
-      filter.status = req.query.status;
+
+      filter.status =
+        req.query.status;
     }
-    if (req.query.date === "today") {
+
+    if (
+      req.query.date === "today"
+    ) {
       const now = new Date();
-      filter.date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+      const today =
+        `${now.getFullYear()}-${String(
+          now.getMonth() + 1
+        ).padStart(2, "0")}-${String(
+          now.getDate()
+        ).padStart(2, "0")}`;
+
+      filter.date = today;
     } else if (req.query.date) {
-      if (!validDate(req.query.date))
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid date" });
-      filter.date = req.query.date;
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+      const normalizedDate =
+        normalizeDate(
+          req.query.date
+        );
+
+      if (
+        !validDate(
+          normalizedDate
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid date",
+        });
+      }
+
+      filter.date =
+        normalizedDate;
     }
-
-    // -------------------------------------------------
-    // Status
-    // -------------------------------------------------
-
-    if (req.query.status) {
-      filter.status = req.query.status;
-    }
-
-    // -------------------------------------------------
-    // Date
-    // -------------------------------------------------
-
-    if (req.query.date) {
-      filter.date = normalizeDate(
-        req.query.date
-      );
-    }
-
-    // -------------------------------------------------
-    // Count
-    // -------------------------------------------------
 
     const count =
-      await Appointment.countDocuments(filter);
+      await Appointment.countDocuments(
+        filter
+      );
 
     return res.status(200).json({
       success: true,
       count,
     });
-
   } catch (error) {
-<<<<<<< HEAD
-    console.error(
-      "Get appointments count error:",
-      error
-    );
-
     return res.status(500).json({
       success: false,
       message:
-        "Failed to get appointments count",
+        "Server error",
       error: error.message,
     });
-=======
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   }
 };
 

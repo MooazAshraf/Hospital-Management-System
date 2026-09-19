@@ -34,8 +34,15 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.3-4.3"></path>
+          <circle
+            cx="11"
+            cy="11"
+            r="8"
+          ></circle>
+
+          <path
+            d="m21 21-4.3-4.3"
+          ></path>
         </svg>
 
         <input
@@ -53,6 +60,7 @@
         [ngModel]="selectedDepartment()"
         (ngModelChange)="selectedDepartment.set($event)"
       >
+
         <option value="">
           All departments
         </option>
@@ -63,6 +71,7 @@
         >
           {{ dept }}
         </option>
+
       </select>
 
     </div>
@@ -134,16 +143,11 @@
         <div class="doctor-image">
 
           <img
-<<<<<<< HEAD
             *ngIf="
               doctor.image &&
               !failedImages().has(doctor._id)
             "
-            [src]="doctor.image"
-=======
-            *ngIf="doctor.image"
             [src]="doctor.image | imagePath"
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
             [alt]="doctor.name"
             (error)="onImageError(doctor._id)"
           />
@@ -176,6 +180,7 @@
                     : 'ltr'
                 "
               >
+
                 <ng-container
                   *ngIf="!isArabicName(doctor.name)"
                 >
@@ -183,6 +188,7 @@
                 </ng-container>
 
                 {{ doctor.name }}
+
               </h2>
 
               <p>
@@ -199,11 +205,13 @@
               [class.available]="doctor.isAvailable"
               [class.unavailable]="!doctor.isAvailable"
             >
+
               {{
                 doctor.isAvailable
                   ? 'Available'
                   : 'Unavailable'
               }}
+
             </span>
 
           </div>
@@ -214,6 +222,7 @@
           ========================== -->
 
           <div class="detail-divider"></div>
+
 
           <div class="detail-row">
 
@@ -305,14 +314,15 @@
       class="change-doctor-button"
       (click)="changeDoctor()"
     >
+
       <span>←</span>
 
       Choose a different doctor
+
     </button>
 
 
-    <!-- IMPORTANT:
-         BookingStepsComponent is used here -->
+    <!-- BookingStepsComponent -->
 
     <app-booking-steps
       [doctorId]="doctor._id"
@@ -338,11 +348,8 @@
 .booking-page {
   width: 100%;
   min-height: 100vh;
-
   background: #ffffff;
-
   padding: 18px 30px 80px;
-
   box-sizing: border-box;
 }
 
@@ -353,7 +360,6 @@
 
 .doctor-selection {
   width: min(1100px, 100%);
-
   margin: 0 auto;
 }
 
@@ -368,19 +374,14 @@
 
 .page-header h1 {
   margin: 0;
-
   color: #173f29;
-
   font-size: 32px;
-
   font-weight: 800;
 }
 
 .page-header p {
   margin: 8px 0 0;
-
   color: #7a8580;
-
   font-size: 15px;
 }
 
@@ -391,11 +392,8 @@
 
 .search-filter-row {
   display: flex;
-
   align-items: center;
-
   gap: 18px;
-
   margin-bottom: 36px;
 }
 
@@ -407,52 +405,35 @@
 .search-box {
   width: 488px;
   height: 56px;
-
   display: flex;
-
   align-items: center;
-
   gap: 12px;
-
   padding: 0 15px;
-
   border: 1px solid #dfe5e1;
-
   border-radius: 13px;
-
   background: #ffffff;
-
   box-sizing: border-box;
-
   transition: 0.2s;
 }
 
 .search-box:focus-within {
   border-color: #1f6f5c;
-
   box-shadow:
     0 0 0 3px rgba(31, 111, 92, 0.08);
 }
 
 .search-box svg {
   color: #9aa8a1;
-
   flex-shrink: 0;
 }
 
 .search-box input {
   width: 100%;
-
   border: none;
-
   outline: none;
-
   background: transparent;
-
   font-family: inherit;
-
   font-size: 17px;
-
   color: #26352d;
 }
 
@@ -467,35 +448,22 @@
 
 .department-select {
   width: 253px;
-
   height: 56px;
-
   padding: 0 20px;
-
   border: 1px solid #dfe5e1;
-
   border-radius: 13px;
-
   background: #ffffff;
-
   font-family: inherit;
-
   font-size: 16px;
-
   color: #26352d;
-
   cursor: pointer;
-
   box-sizing: border-box;
-
   transition: 0.2s;
 }
 
 .department-select:focus {
   outline: none;
-
   border-color: #1f6f5c;
-
   box-shadow:
     0 0 0 3px rgba(31, 111, 92, 0.08);
 }
@@ -507,11 +475,8 @@
 
 .status-message {
   padding: 50px 20px;
-
   text-align: center;
-
   color: #7a8580;
-
   font-size: 15px;
 }
 
@@ -526,10 +491,8 @@
 
 .doctors-grid {
   display: grid;
-
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
-
   gap: 26px;
 }
 
@@ -540,15 +503,10 @@
 
 .doctor-card {
   overflow: hidden;
-
   background: #ffffff;
-
   border: 1px solid #e4e9e6;
-
   border-radius: 17px;
-
   cursor: pointer;
-
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -557,9 +515,7 @@
 
 .doctor-card:hover {
   transform: translateY(-3px);
-
   border-color: #d3ded7;
-
   box-shadow:
     0 8px 22px rgba(20, 83, 45, 0.09);
 }
@@ -571,29 +527,21 @@
 
 .doctor-image {
   width: 100%;
-
   height: 163px;
-
   background: #effaf3;
-
   overflow: hidden;
 }
 
 .doctor-image img {
   width: 100%;
-
   height: 100%;
-
   display: block;
-
   object-fit: cover;
 }
 
 .doctor-placeholder {
   width: 100%;
-
   height: 100%;
-
   background: #effaf3;
 }
 
@@ -613,13 +561,9 @@
 
 .doctor-top {
   display: flex;
-
   align-items: flex-start;
-
   justify-content: space-between;
-
   gap: 12px;
-
   min-height: 57px;
 }
 
@@ -629,23 +573,16 @@
 
 .doctor-top h2 {
   margin: 0;
-
   color: #173f29;
-
   font-size: 17px;
-
   font-weight: 800;
-
   line-height: 1.5;
 }
 
 .doctor-top p {
   margin: 4px 0 0;
-
   color: #39745b;
-
   font-size: 13px;
-
   line-height: 1.5;
 }
 
@@ -656,27 +593,20 @@
 
 .availability {
   flex-shrink: 0;
-
   padding: 6px 13px;
-
   border-radius: 999px;
-
   font-size: 12px;
-
   font-weight: 500;
-
   line-height: 1;
 }
 
 .availability.available {
   color: #18794e;
-
   background: #dff9e9;
 }
 
 .availability.unavailable {
   color: #b42318;
-
   background: #fff0ef;
 }
 
@@ -687,7 +617,6 @@
 
 .detail-divider {
   border-top: 1px solid #edf0ee;
-
   margin: 14px 0 15px;
 }
 
@@ -698,15 +627,10 @@
 
 .detail-row {
   display: flex;
-
   align-items: center;
-
   gap: 7px;
-
   margin-top: 11px;
-
   font-size: 14px;
-
   line-height: 1.4;
 }
 
@@ -720,13 +644,11 @@
 
 .detail-value {
   color: #34423a;
-
   font-weight: 600;
 }
 
 .fee-value {
   color: #173f29;
-
   font-weight: 800;
 }
 
@@ -737,11 +659,8 @@
 
 .doctor-actions {
   display: grid;
-
   grid-template-columns: 1fr 1fr;
-
   gap: 13px;
-
   margin-top: 28px;
 }
 
@@ -752,35 +671,20 @@
 
 .view-profile-button {
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
-
   height: 50px;
-
   padding: 0 14px;
-
   border: 2px solid #1d432b;
-
   border-radius: 9px;
-
   background: #ffffff;
-
   color: #1d432b;
-
   font-family: inherit;
-
   font-size: 14px;
-
   font-weight: 700;
-
   text-decoration: none;
-
   cursor: pointer;
-
   box-sizing: border-box;
-
   transition: 0.2s;
 }
 
@@ -795,33 +699,21 @@
 
 .select-button {
   height: 50px;
-
   border: none;
-
   padding: 0 14px;
-
   border-radius: 9px;
-
   background: #1d432b;
-
   color: #ffffff;
-
   font-family: inherit;
-
   font-size: 14px;
-
   font-weight: 700;
-
   cursor: pointer;
-
   box-sizing: border-box;
-
   transition: 0.2s;
 }
 
 .select-button:hover {
   background: #163722;
-
   transform: translateY(-1px);
 }
 
@@ -832,7 +724,6 @@
 
 .booking-container {
   width: min(800px, 100%);
-
   margin: 0 auto;
 }
 
@@ -843,31 +734,18 @@
 
 .change-doctor-button {
   display: inline-flex;
-
   align-items: center;
-
   gap: 8px;
-
   margin-bottom: 20px;
-
   padding: 10px 16px;
-
   border: 1px solid #dce5df;
-
   border-radius: 9px;
-
   background: #ffffff;
-
   color: #1d432b;
-
   font-family: inherit;
-
   font-size: 13px;
-
   font-weight: 700;
-
   cursor: pointer;
-
   transition: 0.2s;
 }
 
@@ -877,9 +755,7 @@
 
 .change-doctor-button:hover {
   background: #f3f8f5;
-
   border-color: #1f6f5c;
-
   transform: translateX(-2px);
 }
 
@@ -901,7 +777,6 @@
 
   .search-box {
     flex: 1;
-
     width: auto;
   }
 
@@ -920,7 +795,6 @@
 
   .search-filter-row {
     flex-direction: column;
-
     align-items: stretch;
   }
 

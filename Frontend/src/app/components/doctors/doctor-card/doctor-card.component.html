@@ -1,46 +1,32 @@
 <article
   class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-1 transition duration-300"
 >
-<<<<<<< HEAD
 
-  <!-- Doctor Image -->
-  <div class="h-36 bg-green-50 overflow-hidden">
-
-    <img
-      *ngIf="!imageFailed"
-      [src]="doctor.image || 'assets/doctors/doctor1.png'"
-      [alt]="doctor.name"
-      (error)="imageFailed = true"
-      class="w-full h-full object-cover transition duration-300 hover:scale-105"
-    />
-
-    <!-- Fallback if image fails -->
-    <div
-      *ngIf="imageFailed"
-      class="w-full h-full flex items-center justify-center bg-green-50 text-3xl"
-=======
   <!-- Doctor Image -->
   <div class="h-52 bg-green-50 overflow-hidden">
+
     <img
-      *ngIf="doctor.image"
+      *ngIf="doctor.image && !imageFailed"
       [src]="doctor.image | imagePath"
       [alt]="doctor.name"
       class="w-full h-full object-cover transition duration-300 hover:scale-105"
+      (error)="imageFailed = true"
     />
 
     <div
-      *ngIf="!doctor.image"
+      *ngIf="!doctor.image || imageFailed"
       class="w-full h-full flex items-center justify-center bg-green-50 text-7xl"
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
     >
-      
+      👨‍⚕️
     </div>
+
   </div>
 
-<<<<<<< HEAD
-  <!-- Doctor Information -->
+
+  <!-- Content -->
   <div class="p-5">
 
+    <!-- Name -->
     <div class="flex items-start justify-between gap-3">
 
       <div class="min-w-0">
@@ -53,21 +39,15 @@
             Dr.
           </ng-container>
 
-=======
-  <!-- Content -->
-  <div class="p-5">
-    <!-- Name -->
-    <div class="flex items-start justify-between gap-3">
-      <div class="min-w-0">
-        <h2 class="text-xl font-bold text-green-900 truncate">
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
           {{ doctor.name }}
         </h2>
 
         <p class="text-sm text-green-700 mt-1">
           {{ doctor.specialty }}
         </p>
+
       </div>
+
 
       <!-- Availability -->
       <span
@@ -77,98 +57,105 @@
         [class.bg-red-100]="!doctor.isAvailable"
         [class.text-red-700]="!doctor.isAvailable"
       >
-        {{ doctor.isAvailable ? 'Available' : 'Unavailable' }}
+        {{
+          doctor.isAvailable
+            ? 'Available'
+            : 'Unavailable'
+        }}
       </span>
+
     </div>
 
+
     <!-- Divider -->
-    <div class="border-t border-gray-100 my-4"></div>
+    <div
+      class="border-t border-gray-100 my-4"
+    ></div>
+
 
     <!-- Department -->
-    <div class="flex items-center gap-2 text-sm text-gray-500 mt-3">
-<<<<<<< HEAD
-      <span>Department:</span>
-=======
-      <span> Department: </span>
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+    <div
+      class="flex items-center gap-2 text-sm text-gray-500 mt-3"
+    >
+
+      <span>
+        Department:
+      </span>
 
       <span class="font-medium text-gray-700">
         {{ departmentName }}
       </span>
+
     </div>
+
 
     <!-- Experience -->
-    <div class="flex items-center gap-2 text-sm text-gray-500 mt-3">
-<<<<<<< HEAD
-      <span>Experience:</span>
+    <div
+      class="flex items-center gap-2 text-sm text-gray-500 mt-3"
+    >
 
-      <span class="font-medium text-gray-700">
-        {{ doctor.experienceYears }} years
-      </span>
-    </div>
-
-    <!-- Fee -->
-    <div class="flex items-center gap-2 text-sm mt-3">
-
-      <span class="text-gray-500">
-        Fee:
+      <span>
+        Experience:
       </span>
 
-      <span class="font-bold text-green-900">
-        {{ doctor.fees }} EGP
-=======
-      <span> Experience: </span>
-
       <span class="font-medium text-gray-700">
+
         {{ doctor.experienceYears }}
+
         years
+
       </span>
+
     </div>
+
 
     <!-- Fees -->
-    <div class="flex items-center gap-2 text-sm mt-3">
-      <span class="text-gray-500"> LE : </span>
+    <div
+      class="flex items-center gap-2 text-sm mt-3"
+    >
+
+      <span class="text-gray-500">
+        LE:
+      </span>
 
       <span class="font-bold text-green-900">
+
         {{ doctor.fees }}
+
         EGP
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
+
       </span>
+
     </div>
 
-    <!-- Buttons -->
-    <div class="grid grid-cols-2 gap-3 mt-6">
-<<<<<<< HEAD
 
-      <a
-        [routerLink]="['/doctors', doctor._id]"
-        class="block text-center py-2.5 rounded-lg border-2 border-green-900 text-green-900 text-sm font-semibold hover:bg-green-50 transition"
-=======
+    <!-- Buttons -->
+    <div
+      class="grid grid-cols-2 gap-3 mt-6"
+    >
+
       <!-- View Profile -->
       <a
         [routerLink]="['/doctors', doctor._id]"
         class="block text-center py-2.5 rounded-lg border border-green-900 text-green-900 text-sm font-semibold hover:bg-green-50 transition"
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
       >
         View Profile
       </a>
 
-<<<<<<< HEAD
-      <a
-        [routerLink]="['/book-appointment']"
-        [queryParams]="{ doctorId: doctor._id }"
-=======
+
       <!-- Book -->
       <a
         [routerLink]="['/book-appointment']"
         [queryParams]="{
-          doctorId: doctor._id,
+          doctorId: doctor._id
         }"
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
         class="block text-center py-2.5 rounded-lg bg-green-900 text-white text-sm font-semibold hover:bg-green-800 transition"
       >
         Book Now
       </a>
+
     </div>
+
   </div>
+
 </article>

@@ -17,15 +17,14 @@ import {
   Validators,
 } from '@angular/forms';
 
-<<<<<<< HEAD
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpParams } from '@angular/common/http';
-=======
+
 import {
-  CommonModule,
-} from '@angular/common';
+  HttpClient,
+  HttpParams,
+} from '@angular/common/http';
+
 import { ImagePathPipe } from '../../../pipes/image-path.pipe';
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
 
 import {
   debounceTime,
@@ -63,7 +62,7 @@ interface AvailableSlotsResponse {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-      ImagePathPipe,
+    ImagePathPipe,
   ],
 
   templateUrl: './booking-steps.component.html',
@@ -77,36 +76,27 @@ export class BookingStepsComponent
   @Input() doctorSpecialty = '';
   @Input() doctorFees: number | null = null;
 
-  @Output() booked =
-    new EventEmitter<string>();
+  @Output() booked = new EventEmitter<string>();
 
-  private readonly fb =
-    inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
 
-  private readonly http =
-    inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
-  private readonly authService =
-    inject(AuthService);
+  private readonly authService = inject(AuthService);
 
-  private readonly destroy$ =
-    new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   detailsForm: FormGroup;
 
   step = signal(1);
 
-  submitting =
-    signal(false);
+  submitting = signal(false);
 
-  loadingSlots =
-    signal(false);
+  loadingSlots = signal(false);
 
-  errorMessage =
-    signal('');
+  errorMessage = signal('');
 
-  availableSlots =
-    signal<Slot[]>([]);
+  availableSlots = signal<Slot[]>([]);
 
   stepLabels = [
     'Patient',
@@ -118,75 +108,67 @@ export class BookingStepsComponent
   minDate = '';
 
   morningSlots = computed(() =>
-    this.availableSlots().filter(
-      (slot) => {
-        const hour =
-          Number(
-            slot.time.split(':')[0]
-          );
+    this.availableSlots().filter((slot) => {
+      const hour = Number(
+        slot.time.split(':')[0]
+      );
 
-        return hour < 12;
-      }
-    )
+      return hour < 12;
+    })
   );
 
   afternoonSlots = computed(() =>
-    this.availableSlots().filter(
-      (slot) => {
-        const hour =
-          Number(
-            slot.time.split(':')[0]
-          );
+    this.availableSlots().filter((slot) => {
+      const hour = Number(
+        slot.time.split(':')[0]
+      );
 
-        return hour >= 12;
-      }
-    )
+      return hour >= 12;
+    })
   );
 
   constructor() {
-    this.detailsForm =
-      this.fb.group({
+    this.detailsForm = this.fb.group({
+      patientName: [
+        '',
+        Validators.required,
+      ],
 
-        patientName: [
-          '',
+      phone: [
+        '',
+        [
           Validators.required,
+          Validators.pattern(
+            /^01[0125][0-9]{8}$/
+          ),
         ],
+      ],
 
-        phone: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(
-              /^01[0125][0-9]{8}$/
-            ),
-          ],
-        ],
-
-        email: [
-          '',
-          [
-            Validators.required,
-            Validators.email,
-          ],
-        ],
-
-        date: [
-          '',
+      email: [
+        '',
+        [
           Validators.required,
+          Validators.email,
         ],
+      ],
 
-        time: [
-          '',
-          Validators.required,
-        ],
+      date: [
+        '',
+        Validators.required,
+      ],
 
-        appointmentType: [
-          'Check-up',
-          Validators.required,
-        ],
+      time: [
+        '',
+        Validators.required,
+      ],
 
-        notes: [''],
-      });
+      appointmentType: [
+        'Check-up',
+        Validators.required,
+      ],
+
+      notes: [''],
+    });
   }
 
   // =====================================================
@@ -194,12 +176,9 @@ export class BookingStepsComponent
   // =====================================================
 
   ngOnInit(): void {
+    const today = new Date();
 
-    const today =
-      new Date();
-
-    this.minDate =
-      this.formatDate(today);
+    this.minDate = this.formatDate(today);
 
     const currentUser =
       this.authService.getUser();
@@ -243,29 +222,26 @@ export class BookingStepsComponent
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe(
-        (date: string) => {
-
-          // Reset selected time
-          this.detailsForm.patchValue(
-            {
-              time: '',
-            },
-            {
-              emitEvent: false,
-            }
-          );
-
-          if (
-            date &&
-            date.length === 10
-          ) {
-            this.loadSlots(date);
-          } else {
-            this.availableSlots.set([]);
+      .subscribe((date: string) => {
+        // Reset selected time
+        this.detailsForm.patchValue(
+          {
+            time: '',
+          },
+          {
+            emitEvent: false,
           }
+        );
+
+        if (
+          date &&
+          date.length === 10
+        ) {
+          this.loadSlots(date);
+        } else {
+          this.availableSlots.set([]);
         }
-      );
+      });
   }
 
   // =====================================================
@@ -281,10 +257,7 @@ export class BookingStepsComponent
   // Format Date
   // =====================================================
 
-  private formatDate(
-    date: Date
-  ): string {
-
+  private formatDate(date: Date): string {
     const year =
       date.getFullYear();
 
@@ -305,10 +278,7 @@ export class BookingStepsComponent
   // Load Available Slots
   // =====================================================
 
-  loadSlots(
-    date: string
-  ): void {
-
+  loadSlots(date: string): void {
     if (
       !this.doctorId ||
       !date
@@ -337,15 +307,15 @@ export class BookingStepsComponent
     this.http
       .get<AvailableSlotsResponse>(
         'http://localhost:5000/api/appointments/available-slots',
-        { params }
+        {
+          params,
+        }
       )
       .pipe(
         takeUntil(this.destroy$)
       )
       .subscribe({
-
         next: (res) => {
-
           console.log(
             'Available slots response:',
             res
@@ -373,19 +343,15 @@ export class BookingStepsComponent
           this.loadingSlots.set(false);
 
           if (!slots.length) {
-
             this.errorMessage.set(
               'لا توجد مواعيد متاحة لهذا اليوم.'
             );
-
           } else {
-
             this.errorMessage.set('');
           }
         },
 
         error: (error) => {
-
           console.error(
             'Available slots error:',
             error
@@ -407,10 +373,7 @@ export class BookingStepsComponent
   // Date Chosen
   // =====================================================
 
-  onDateChosen(
-    date: string
-  ): void {
-
+  onDateChosen(date: string): void {
     this.detailsForm.patchValue({
       date,
       time: '',
@@ -425,10 +388,7 @@ export class BookingStepsComponent
   // Choose Time
   // =====================================================
 
-  chooseTime(
-    slot: Slot
-  ): void {
-
+  chooseTime(slot: Slot): void {
     if (slot.booked) {
       return;
     }
@@ -444,10 +404,7 @@ export class BookingStepsComponent
   // Slot Title
   // =====================================================
 
-  slotTitle(
-    slot: Slot
-  ): string {
-
+  slotTitle(slot: Slot): string {
     return slot.booked
       ? 'هذا الموعد محجوز'
       : 'اختيار هذا الموعد';
@@ -458,11 +415,9 @@ export class BookingStepsComponent
   // =====================================================
 
   hasAnyAvailableSlot(): boolean {
-
     return this.availableSlots()
       .some(
-        (slot) =>
-          !slot.booked
+        (slot) => !slot.booked
       );
   }
 
@@ -471,28 +426,22 @@ export class BookingStepsComponent
   // =====================================================
 
   goToReview(): void {
-
     const appointmentType =
       this.detailsForm.get(
         'appointmentType'
       );
 
     const time =
-      this.detailsForm.get(
-        'time'
-      );
+      this.detailsForm.get('time');
 
     if (
       appointmentType?.invalid
     ) {
-
       appointmentType.markAsTouched();
-
       return;
     }
 
     if (time?.invalid) {
-
       time.markAsTouched();
 
       this.errorMessage.set(
@@ -510,9 +459,7 @@ export class BookingStepsComponent
   // =====================================================
 
   back(): void {
-
     if (this.step() > 1) {
-
       this.step.update(
         (value) => value - 1
       );
@@ -524,7 +471,6 @@ export class BookingStepsComponent
   // =====================================================
 
   confirm(): void {
-
     this.errorMessage.set('');
 
     const currentUser =
@@ -535,7 +481,6 @@ export class BookingStepsComponent
     // -------------------------------------------------
 
     if (!currentUser) {
-
       this.errorMessage.set(
         'يجب تسجيل الدخول أولاً لحجز موعد.'
       );
@@ -548,7 +493,6 @@ export class BookingStepsComponent
     // -------------------------------------------------
 
     if (!this.doctorId) {
-
       this.errorMessage.set(
         'بيانات الطبيب غير موجودة.'
       );
@@ -563,7 +507,6 @@ export class BookingStepsComponent
     if (
       this.detailsForm.invalid
     ) {
-
       this.detailsForm.markAllAsTouched();
 
       this.errorMessage.set(
@@ -583,13 +526,11 @@ export class BookingStepsComponent
     const selectedSlot =
       this.availableSlots().find(
         (slot) =>
-          slot.time ===
-            formValue.time &&
+          slot.time === formValue.time &&
           !slot.booked
       );
 
     if (!selectedSlot) {
-
       this.errorMessage.set(
         'هذا الموعد غير متاح. من فضلك اختر موعدًا آخر.'
       );
@@ -614,7 +555,6 @@ export class BookingStepsComponent
     this.submitting.set(true);
 
     // -------------------------------------------------
-    // IMPORTANT:
     // Do NOT send patient id from frontend.
     //
     // Backend gets:
@@ -626,15 +566,11 @@ export class BookingStepsComponent
     // -------------------------------------------------
 
     const payload = {
+      doctor: this.doctorId,
 
-      doctor:
-        this.doctorId,
+      date: formValue.date,
 
-      date:
-        formValue.date,
-
-      time:
-        formValue.time,
+      time: formValue.time,
 
       appointmentType:
         formValue.appointmentType,
@@ -658,14 +594,10 @@ export class BookingStepsComponent
         payload
       )
       .pipe(
-        takeUntil(
-          this.destroy$
-        )
+        takeUntil(this.destroy$)
       )
       .subscribe({
-
         next: (res) => {
-
           console.log(
             'Appointment created:',
             res
@@ -700,7 +632,6 @@ export class BookingStepsComponent
         },
 
         error: (error) => {
-
           console.error(
             'Booking error:',
             error
@@ -721,7 +652,6 @@ export class BookingStepsComponent
             error?.status === 400 ||
             error?.status === 409
           ) {
-
             if (
               formValue.date
             ) {

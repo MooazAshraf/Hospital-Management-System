@@ -50,10 +50,7 @@ app.get("/api/health", (_req, res) => {
   res.status(200).json({
     success: true,
     message: "urCare API is running",
-<<<<<<< HEAD
-=======
     dbState: mongoose.connection.readyState,
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
   });
 });
 
@@ -83,29 +80,18 @@ app.use("/api/departments", departmentRouter);
 
 app.use("/api/auditLogs", auditLogRouter);
 
-<<<<<<< HEAD
-// Contact messages
-app.use("/api/contact", contactRouter);
-
-// Backward-compatible aliases used by older frontend code.
-=======
 // =========================
 // BACKWARD COMPATIBILITY
 // =========================
 
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
 app.use("/reviews", reviewRouter);
 
 app.use("/payments", paymentRouter);
 
-<<<<<<< HEAD
-// 404 handler
-=======
 // =========================
 // 404 HANDLER
 // =========================
 
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
 app.use((_req, res) => {
   res.status(404).json({
     success: false,
@@ -113,18 +99,12 @@ app.use((_req, res) => {
   });
 });
 
-<<<<<<< HEAD
-// Error handler
-app.use((error, _req, res, _next) => {
-  console.error(error);
-=======
 // =========================
 // GLOBAL ERROR HANDLER
 // =========================
 
 app.use((error, _req, res, _next) => {
   console.error("Server Error:", error);
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
 
   res.status(error.status || 500).json({
     success: false,
@@ -163,11 +143,6 @@ const startServer = async () => {
     if (!process.env.JWT_SECRET) {
       throw new Error("JWT_SECRET is missing in Backend/.env");
     }
-<<<<<<< HEAD
-
-    await mongoose.connect(process.env.DB_LINK);
-
-=======
 
     mongoose.set("bufferCommands", false);
 
@@ -176,7 +151,6 @@ const startServer = async () => {
       socketTimeoutMS: 20000,
     });
 
->>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
     console.log("MongoDB connected");
 
     app.listen(PORT, () => {

@@ -1,14 +1,8 @@
 const express = require("express");
 
-const { authenticate } =
-  require("../middlewares/isLogged");
-
-const { authorize } =
-  require("../middlewares/authorize");
-
-const {
-  checkAppointmentAccess
-} = require("../middlewares/appointmentAccess");
+const { authenticate } = require("../middlewares/isLogged");
+const { authorize } = require("../middlewares/authorize");
+const { checkAppointmentAccess } = require("../middlewares/appointmentAccess");
 
 const {
   createAppointment,
@@ -22,11 +16,13 @@ const {
 
 const router = express.Router();
 
+// Available appointment slots
 router.get(
   "/available-slots",
   getAvailableSlots
 );
 
+// Appointments count
 router.get(
   "/count",
   authenticate,
@@ -34,12 +30,14 @@ router.get(
   getAppointmentsCount
 );
 
+// Get all appointments
 router.get(
   "/",
   authenticate,
   getAllAppointments
 );
 
+// Create appointment
 router.post(
   "/",
   authenticate,
@@ -47,12 +45,14 @@ router.post(
   createAppointment
 );
 
+// Get appointment by ID
 router.get(
   "/:id",
   authenticate,
   getAppointmentById
 );
 
+// Update appointment
 router.put(
   "/:id",
   authenticate,
@@ -60,6 +60,7 @@ router.put(
   updateAppointment
 );
 
+// Delete appointment
 router.delete(
   "/:id",
   authenticate,

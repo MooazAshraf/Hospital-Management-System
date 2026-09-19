@@ -1,391 +1,90 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
-// for review
-import { ReviewsListComponent } from '../../../components/reviews/reviews-list/reviews-list.component';
-interface Doctor {
-  name: string;
-  specialty: string;
-  description: string;
-  city: string;
-  rating: string;
-}
-
-interface Specialty {
-  name: string;
-  key: string;
-}
-
-interface SpecialtyPage {
-  specialties: Specialty[];
-  doctors: Doctor[];
-}
+import { DepartmentCardComponent } from '../../departments/department-card/department-card.component';
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
+import { DoctorService } from '../../../services/doctor.service';
+import { DepartmentsService } from '../../../services/department.service';
+import { Department } from '../../../models/department.model';
+import { Doctor, DoctorDepartment } from '../../../models/doctor.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    ReviewsListComponent
-  ],
-  templateUrl: './home.component.html'
+  imports: [CommonModule, RouterLink, DepartmentCardComponent, ImagePathPipe],
+  templateUrl: './home.component.html',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  private readonly departmentService = inject(DepartmentsService);
+  private readonly doctorService = inject(DoctorService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  currentPage = 0;
+  // =====================================================
+  // TOP DEPARTMENTS (بيانات حقيقية من الـ API)
+  // =====================================================
 
-  specialtyPages: SpecialtyPage[] = [
+  topDepartments: Department[] = [];
+  departmentsLoading = false;
+  departmentsError = '';
 
-    // =====================================================
-    // PAGE 1
-    // =====================================================
+  private readonly maxTopDepartments = 4;
 
-    {
-      specialties: [
-        {
-          name: 'أنف وأذن وحنجرة',
-          key: 'ent'
-        },
-        {
-          name: 'أطفال',
-          key: 'pediatrics'
-        },
-        {
-          name: 'طب باطني',
-          key: 'internal'
-        },
-        {
-          name: 'أسنان',
-          key: 'dentistry'
-        }
-      ],
+  // =====================================================
+  // TOP DOCTORS (بيانات حقيقية من الـ API)
+  // =====================================================
 
-      doctors: [
-        {
-          name: 'د. أحمد حسن',
-          specialty: 'استشاري قلب',
-          description:
-            'استشاري قلب متخصص في تقديم الرعاية القلبية المتكاملة.',
-          city: 'القاهرة',
-          rating: '8'
-        },
+  topDoctors: Doctor[] = [];
+  doctorsLoading = false;
+  doctorsError = '';
 
-        {
-          name: 'د. سارة محمد',
-          specialty: 'استشاري أسنان',
-          description:
-            'متخصصة في علاج الأسنان وتقديم رعاية مريحة للمرضى.',
-          city: 'القاهرة',
-          rating: '8'
-        },
+  private readonly maxTopDoctors = 6;
 
-        {
-          name: 'د. عمر علي',
-          specialty: 'استشاري مخ وأعصاب',
-          description:
-            'استشاري مخ وأعصاب متخصص في التشخيص والعلاج المتكامل.',
-          city: 'القاهرة',
-          rating: '8'
-        }
-      ]
-    },
+  ngOnInit(): void {
+    this.loadTopDepartments();
+    this.loadTopDoctors();
+  }
 
+  private loadTopDepartments(): void {
+    this.departmentsLoading = true;
+    this.departmentService.getAll().subscribe({
+      next: (res) => {
+        const data = res?.data || [];
+        this.topDepartments = data.slice(0, this.maxTopDepartments);
+        this.departmentsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.departmentsError = 'تعذر تحميل الأقسام حالياً.';
+        this.departmentsLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
 
-    // =====================================================
-    // PAGE 2
-    // =====================================================
+  private loadTopDoctors(): void {
+    this.doctorsLoading = true;
+    this.doctorService.getDoctors().subscribe({
+      next: (data) => {
+        // بنعرض المتاحين بس، ولو مفيش كفاية بنكمل بالباقي
+        const available = data.filter((d) => d.isAvailable);
+        const pool = available.length > 0 ? available : data;
+        this.topDoctors = pool.slice(0, this.maxTopDoctors);
+        this.doctorsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.doctorsError = 'تعذر تحميل الأطباء حالياً.';
+        this.doctorsLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
 
-    {
-      specialties: [
-        {
-          name: 'قلب',
-          key: 'cardiology'
-        },
-        {
-          name: 'مخ وأعصاب',
-          key: 'neurology'
-        },
-        {
-          name: 'جلدية',
-          key: 'dermatology'
-        },
-        {
-          name: 'نساء وتوليد',
-          key: 'gynecology'
-        }
-      ],
-
-      doctors: [
-        {
-          name: 'د. محمد علي',
-          specialty: 'استشاري قلب',
-          description:
-            'استشاري أمراض القلب والأوعية الدموية.',
-          city: 'القاهرة',
-          rating: '9'
-        },
-
-        {
-          name: 'د. ياسمين أحمد',
-          specialty: 'استشاري جلدية',
-          description:
-            'متخصصة في علاج الأمراض الجلدية والعناية بالبشرة.',
-          city: 'القاهرة',
-          rating: '9'
-        },
-
-        {
-          name: 'د. خالد محمود',
-          specialty: 'استشاري مخ وأعصاب',
-          description:
-            'متخصص في تشخيص وعلاج أمراض المخ والأعصاب.',
-          city: 'القاهرة',
-          rating: '8'
-        }
-      ]
-    },
-
-
-    // =====================================================
-    // PAGE 3
-    // =====================================================
-
-    {
-      specialties: [
-        {
-          name: 'عيون',
-          key: 'ophthalmology'
-        },
-        {
-          name: 'عظام',
-          key: 'orthopedics'
-        },
-        {
-          name: 'مسالك بولية',
-          key: 'urology'
-        },
-        {
-          name: 'تغذية',
-          key: 'nutrition'
-        }
-      ],
-
-      doctors: [
-        {
-          name: 'د. كريم حسن',
-          specialty: 'استشاري عيون',
-          description:
-            'استشاري طب وجراحة العيون والفحوصات المتخصصة.',
-          city: 'القاهرة',
-          rating: '9'
-        },
-
-        {
-          name: 'د. محمود سامي',
-          specialty: 'استشاري عظام',
-          description:
-            'متخصص في علاج مشاكل العظام والمفاصل.',
-          city: 'القاهرة',
-          rating: '8'
-        },
-
-        {
-          name: 'د. نور محمد',
-          specialty: 'استشاري تغذية',
-          description:
-            'متخصصة في التغذية العلاجية ووضع الأنظمة الغذائية.',
-          city: 'القاهرة',
-          rating: '9'
-        }
-      ]
-    },
-
-
-    // =====================================================
-    // PAGE 4
-    // =====================================================
-
-    {
-      specialties: [
-        {
-          name: 'طب نفسي',
-          key: 'psychiatry'
-        },
-        {
-          name: 'جراحة عامة',
-          key: 'surgery'
-        },
-        {
-          name: 'صدر وحساسية',
-          key: 'chest'
-        },
-        {
-          name: 'كلى',
-          key: 'nephrology'
-        }
-      ],
-
-      doctors: [
-        {
-          name: 'د. علي حسن',
-          specialty: 'استشاري طب نفسي',
-          description:
-            'متخصص في الصحة النفسية والاستشارات العلاجية.',
-          city: 'القاهرة',
-          rating: '9'
-        },
-
-        {
-          name: 'د. سامح أحمد',
-          specialty: 'استشاري جراحة عامة',
-          description:
-            'استشاري جراحة عامة متخصص في العديد من الحالات الجراحية.',
-          city: 'القاهرة',
-          rating: '8'
-        },
-
-        {
-          name: 'د. منى خالد',
-          specialty: 'استشاري صدر وحساسية',
-          description:
-            'متخصصة في أمراض الصدر والحساسية والجهاز التنفسي.',
-          city: 'القاهرة',
-          rating: '9'
-        }
-      ]
+  departmentName(doctor: Doctor): string {
+    const dept = doctor.department;
+    if (dept && typeof dept === 'object') {
+      return (dept as DoctorDepartment).name;
     }
-  ];
-
-
-  // =====================================================
-  // CURRENT DATA
-  // =====================================================
-
-  get currentSpecialties(): Specialty[] {
-    return this.specialtyPages[this.currentPage].specialties;
+    return doctor.specialty || '';
   }
-
-
-  get currentDoctors(): Doctor[] {
-    return this.specialtyPages[this.currentPage].doctors;
-  }
-
-
-  // =====================================================
-  // NEXT
-  // =====================================================
-
-  nextPage(): void {
-
-    if (this.currentPage < this.specialtyPages.length - 1) {
-      this.currentPage++;
-    } else {
-      this.currentPage = 0;
-    }
-
-  }
-
-
-  // =====================================================
-  // PREVIOUS
-  // =====================================================
-
-  previousPage(): void {
-
-    if (this.currentPage > 0) {
-      this.currentPage--;
-    } else {
-      this.currentPage = this.specialtyPages.length - 1;
-    }
-
-  }
-
-
-  // =====================================================
-  // GO TO SPECIFIC PAGE
-  // =====================================================
-
-  goToPage(index: number): void {
-    this.currentPage = index;
-  }
-
-
-  // =====================================================
-  // SPECIALTY CLICK
-  // =====================================================
-
-  selectSpecialty(specialty: Specialty): void {
-
-    console.log('Selected specialty:', specialty.name);
-
-    // هنا تقدر بعدين تبعت التخصص للـ Doctors page
-    // لما نربطه بالـ backend.
-
-  }
-
-
-  // =====================================================
-  // ICON
-  // =====================================================
-
-  getSpecialtyIcon(key: string): string {
-
-    switch (key) {
-
-      case 'dentistry':
-        return 'dentistry';
-
-      case 'internal':
-        return 'internal';
-
-      case 'pediatrics':
-        return 'pediatrics';
-
-      case 'ent':
-        return 'ent';
-
-      case 'cardiology':
-        return 'cardiology';
-
-      case 'neurology':
-        return 'neurology';
-
-      case 'dermatology':
-        return 'dermatology';
-
-      case 'gynecology':
-        return 'gynecology';
-
-      case 'ophthalmology':
-        return 'ophthalmology';
-
-      case 'orthopedics':
-        return 'orthopedics';
-
-      case 'urology':
-        return 'urology';
-
-      case 'nutrition':
-        return 'nutrition';
-
-      case 'psychiatry':
-        return 'psychiatry';
-
-      case 'surgery':
-        return 'surgery';
-
-      case 'chest':
-        return 'chest';
-
-      case 'nephrology':
-        return 'nephrology';
-
-      default:
-        return 'doctor';
-
-    }
-
-  }
-
 }

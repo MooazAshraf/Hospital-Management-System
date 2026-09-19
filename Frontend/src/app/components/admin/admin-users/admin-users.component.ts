@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { UserServices } from '../../../services/users.service';
 import { Iuser } from '../../../models/users.model';
 
@@ -12,6 +13,7 @@ import { Iuser } from '../../../models/users.model';
 })
 export class AdminUsersComponent implements OnInit {
   private readonly usersService = inject(UserServices);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   users: Iuser[] = [];
   loading = false;
@@ -21,53 +23,114 @@ export class AdminUsersComponent implements OnInit {
 
   get filteredUsers(): Iuser[] {
     const term = this.search.trim().toLowerCase();
-    if (!term) return this.users;
-    return this.users.filter((u) =>
-      u.name.toLowerCase().includes(term) ||
-      u.email.toLowerCase().includes(term) ||
-      u.role.toLowerCase().includes(term)
+
+    if (!term) {
+      return this.users;
+    }
+
+    return this.users.filter(
+      (u) =>
+        u.name.toLowerCase().includes(term) ||
+        u.email.toLowerCase().includes(term) ||
+        u.role.toLowerCase().includes(term),
     );
   }
 
-  ngOnInit(): void { this.loadUsers(); }
+  ngOnInit(): void {
+    this.loadUsers();
+  }
 
   loadUsers(): void {
     this.loading = true;
+    this.errorMessage = '';
+
     this.usersService.getUsers().subscribe({
-      next: (res) => { this.users = res.users || []; this.loading = false; },
-      error: (err) => { this.errorMessage = err?.error?.message || 'Failed to load users'; this.loading = false; },
+      next: (res) => {
+        this.users = res.users || [];
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+
+      error: (err) => {
+        this.errorMessage = err?.error?.message || 'Failed to load users';
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
   updateRole(user: Iuser, role: Iuser['role']): void {
     this.savingId = user._id;
-    this.usersService.updateProfile(user._id, { role } as any).subscribe({
+    this.errorMessage = '';
+
+    this.usersService.updateProfile(user._id, { role }).subscribe({
       next: (res) => {
         const index = this.users.findIndex((u) => u._id === user._id);
-        if (index >= 0) this.users[index] = { ...this.users[index], ...res.user };
+
+        if (index >= 0) {
+          this.users[index] = {
+            ...this.users[index],
+            ...res.user,
+          };
+        }
+
         this.savingId = '';
+        this.cdr.detectChanges();
       },
-      error: (err) => { this.errorMessage = err?.error?.message || 'Failed to update role'; this.savingId = ''; },
+
+      error: (err) => {
+        this.errorMessage = err?.error?.message || 'Failed to update role';
+        this.savingId = '';
+        this.cdr.detectChanges();
+      },
     });
   }
 
   toggleActive(user: Iuser): void {
     this.savingId = user._id;
-    this.usersService.updateProfile(user._id, { isActive: !user.isActive } as any).subscribe({
-      next: (res) => {
-        const index = this.users.findIndex((u) => u._id === user._id);
-        if (index >= 0) this.users[index] = { ...this.users[index], ...res.user };
-        this.savingId = '';
-      },
-      error: (err) => { this.errorMessage = err?.error?.message || 'Failed to update account'; this.savingId = ''; },
-    });
+    this.errorMessage = '';
+
+    this.usersService
+      .updateProfile(user._id, {
+        isActive: !user.isActive,
+      })
+      .subscribe({
+        next: (res) => {
+          const index = this.users.findIndex((u) => u._id === user._id);
+
+          if (index >= 0) {
+            this.users[index] = {
+              ...this.users[index],
+              ...res.user,
+            };
+          }
+
+          this.savingId = '';
+          this.cdr.detectChanges();
+        },
+
+        error: (err) => {
+          this.errorMessage = err?.error?.message || 'Failed to update account';
+          this.savingId = '';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   deleteUser(user: Iuser): void {
-    if (!confirm(`Delete ${user.name}?`)) return;
+    if (!confirm(`Delete ${user.name}?`)) {
+      return;
+    }
+
     this.usersService.deleteUser(user._id).subscribe({
-      next: () => this.loadUsers(),
-      error: (err) => this.errorMessage = err?.error?.message || 'Failed to delete user',
+      next: () => {
+        this.loadUsers();
+      },
+
+      error: (err) => {
+        this.errorMessage = err?.error?.message || 'Failed to delete user';
+        this.cdr.detectChanges();
+      },
     });
   }
 }

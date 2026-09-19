@@ -19,7 +19,9 @@ const getUsers = async (req, res) => {
       users,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -44,17 +46,30 @@ const getUsersBasic = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
 
     const isOwner = String(user._id) === String(req.user.userId);
     if (!isOwner && req.user.role !== "admin") {
-      return res.status(403).json({ success: false, message: "You are not allowed to view this account" });
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to view this account",
+      });
     }
 
-    res.status(200).json({ success: true, message: "User fetched successfully", user });
+    res
+      .status(200)
+      .json({ success: true, message: "User fetched successfully", user });
   } catch (error) {
-    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid user id" });
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    if (error.name === "CastError")
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user id" });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -62,8 +77,13 @@ const addUser = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
 
-    const existingUser = await User.findOne({ email: String(email).toLowerCase() });
-    if (existingUser) return res.status(409).json({ success: false, message: "Email already exists" });
+    const existingUser = await User.findOne({
+      email: String(email).toLowerCase(),
+    });
+    if (existingUser)
+      return res
+        .status(409)
+        .json({ success: false, message: "Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await User.create({
@@ -91,9 +111,19 @@ const addUser = async (req, res) => {
       user: publicUser(user),
     });
   } catch (error) {
-    if (error.code === 11000) return res.status(409).json({ success: false, message: "Email already exists" });
-    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    if (error.code === 11000)
+      return res
+        .status(409)
+        .json({ success: false, message: "Email already exists" });
+    if (error.name === "ValidationError")
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        error: error.message,
+      });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -103,25 +133,38 @@ const updateUserData = async (req, res) => {
     const isAdmin = req.user.role === "admin";
 
     if (!isOwner && !isAdmin) {
-      return res.status(403).json({ success: false, message: "You are not allowed to update this account" });
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this account",
+      });
     }
 
     const { password, role, isActive, ...otherData } = req.body;
 
     if (role !== undefined) {
-      if (!isAdmin) return res.status(403).json({ success: false, message: "Only an admin can change roles" });
+      if (!isAdmin)
+        return res
+          .status(403)
+          .json({ success: false, message: "Only an admin can change roles" });
       if (!["user", "doctor", "admin"].includes(role)) {
-        return res.status(400).json({ success: false, message: "Invalid role" });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid role" });
       }
       otherData.role = role;
     }
 
     if (isActive !== undefined) {
-      if (!isAdmin) return res.status(403).json({ success: false, message: "Only an admin can change account status" });
+      if (!isAdmin)
+        return res.status(403).json({
+          success: false,
+          message: "Only an admin can change account status",
+        });
       otherData.isActive = isActive;
     }
 
-    if (otherData.email) otherData.email = String(otherData.email).toLowerCase();
+    if (otherData.email)
+      otherData.email = String(otherData.email).toLowerCase();
     if (password) otherData.password = await bcrypt.hash(password, 12);
 
     const user = await User.findByIdAndUpdate(req.params.id, otherData, {
@@ -129,49 +172,93 @@ const updateUserData = async (req, res) => {
       runValidators: true,
     }).select("-password");
 
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
 
-    res.status(200).json({ success: true, message: "User updated successfully", user });
+    res
+      .status(200)
+      .json({ success: true, message: "User updated successfully", user });
   } catch (error) {
-    if (error.code === 11000) return res.status(409).json({ success: false, message: "Email already exists" });
-    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
-    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid user id" });
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    if (error.code === 11000)
+      return res
+        .status(409)
+        .json({ success: false, message: "Email already exists" });
+    if (error.name === "ValidationError")
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        error: error.message,
+      });
+    if (error.name === "CastError")
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user id" });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 const deleteUser = async (req, res) => {
   try {
     if (String(req.params.id) === String(req.user.userId)) {
-      return res.status(400).json({ success: false, message: "You cannot delete your own admin account" });
+      return res.status(400).json({
+        success: false,
+        message: "You cannot delete your own admin account",
+      });
     }
 
     const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
 
-    res.status(200).json({ success: true, message: "User deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "User deleted successfully" });
   } catch (error) {
-    if (error.name === "CastError") return res.status(400).json({ success: false, message: "Invalid user id" });
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    if (error.name === "CastError")
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user id" });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 const userLogin = async (req, res) => {
   try {
-    const email = String(req.body.email || "").trim().toLowerCase();
+    const email = String(req.body.email || "")
+      .trim()
+      .toLowerCase();
     const password = req.body.password;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email and password are required" });
     }
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ success: false, message: "Invalid email or password" });
+    if (!user)
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
 
     const passwordCorrect = await bcrypt.compare(password, user.password);
-    if (!passwordCorrect) return res.status(401).json({ success: false, message: "Invalid email or password" });
+    if (!passwordCorrect)
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
 
-    if (!user.isActive) return res.status(403).json({ success: false, message: "Your account is inactive" });
+    if (!user.isActive)
+      return res
+        .status(403)
+        .json({ success: false, message: "Your account is inactive" });
 
     user.lastLoginDate = new Date();
     await user.save();
@@ -189,7 +276,9 @@ const userLogin = async (req, res) => {
       user: publicUser(user),
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -198,14 +287,28 @@ const createStaffAccount = async (req, res) => {
     const { name, email, password, phone, role } = req.body;
 
     if (!["doctor", "admin"].includes(role)) {
-      return res.status(400).json({ success: false, message: "role must be either 'doctor' or 'admin'" });
+      return res.status(400).json({
+        success: false,
+        message: "role must be either 'doctor' or 'admin'",
+      });
     }
 
-    const existingUser = await User.findOne({ email: String(email || "").toLowerCase() });
-    if (existingUser) return res.status(409).json({ success: false, message: "Email already exists" });
+    const existingUser = await User.findOne({
+      email: String(email || "").toLowerCase(),
+    });
+    if (existingUser)
+      return res
+        .status(409)
+        .json({ success: false, message: "Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await User.create({ name, email, password: hashedPassword, phone, role });
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role,
+    });
 
     res.status(201).json({
       success: true,
@@ -213,9 +316,19 @@ const createStaffAccount = async (req, res) => {
       user: publicUser(user),
     });
   } catch (error) {
-    if (error.code === 11000) return res.status(409).json({ success: false, message: "Email already exists" });
-    if (error.name === "ValidationError") return res.status(400).json({ success: false, message: "Validation failed", error: error.message });
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    if (error.code === 11000)
+      return res
+        .status(409)
+        .json({ success: false, message: "Email already exists" });
+    if (error.name === "ValidationError")
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        error: error.message,
+      });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 

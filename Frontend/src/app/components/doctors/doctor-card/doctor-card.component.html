@@ -1,250 +1,101 @@
 <article
-  class="bg-white
-         rounded-2xl
-         border
-         border-gray-100
-         shadow-sm
-         overflow-hidden
-         hover:shadow-lg
-         hover:-translate-y-1
-         transition
-         duration-300"
+  class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-1 transition duration-300"
 >
-
   <!-- Doctor Image -->
-  <div
-    class="h-52
-           bg-green-50
-           overflow-hidden"
-  >
-
+  <div class="h-52 bg-green-50 overflow-hidden">
     <img
       *ngIf="doctor.image"
-      [src]="doctor.image"
+      [src]="doctor.image | imagePath"
       [alt]="doctor.name"
-      class="w-full
-             h-full
-             object-cover
-             transition
-             duration-300
-             hover:scale-105"
+      class="w-full h-full object-cover transition duration-300 hover:scale-105"
     />
 
     <div
       *ngIf="!doctor.image"
-      class="w-full
-             h-full
-             flex
-             items-center
-             justify-center
-             bg-green-50
-             text-7xl"
+      class="w-full h-full flex items-center justify-center bg-green-50 text-7xl"
     >
       👨‍⚕️
     </div>
-
   </div>
 
   <!-- Content -->
   <div class="p-5">
-
     <!-- Name -->
-    <div
-      class="flex
-             items-start
-             justify-between
-             gap-3"
-    >
-
+    <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
-
-        <h2
-          class="text-xl
-                 font-bold
-                 text-green-900
-                 truncate"
-        >
-          Dr. {{ doctor.name }}
+        <h2 class="text-xl font-bold text-green-900 truncate">
+          {{ doctor.name }}
         </h2>
 
-        <p
-          class="text-sm
-                 text-green-700
-                 mt-1"
-        >
+        <p class="text-sm text-green-700 mt-1">
           {{ doctor.specialty }}
         </p>
-
       </div>
 
       <!-- Availability -->
       <span
-        class="shrink-0
-               text-xs
-               px-3
-               py-1
-               rounded-full
-               font-medium"
+        class="shrink-0 text-xs px-3 py-1 rounded-full font-medium"
         [class.bg-green-100]="doctor.isAvailable"
         [class.text-green-700]="doctor.isAvailable"
         [class.bg-red-100]="!doctor.isAvailable"
         [class.text-red-700]="!doctor.isAvailable"
       >
-        {{
-          doctor.isAvailable
-            ? 'Available'
-            : 'Unavailable'
-        }}
+        {{ doctor.isAvailable ? 'Available' : 'Unavailable' }}
       </span>
-
     </div>
 
     <!-- Divider -->
-    <div
-      class="border-t
-             border-gray-100
-             my-4"
-    ></div>
+    <div class="border-t border-gray-100 my-4"></div>
 
     <!-- Department -->
-    <div
-      class="flex
-             items-center
-             gap-2
-             text-sm
-             text-gray-500
-             mt-3"
-    >
-      <span>
-        Department:
-      </span>
+    <div class="flex items-center gap-2 text-sm text-gray-500 mt-3">
+      <span> Department: </span>
 
-      <span
-        class="font-medium
-               text-gray-700"
-      >
+      <span class="font-medium text-gray-700">
         {{ departmentName }}
       </span>
     </div>
 
     <!-- Experience -->
-    <div
-      class="flex
-             items-center
-             gap-2
-             text-sm
-             text-gray-500
-             mt-3"
-    >
-      <span>
-        Experience:
-      </span>
+    <div class="flex items-center gap-2 text-sm text-gray-500 mt-3">
+      <span> Experience: </span>
 
-      <span
-        class="font-medium
-               text-gray-700"
-      >
+      <span class="font-medium text-gray-700">
         {{ doctor.experienceYears }}
         years
       </span>
     </div>
 
     <!-- Fees -->
-    <div
-      class="flex
-             items-center
-             gap-2
-             text-sm
-             mt-3"
-    >
-      <span class="text-gray-500">
-        LE :
-      </span>
+    <div class="flex items-center gap-2 text-sm mt-3">
+      <span class="text-gray-500"> LE : </span>
 
-      <span
-        class="font-bold
-               text-green-900"
-      >
+      <span class="font-bold text-green-900">
         {{ doctor.fees }}
         EGP
       </span>
     </div>
 
     <!-- Buttons -->
-    <div
-      class="grid
-             grid-cols-2
-             gap-3
-             mt-6"
-    >
-
+    <div class="grid grid-cols-2 gap-3 mt-6">
       <!-- View Profile -->
       <a
-        [routerLink]="[
-          '/doctors',
-          doctor._id
-        ]"
-        class="block
-               text-center
-               py-2.5
-               rounded-lg
-               border
-               border-green-900
-               text-green-900
-               text-sm
-               font-semibold
-               hover:bg-green-50
-               transition"
+        [routerLink]="['/doctors', doctor._id]"
+        class="block text-center py-2.5 rounded-lg border border-green-900 text-green-900 text-sm font-semibold hover:bg-green-50 transition"
       >
         View Profile
       </a>
 
-      <!-- NEW: Write Review -->
-      <a
-        [routerLink]="[
-          '/doctors',
-          doctor._id
-        ]"
-        fragment="reviews"
-        class="block
-               text-center
-               py-2.5
-               rounded-lg
-               border
-               border-green-700
-               text-green-700
-               text-sm
-               font-semibold
-               hover:bg-green-50
-               transition"
-      >
-        Write Review
-      </a>
-
       <!-- Book -->
       <a
-        [routerLink]="[
-          '/book-appointment'
-        ]"
+        [routerLink]="['/book-appointment']"
         [queryParams]="{
-          doctorId: doctor._id
+          doctorId: doctor._id,
         }"
-        class="block
-               text-center
-               py-2.5
-               rounded-lg
-               bg-green-900
-               text-white
-               text-sm
-               font-semibold
-               hover:bg-green-800
-               transition"
+        class="block text-center py-2.5 rounded-lg bg-green-900 text-white text-sm font-semibold hover:bg-green-800 transition"
       >
         Book Now
       </a>
-
     </div>
-
   </div>
-
 </article>

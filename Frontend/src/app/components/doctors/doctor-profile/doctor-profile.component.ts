@@ -7,12 +7,8 @@ import {
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import {
-  ActivatedRoute,
-  RouterLink
-} from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
 
 import { DoctorService } from '../../../services/doctor.service';
 import { Doctor } from '../../../models/doctor.model';
@@ -25,13 +21,7 @@ import { AuthService } from '../../../services/auth.service';
 @Component({
   selector: 'app-doctor-profile',
   standalone: true,
-
-  imports: [
-    CommonModule,
-    RouterLink,
-    FormsModule
-  ],
-
+  imports: [CommonModule, RouterLink, ImagePathPipe],
   templateUrl: './doctor-profile.component.html',
 })
 export class DoctorProfileComponent

@@ -1,4 +1,3 @@
-
 <main class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-7xl mx-auto space-y-6">
     <!-- Header Section -->
@@ -69,6 +68,7 @@
             <tr
               class="bg-gray-50/80 border-b border-gray-200/80 text-xs font-bold text-[#1B3B2B] uppercase tracking-wider"
             >
+              <th class="py-4 px-6">Image</th>
               <th class="py-4 px-6">Name</th>
               <th class="py-4 px-6">Email</th>
               <th class="py-4 px-6">Phone</th>
@@ -82,6 +82,15 @@
 
           <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
             <tr *ngFor="let doctor of doctors" class="hover:bg-gray-50/50 transition-colors">
+              <td class="py-4 px-6">
+                <img
+                  *ngIf="doctor.image"
+                  [src]="doctor.image"
+                  [alt]="doctor.name"
+                  class="w-10 h-10 rounded-full object-cover"
+                />
+              </td>
+
               <td class="py-4 px-6 font-semibold text-gray-900">
                 {{ doctor.name || 'N/A' }}
               </td>
@@ -129,7 +138,7 @@
 
             <!-- Loading -->
             <tr *ngIf="loading">
-              <td colspan="8" class="py-12 text-center text-gray-500">
+              <td colspan="9" class="py-12 text-center text-gray-500">
                 <div
                   class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-[#1B3B2B] rounded-full mb-2"
                 ></div>
@@ -140,7 +149,7 @@
 
             <!-- Empty -->
             <tr *ngIf="!loading && (!doctors || doctors.length === 0)">
-              <td colspan="8" class="py-12 text-center text-gray-500">
+              <td colspan="9" class="py-12 text-center text-gray-500">
                 <div
                   class="inline-flex items-center justify-center w-12 h-12 bg-emerald-50 text-[#1B3B2B] rounded-full mb-3"
                 >
@@ -313,6 +322,26 @@
             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1B3B2B] focus:ring-1 focus:ring-[#1B3B2B]/20"
           />
         </div>
+      </div>
+
+      <!-- Image URL (NEW) -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5"> Image URL </label>
+
+        <input
+          type="text"
+          [(ngModel)]="doctorForm.image"
+          name="image"
+          placeholder="/images/doctors/dr-ahmed-hassan.jpg"
+          class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1B3B2B] focus:ring-1 focus:ring-[#1B3B2B]/20"
+        />
+
+        <img
+          *ngIf="doctorForm.image"
+          [src]="doctorForm.image"
+          alt="Preview"
+          class="mt-2 w-16 h-16 rounded-full object-cover border border-gray-200"
+        />
       </div>
 
       <!-- Account Password -->

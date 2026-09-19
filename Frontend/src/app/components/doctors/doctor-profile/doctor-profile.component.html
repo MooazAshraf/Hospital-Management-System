@@ -37,7 +37,7 @@
 
         <img
           *ngIf="d.image"
-          [src]="d.image"
+          [src]="d.image | imagePath"
           [alt]="d.name"
           class="w-full h-full object-cover"
         />

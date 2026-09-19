@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users.model");
+const Patient = require("../models/patient.model");
 
 const publicUser = (user) => {
   const value = user.toObject ? user.toObject() : { ...user };
@@ -11,6 +12,24 @@ const publicUser = (user) => {
 const getUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password").sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      count: users.length,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+// Lightweight directory endpoint: id + name + role only.
+// Used by non-admin roles (e.g. patients viewing their own medical reports)
+// to resolve who a patient/doctor is without exposing email/phone/etc.
+// Full user records (getUsers) stay restricted to doctor/admin.
+const getUsersBasic = async (req, res) => {
+  try {
+    const users = await User.find().select("name role").sort({ name: 1 });
     res.status(200).json({
       success: true,
       message: "Users fetched successfully",
@@ -54,6 +73,17 @@ const addUser = async (req, res) => {
       phone,
       role: "user",
     });
+
+    // Every "user" role account needs a matching Patient profile — medical
+    // reports, appointments, etc. are keyed off it. If this fails, roll the
+    // User creation back rather than leaving an account with no profile
+    // (which silently breaks "my medical reports" for that account).
+    try {
+      await Patient.create({ user: user._id, name, email, phone });
+    } catch (patientError) {
+      await User.findByIdAndDelete(user._id);
+      throw patientError;
+    }
 
     res.status(201).json({
       success: true,
@@ -191,6 +221,7 @@ const createStaffAccount = async (req, res) => {
 
 module.exports = {
   getUsers,
+  getUsersBasic,
   getUserById,
   addUser,
   updateUserData,

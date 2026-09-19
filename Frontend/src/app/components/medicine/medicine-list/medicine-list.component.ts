@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MedicineService } from '../services/medicine.service';
@@ -17,9 +17,11 @@ export class MedicineListComponent implements OnInit {
   filteredMedicines: Medicine[] = [];
   categories: string[] = [];
 
+  // Only doctors and admins can add/edit/delete medicines.
+  canManage = false;
+
   loading = false;
   errorMessage = '';
-  canManage = false;
 
   searchTerm = '';
   categoryFilter = '';
@@ -37,7 +39,12 @@ export class MedicineListComponent implements OnInit {
 
   form: FormGroup;
 
-  constructor(private medicineService: MedicineService, private fb: FormBuilder, private authService: AuthService) {
+  constructor(
+    private medicineService: MedicineService,
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef,
+  ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       genericName: ['', [Validators.required]],
@@ -52,7 +59,7 @@ export class MedicineListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.canManage = this.authService.hasRole('admin');
+    this.canManage = this.authService.hasRole('doctor', 'admin');
     this.loadMedicines();
   }
 
@@ -72,10 +79,12 @@ export class MedicineListComponent implements OnInit {
         ).sort();
         this.applyFilters();
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.errorMessage = error?.error?.message || 'Failed to load medicines. Please try again.';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -98,10 +107,12 @@ export class MedicineListComponent implements OnInit {
 
   onSearchChange(): void {
     this.applyFilters();
+    this.cdr.detectChanges();
   }
 
   onCategoryChange(): void {
     this.applyFilters();
+    this.cdr.detectChanges();
   }
 
   isExpired(dateStr: string): boolean {
@@ -132,6 +143,7 @@ export class MedicineListComponent implements OnInit {
   // ---------- Modal (Add / Edit) ----------
 
   openAddModal(): void {
+    if (!this.canManage) return;
     this.isEditMode = false;
     this.editingId = null;
     this.formError = '';
@@ -140,6 +152,7 @@ export class MedicineListComponent implements OnInit {
   }
 
   openEditModal(medicine: Medicine): void {
+    if (!this.canManage) return;
     this.isEditMode = true;
     this.editingId = medicine._id ?? null;
     this.formError = '';
@@ -189,6 +202,7 @@ export class MedicineListComponent implements OnInit {
       error: (error) => {
         this.saving = false;
         this.formError = error?.error?.message || 'Something went wrong. Please check your input and try again.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -196,6 +210,7 @@ export class MedicineListComponent implements OnInit {
   // ---------- Delete ----------
 
   confirmDelete(medicine: Medicine): void {
+    if (!this.canManage) return;
     this.deleteTarget = medicine;
   }
 
@@ -218,6 +233,7 @@ export class MedicineListComponent implements OnInit {
         this.deleting = false;
         this.errorMessage = error?.error?.message || 'Failed to delete medicine.';
         this.deleteTarget = null;
+        this.cdr.detectChanges();
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -15,8 +15,8 @@ import { MedicalReportCardComponent } from '../medical-report-card/medical-repor
 import { MedicalReportService, SimpleUser } from '../services/medical-report.service';
 import { MedicineService } from '../../medicine/services/medicine.service';
 import { Medicine } from '../../medicine/medicine.model';
-import { emptyReport, MedicalReport } from '../medical-report.model';
 import { AuthService } from '../../../services/auth.service';
+import { emptyReport, MedicalReport } from '../medical-report.model';
 
 @Component({
   selector: 'app-medical-reports-list',
@@ -29,9 +29,9 @@ export class MedicalReportsListComponent implements OnInit {
   reports: MedicalReport[] = [];
   filteredReports: MedicalReport[] = [];
 
-  // True when /api/users could not be loaded (e.g. no one is logged in).
-  // The page still works, it just falls back to showing raw names/IDs
-  // instead of resolved patient/doctor names, and add/edit is disabled.
+  // True when /api/users or /api/medicalReports could not be loaded
+  // (e.g. no one is logged in). The page still works, it just falls
+  // back gracefully.
   needsLogin = false;
   canManage = false;
 
@@ -66,8 +66,9 @@ export class MedicalReportsListComponent implements OnInit {
   constructor(
     private reportService: MedicalReportService,
     private medicineService: MedicineService,
-    private fb: FormBuilder,
     private authService: AuthService,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
       patient: ['', Validators.required],
@@ -98,20 +99,20 @@ export class MedicalReportsListComponent implements OnInit {
   loadAll(): void {
     this.loading = true;
     this.errorMessage = '';
-    this.needsLogin = false;
 
     forkJoin({
       reports: this.reportService.getReports().pipe(
         catchError((error) => {
-          this.errorMessage = error?.error?.message || 'Failed to load medical reports.';
+          if (error?.status === 401) {
+            this.needsLogin = true;
+          } else {
+            this.errorMessage = error?.error?.message || 'Failed to load medical reports.';
+          }
           return of([] as MedicalReport[]);
         })
       ),
       users: this.reportService.getUsers().pipe(
         catchError((error) => {
-          // Most common cause: nobody is logged in yet, so /api/users
-          // (which requires auth) rejects. Don't let that block the
-          // rest of the page — just fall back gracefully.
           if (error?.status === 401) {
             this.needsLogin = true;
           }
@@ -142,6 +143,10 @@ export class MedicalReportsListComponent implements OnInit {
 
       this.applyFilters();
       this.loading = false;
+      // The app runs without zone.js, so async work (like this HTTP
+      // response) doesn't automatically trigger a view refresh —
+      // force one explicitly.
+      this.cdr.detectChanges();
     });
   }
 
@@ -174,10 +179,12 @@ export class MedicalReportsListComponent implements OnInit {
 
   onSearchChange(): void {
     this.applyFilters();
+    this.cdr.detectChanges();
   }
 
   onTypeChange(): void {
     this.applyFilters();
+    this.cdr.detectChanges();
   }
 
   // ---------- Prescribed medicines FormArray ----------
@@ -207,10 +214,11 @@ export class MedicalReportsListComponent implements OnInit {
     this.prescribedMedicines.clear();
 
     this.form.reset(emptyReport());
-  this.showModal = true;
+    this.showModal = true;
   }
 
   openEditModal(report: MedicalReport): void {
+    if (!this.canManage) return;
     this.isEditMode = true;
     this.editingId = report._id ?? null;
     this.formError = '';
@@ -219,7 +227,7 @@ export class MedicalReportsListComponent implements OnInit {
     (report.prescribedMedicines || []).forEach((pm) => {
       this.prescribedMedicines.push(
         this.fb.group({
-          medicine: [typeof pm.medicine === 'object' ? pm.medicine._id : pm.medicine, Validators.required],
+          medicine: [typeof pm.medicine === 'object' ? (pm.medicine as any)._id : pm.medicine, Validators.required],
           dosage: [pm.dosage, Validators.required],
           frequency: [pm.frequency, Validators.required],
           duration: [pm.duration, Validators.required],
@@ -228,8 +236,8 @@ export class MedicalReportsListComponent implements OnInit {
     });
 
     this.form.patchValue({
-      patient: typeof report.patient === 'object' ? report.patient._id : report.patient,
-      doctor: typeof report.doctor === 'object' ? report.doctor._id : report.doctor,
+      patient: typeof report.patient === 'object' ? (report.patient as any)._id : report.patient,
+      doctor: typeof report.doctor === 'object' ? (report.doctor as any)._id : report.doctor,
       reportType: report.reportType,
       title: report.title,
       diagnosis: report.diagnosis,
@@ -253,6 +261,7 @@ export class MedicalReportsListComponent implements OnInit {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.formError = 'Please fill in all required fields.';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -272,6 +281,7 @@ export class MedicalReportsListComponent implements OnInit {
       error: (error) => {
         this.saving = false;
         this.formError = error?.error?.message || 'Something went wrong. Please check your input and try again.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -279,6 +289,7 @@ export class MedicalReportsListComponent implements OnInit {
   // ---------- Delete ----------
 
   confirmDelete(report: MedicalReport): void {
+    if (!this.canManage) return;
     this.deleteTarget = report;
   }
 
@@ -301,6 +312,7 @@ export class MedicalReportsListComponent implements OnInit {
         this.deleting = false;
         this.errorMessage = error?.error?.message || 'Failed to delete report.';
         this.deleteTarget = null;
+        this.cdr.detectChanges();
       },
     });
   }

@@ -1,24 +1,14 @@
 const MedicalReport = require("../models/medicalReports.model");
-const Patient = require("../models/patient.model");
-const Doctor = require("../models/doctors.model");
 const Notification = require("../models/notifications.models");
 
-const toUserId = async (role, userId) => {
-  if (role === "doctor") {
-    const doctor = await Doctor.findOne({ user: userId }).select("user");
-    return doctor?.user || null;
-  }
-  if (role === "user") {
-    const patient = await Patient.findOne({ user: userId }).select("user");
-    return patient?.user || null;
-  }
-  return userId;
-};
-
-const canAccessReport = async (report, req) => {
+// report.patient and report.doctor both store the User id directly (see
+// schema refs), so access checks compare req.user.userId straight against
+// them — no need to round-trip through a Patient/Doctor profile document,
+// which isn't guaranteed to exist for every account.
+const canAccessReport = (report, req) => {
   if (req.user.role === "admin") return true;
-  const ownUserId = await toUserId(req.user.role, req.user.userId);
-  return ownUserId && (String(report.patient) === String(ownUserId) || String(report.doctor) === String(ownUserId));
+  const userId = String(req.user.userId);
+  return String(report.patient) === userId || String(report.doctor) === userId;
 };
 
 const getAllMedicalReports = async (req, res) => {
@@ -26,9 +16,10 @@ const getAllMedicalReports = async (req, res) => {
     let filter = {};
 
     if (req.user.role === "user") {
-      const patient = await Patient.findOne({ user: req.user.userId }).select("_id");
-      if (!patient) return res.status(200).json([]);
-      // Reports store the User id, not Patient document id.
+      // report.patient stores the User id directly (see schema), so we can
+      // filter on it without requiring a separate Patient profile document
+      // to exist first. A user should see every report tied to their
+      // account, profile filled in or not.
       filter.patient = req.user.userId;
     } else if (req.user.role === "doctor") {
       filter.doctor = req.user.userId;
@@ -60,7 +51,7 @@ const getMedicalReportById = async (req, res) => {
 
     if (!report) return res.status(404).json({ success: false, message: "Medical report not found" });
 
-    if (!(await canAccessReport(report, req))) {
+    if (!canAccessReport(report, req)) {
       return res.status(403).json({ success: false, message: "You are not allowed to access this report" });
     }
 

@@ -1,20 +1,23 @@
 <div class="bg-white rounded-xl p-7">
-  <p class="text-[15px] mb-5">{{ review.comment }}</p>
 
-  <div class="flex items-center gap-3">
-    <div class="w-9 h-9 rounded-full bg-mint flex-shrink-0"></div>
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <p class="text-sm font-semibold text-green-900">
+        {{ review.patient?.name }}
+      </p>
 
+      <p class="text-[13px] text-gray-600">
+        Dr. {{ review.doctor?.name }}
+      </p>
+    </div>
 
-<div>
-  <div class="text-sm font-semibold text-green-900">
-    {{ review.patient?.name }}
+    <div class="text-yellow-500">
+      {{ '★'.repeat(review.rating) }}
+    </div>
   </div>
 
-  <div class="text-[13px] text-gray-600">
-    Dr. {{ review.doctor?.name }}
-  </div>
-</div>
+  <p class="text-[15px] text-gray-700 mb-5">
+    {{ review.comment }}
+  </p>
 
-
-  </div>
 </div>

@@ -17,7 +17,7 @@ const reviewSchema = new mongoose.Schema(
     appointment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Appointment",
-      required: [true, "Appointment is required"],
+      // required: [true, "Appointment is required"],
     },
 
     rating: {

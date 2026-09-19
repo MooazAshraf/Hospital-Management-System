@@ -1,11 +1,17 @@
 <section class="wrap py-16">
 
   <!-- Loading -->
-  <div *ngIf="isLoading()" class="text-center py-10 text-gray-500">
+
+  <div
+    *ngIf="isLoading()"
+    class="text-center py-10 text-gray-500"
+  >
     Loading doctor profile...
   </div>
 
+
   <!-- Error -->
+
   <div
     *ngIf="!isLoading() && errorMessage()"
     class="text-center py-10 text-red-600"
@@ -13,28 +19,38 @@
     {{ errorMessage() }}
   </div>
 
+
   <!-- Profile -->
+
   <div
     *ngIf="!isLoading() && doctor() as d"
     class="grid grid-cols-1 md:grid-cols-3 gap-10"
   >
 
     <!-- Photo + booking -->
+
     <div>
-      <div class="h-64 rounded-2xl overflow-hidden bg-gray-100 mb-5">
+
+      <div
+        class="h-64 rounded-2xl overflow-hidden bg-gray-100 mb-5"
+      >
+
         <img
           *ngIf="d.image"
           [src]="d.image | imagePath"
           [alt]="d.name"
           class="w-full h-full object-cover"
         />
+
         <div
           *ngIf="!d.image"
           class="w-full h-full flex items-center justify-center text-6xl"
         >
           👨‍⚕️
         </div>
+
       </div>
+
 
       <span
         class="inline-block text-xs px-3 py-1 rounded-full mb-5"
@@ -46,6 +62,7 @@
         {{ d.isAvailable ? 'Available' : 'Unavailable' }}
       </span>
 
+
       <a
         [routerLink]="['/book-appointment']"
         [queryParams]="{ doctorId: d._id }"
@@ -54,58 +71,441 @@
       >
         Book Now
       </a>
+
     </div>
 
-    <!-- Details -->
-    <div class="md:col-span-2">
-      <h1 class="text-3xl font-bold text-green-900">Dr. {{ d.name }}</h1>
-      <p class="text-green-700 mt-1">{{ d.specialty }}</p>
 
-      <p class="text-gray-600 mt-6" *ngIf="d.description">
+    <!-- Details -->
+
+    <div class="md:col-span-2">
+
+      <h1 class="text-3xl font-bold text-green-900">
+        Dr. {{ d.name }}
+      </h1>
+
+
+      <p class="text-green-700 mt-1">
+        {{ d.specialty }}
+      </p>
+
+
+      <p
+        class="text-gray-600 mt-6"
+        *ngIf="d.description"
+      >
         {{ d.description }}
       </p>
 
+
       <div class="grid grid-cols-2 gap-6 mt-8">
+
         <div>
-          <p class="text-sm text-gray-400">Department</p>
-          <p class="font-semibold text-gray-800">{{ departmentName }}</p>
+
+          <p class="text-sm text-gray-400">
+            Department
+          </p>
+
+          <p class="font-semibold text-gray-800">
+            {{ departmentName }}
+          </p>
+
         </div>
+
+
         <div>
-          <p class="text-sm text-gray-400">Experience</p>
+
+          <p class="text-sm text-gray-400">
+            Experience
+          </p>
+
           <p class="font-semibold text-gray-800">
             {{ d.experienceYears }} years
           </p>
+
         </div>
+
+
         <div>
-          <p class="text-sm text-gray-400">Fees</p>
-          <p class="font-semibold text-gray-800">{{ d.fees }} EGP</p>
+
+          <p class="text-sm text-gray-400">
+            Fees
+          </p>
+
+          <p class="font-semibold text-gray-800">
+            {{ d.fees }} EGP
+          </p>
+
         </div>
+
+
         <div *ngIf="d.roomNumber">
-          <p class="text-sm text-gray-400">Room</p>
-          <p class="font-semibold text-gray-800">{{ d.roomNumber }}</p>
+
+          <p class="text-sm text-gray-400">
+            Room
+          </p>
+
+          <p class="font-semibold text-gray-800">
+            {{ d.roomNumber }}
+          </p>
+
         </div>
+
       </div>
 
-      <div *ngIf="d.qualifications?.length" class="mt-8">
-        <p class="text-sm text-gray-400 mb-2">Qualifications</p>
-        <ul class="list-disc list-inside text-gray-700 space-y-1">
-          <li *ngFor="let q of d.qualifications">{{ q }}</li>
+
+      <div
+        *ngIf="d.qualifications?.length"
+        class="mt-8"
+      >
+
+        <p class="text-sm text-gray-400 mb-2">
+          Qualifications
+        </p>
+
+        <ul
+          class="list-disc list-inside text-gray-700 space-y-1"
+        >
+
+          <li *ngFor="let q of d.qualifications">
+            {{ q }}
+          </li>
+
         </ul>
+
       </div>
 
-      <div *ngIf="d.availability?.length" class="mt-8">
-        <p class="text-sm text-gray-400 mb-2">Weekly availability</p>
+
+      <div
+        *ngIf="d.availability?.length"
+        class="mt-8"
+      >
+
+        <p class="text-sm text-gray-400 mb-2">
+          Weekly availability
+        </p>
+
         <div class="flex flex-wrap gap-2">
+
           <span
             *ngFor="let slot of d.availability"
             class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700"
           >
-            {{ slot.day }}: {{ slot.startTime }} - {{ slot.endTime }}
+            {{ slot.day }}:
+            {{ slot.startTime }} -
+            {{ slot.endTime }}
           </span>
+
         </div>
+
       </div>
+
     </div>
 
   </div>
+
+
+  <!-- ===================================================== -->
+  <!-- NEW: Reviews Section -->
+  <!-- ===================================================== -->
+
+  <section
+    id="reviews"
+    *ngIf="!isLoading() && doctor()"
+    class="mt-16 scroll-mt-24"
+  >
+
+    <div class="border-t border-gray-200 pt-12">
+
+      <h2 class="text-3xl font-bold text-green-900">
+        Reviews
+      </h2>
+
+
+      <p class="text-gray-500 mt-2">
+        What patients say about Dr. {{ doctor()?.name }}
+      </p>
+
+
+      <!-- NEW: Review Form -->
+
+      <div
+        id="review-form"
+        *ngIf="isLoggedIn"
+        class="mt-8 bg-gray-50 rounded-2xl p-6"
+      >
+
+        <h3 class="text-xl font-semibold text-green-900 mb-5">
+
+          {{
+            editingReviewId
+              ? 'Edit Your Review'
+              : 'Write a Review'
+          }}
+
+        </h3>
+
+
+        <!-- NEW: Rating -->
+
+        <div class="mb-5">
+
+          <p class="text-sm font-medium text-gray-700 mb-2">
+            Your Rating
+          </p>
+
+
+          <div class="flex gap-2">
+
+            <button
+              *ngFor="let star of [1, 2, 3, 4, 5]"
+              type="button"
+              (click)="setRating(star)"
+              class="text-3xl transition hover:scale-110"
+              [class.text-yellow-400]="star <= selectedRating"
+              [class.text-gray-300]="star > selectedRating"
+            >
+              ★
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- NEW: Comment -->
+
+        <div class="mb-5">
+
+          <label
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Your Review
+          </label>
+
+
+          <textarea
+            [(ngModel)]="reviewComment"
+            rows="4"
+            maxlength="500"
+            placeholder="Write your experience with this doctor..."
+            class="w-full rounded-lg border border-gray-200 px-4 py-3
+                   focus:outline-none focus:ring-2 focus:ring-green-700"
+          ></textarea>
+
+
+          <p class="text-xs text-gray-400 mt-1">
+            {{ reviewComment.length }}/500
+          </p>
+
+        </div>
+
+
+        <!-- NEW: Success Message -->
+
+        <p
+          *ngIf="reviewMessage"
+          class="text-green-700 text-sm mb-4"
+        >
+          {{ reviewMessage }}
+        </p>
+
+
+        <!-- NEW: Error Message -->
+
+        <p
+          *ngIf="reviewError"
+          class="text-red-600 text-sm mb-4"
+        >
+          {{ reviewError }}
+        </p>
+
+
+        <!-- NEW: Submit -->
+
+        <button
+          *ngIf="!editingReviewId"
+          type="button"
+          (click)="submitReview()"
+          [disabled]="isReviewSubmitting"
+          class="px-6 py-3 rounded-lg bg-green-900 text-white
+                 font-semibold hover:bg-green-800 transition
+                 disabled:opacity-50"
+        >
+
+          {{
+            isReviewSubmitting
+              ? 'Submitting...'
+              : 'Submit Review'
+          }}
+
+        </button>
+
+
+        <!-- NEW: Update -->
+
+        <button
+          *ngIf="editingReviewId"
+          type="button"
+          (click)="updateReview()"
+          [disabled]="isReviewSubmitting"
+          class="px-6 py-3 rounded-lg bg-green-900 text-white
+                 font-semibold hover:bg-green-800 transition
+                 disabled:opacity-50"
+        >
+
+          {{
+            isReviewSubmitting
+              ? 'Updating...'
+              : 'Update Review'
+          }}
+
+        </button>
+
+
+        <!-- NEW: Cancel -->
+
+        <button
+          *ngIf="editingReviewId"
+          type="button"
+          (click)="cancelEdit()"
+          class="ml-3 px-6 py-3 rounded-lg border border-gray-300
+                 text-gray-700 font-semibold hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+
+      <!-- NEW: Not Logged In -->
+
+      <div
+        *ngIf="!isLoggedIn"
+        class="mt-8 bg-gray-50 rounded-xl p-6 text-center"
+      >
+
+        <p class="text-gray-600">
+          Please login to write a review.
+        </p>
+
+
+        <a
+          routerLink="/login"
+          class="inline-block mt-4 px-5 py-2.5 rounded-lg
+                 bg-green-900 text-white font-semibold"
+        >
+          Login
+        </a>
+
+      </div>
+
+
+      <!-- NEW: Reviews List -->
+
+      <div class="mt-10 space-y-5">
+
+        <!-- No Reviews -->
+
+        <div
+          *ngIf="reviews.length === 0"
+          class="text-gray-500 text-center py-8"
+        >
+          No reviews yet. Be the first to review this doctor.
+        </div>
+
+
+        <!-- Review -->
+
+        <article
+          *ngFor="let review of reviews"
+          class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm"
+        >
+
+          <!-- Review Header -->
+
+          <div
+            class="flex items-start justify-between gap-4"
+          >
+
+            <div>
+
+              <p class="font-semibold text-green-900">
+                {{ review.patient?.name }}
+              </p>
+
+
+              <p class="text-sm text-gray-400 mt-1">
+                {{ review.createdAt | date:'mediumDate' }}
+              </p>
+
+            </div>
+
+
+            <!-- NEW: Stars -->
+
+            <div class="flex gap-1">
+
+              <span
+                *ngFor="let star of [1, 2, 3, 4, 5]"
+                class="text-xl"
+                [class.text-yellow-400]="star <= review.rating"
+                [class.text-gray-300]="star > review.rating"
+              >
+                ★
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Review Comment -->
+
+          <p class="text-gray-700 mt-4 leading-7">
+            {{ review.comment }}
+          </p>
+
+
+          <!-- NEW: Edit/Delete -->
+
+          <div
+            *ngIf="canModifyReview(review)"
+            class="flex gap-2 mt-5"
+          >
+
+            <!-- Edit -->
+
+            <button
+              type="button"
+              (click)="startEdit(review)"
+              class="px-4 py-2 rounded-lg border border-green-700
+                     text-green-700 text-sm font-medium
+                     hover:bg-green-50 transition"
+            >
+              Edit
+            </button>
+
+
+            <!-- Delete -->
+
+            <button
+              type="button"
+              (click)="deleteReview(review)"
+              class="px-4 py-2 rounded-lg border border-red-500
+                     text-red-600 text-sm font-medium
+                     hover:bg-red-50 transition"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </section>
 
 </section>

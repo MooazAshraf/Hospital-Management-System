@@ -21,15 +21,25 @@
     </button>
   </div>
 
-  <!-- Needs login banner -->
-  @if (needsLogin) {
+  <!-- Login / permission banner -->
+  @if (!isLoggedIn) {
     <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-800 text-sm flex items-start gap-3">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5">
         <path d="M12 9v4M12 17h.01" /><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.7 3.86a2 2 0 0 0-3.4 0Z" />
       </svg>
       <div>
         <p class="font-medium">You're not logged in</p>
-        <p class="text-amber-700/90 mt-0.5">Patient and doctor names can't be resolved, and adding/editing reports is disabled until you log in.</p>
+        <p class="text-amber-700/90 mt-0.5">Log in to view medical reports. Adding, editing and deleting reports is limited to admins.</p>
+      </div>
+    </div>
+  } @else if (!isAdmin) {
+    <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-800 text-sm flex items-start gap-3">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5">
+        <circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" />
+      </svg>
+      <div>
+        <p class="font-medium">Read-only view</p>
+        <p class="text-blue-700/90 mt-0.5">Only admins can add, edit or delete medical reports.</p>
       </div>
     </div>
   }
@@ -114,7 +124,7 @@
           [patientName]="patientName(report.patient)"
           [doctorName]="doctorName(report.doctor)"
           [medicineNames]="medicineNamesById"
-          [showActions]="!needsLogin"
+          [showActions]="canManage"
           (edit)="openEditModal($event)"
           (remove)="confirmDelete($event)">
         </app-medical-report-card>

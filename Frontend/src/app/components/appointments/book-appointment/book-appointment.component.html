@@ -134,11 +134,16 @@
         <div class="doctor-image">
 
           <img
+<<<<<<< HEAD
             *ngIf="
               doctor.image &&
               !failedImages().has(doctor._id)
             "
             [src]="doctor.image"
+=======
+            *ngIf="doctor.image"
+            [src]="doctor.image | imagePath"
+>>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
             [alt]="doctor.name"
             (error)="onImageError(doctor._id)"
           />

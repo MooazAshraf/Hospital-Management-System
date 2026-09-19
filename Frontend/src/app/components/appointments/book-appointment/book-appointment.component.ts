@@ -18,6 +18,7 @@ import { DoctorService } from '../../../services/doctor.service';
 import { Doctor } from '../../../models/doctor.model';
 
 import { BookingStepsComponent } from '../booking-steps/booking-steps.component';
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
 
 
 @Component({
@@ -30,6 +31,7 @@ import { BookingStepsComponent } from '../booking-steps/booking-steps.component'
     FormsModule,
     RouterLink,
     BookingStepsComponent,
+    ImagePathPipe,
   ],
 
   templateUrl: './book-appointment.component.html',

@@ -24,7 +24,7 @@
       <div class="h-64 rounded-2xl overflow-hidden bg-gray-100 mb-5">
         <img
           *ngIf="d.image"
-          [src]="d.image"
+          [src]="d.image | imagePath"
           [alt]="d.name"
           class="w-full h-full object-cover"
         />

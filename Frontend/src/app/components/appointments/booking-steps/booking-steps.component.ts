@@ -17,8 +17,15 @@ import {
   Validators,
 } from '@angular/forms';
 
+<<<<<<< HEAD
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';
+=======
+import {
+  CommonModule,
+} from '@angular/common';
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
+>>>>>>> fd9fee81fadad1e6281dc26b3c0f08f832043ea1
 
 import {
   debounceTime,
@@ -56,6 +63,7 @@ interface AvailableSlotsResponse {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+      ImagePathPipe,
   ],
 
   templateUrl: './booking-steps.component.html',

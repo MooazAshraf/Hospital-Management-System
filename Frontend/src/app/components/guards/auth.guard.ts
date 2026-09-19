@@ -15,7 +15,10 @@ export const roleGuard = (roles: Array<'user' | 'doctor' | 'admin'>): CanActivat
     const router = inject(Router);
     const user = auth.getUser();
 
-    if (!user) return router.createUrlTree(['/login']);
+    if (!user) {
+      return router.createUrlTree(['/login']);
+    }
+
     return roles.includes(user.role) ? true : router.createUrlTree(['/']);
   };
 };

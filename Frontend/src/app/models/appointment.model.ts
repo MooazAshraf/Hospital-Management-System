@@ -100,3 +100,54 @@ export interface AvailableSlotsResponse {
     availableTimes?: string[];
   };
 }
+
+// ==============================
+// Review
+// ==============================
+
+export interface Review {
+  _id: string;
+
+  patient:
+    | string
+    | AppointmentPatient;
+
+  doctor:
+    | string
+    | AppointmentDoctor;
+
+  appointment?: string;
+
+  rating: number;
+  comment?: string;
+
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateReviewPayload {
+  doctor: string;
+  appointment?: string;
+  rating: number;
+  comment?: string;
+}
+
+export interface UpdateReviewPayload {
+  rating?: number;
+  comment?: string;
+}
+
+export interface ReviewResponse {
+  success?: boolean;
+  message: string;
+  data: Review;
+  review?: Review;
+}
+
+export interface ReviewListResponse {
+  success?: boolean;
+  message?: string;
+  count?: number;
+  data: Review[];
+  reviews?: Review[];
+}

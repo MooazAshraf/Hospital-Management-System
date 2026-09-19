@@ -6,6 +6,8 @@ import {
   OnInit,
   signal,
   computed,
+  inject,
+  OnDestroy,
 } from '@angular/core';
 
 import {
@@ -15,46 +17,74 @@ import {
   Validators,
 } from '@angular/forms';
 
-import {
-  CommonModule,
-} from '@angular/common';
-import { ImagePathPipe } from '../../../pipes/image-path.pipe';
+import { CommonModule } from '@angular/common';
 
 import {
   HttpClient,
+  HttpParams,
 } from '@angular/common/http';
+
+import { ImagePathPipe } from '../../../pipes/image-path.pipe';
+
+import {
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+  takeUntil,
+} from 'rxjs';
+
+import { AuthService } from '../../../services/auth.service';
 
 interface Slot {
   time: string;
   booked: boolean;
 }
 
+interface AvailableSlotsResponse {
+  success: boolean;
+  message?: string;
+
+  data?: {
+    availableTimes?: string[];
+  };
+
+  availableTimes?: string[];
+
+  slots?: string[];
+
+  availableSlots?: string[];
+}
+
 @Component({
   selector: 'app-booking-steps',
   standalone: true,
+
   imports: [
     CommonModule,
     ReactiveFormsModule,
-      ImagePathPipe,
+    ImagePathPipe,
   ],
-  templateUrl:
-    './booking-steps.component.html',
+
+  templateUrl: './booking-steps.component.html',
 })
 export class BookingStepsComponent
-  implements OnInit {
+  implements OnInit, OnDestroy {
 
   @Input() doctorId = '';
-
   @Input() doctorName = '';
-
   @Input() doctorImage = '';
-
   @Input() doctorSpecialty = '';
-
   @Input() doctorFees: number | null = null;
 
-  @Output() booked =
-    new EventEmitter<string>();
+  @Output() booked = new EventEmitter<string>();
+
+  private readonly fb = inject(FormBuilder);
+
+  private readonly http = inject(HttpClient);
+
+  private readonly authService = inject(AuthService);
+
+  private readonly destroy$ = new Subject<void>();
 
   detailsForm: FormGroup;
 
@@ -66,8 +96,7 @@ export class BookingStepsComponent
 
   errorMessage = signal('');
 
-  availableSlots =
-    signal<Slot[]>([]);
+  availableSlots = signal<Slot[]>([]);
 
   stepLabels = [
     'Patient',
@@ -79,98 +108,156 @@ export class BookingStepsComponent
   minDate = '';
 
   morningSlots = computed(() =>
-    this.availableSlots().filter(
-      (slot) => {
-        const hour =
-          Number(
-            slot.time.split(':')[0]
-          );
+    this.availableSlots().filter((slot) => {
+      const hour = Number(
+        slot.time.split(':')[0]
+      );
 
-        return hour < 12;
-      }
-    )
+      return hour < 12;
+    })
   );
 
   afternoonSlots = computed(() =>
-    this.availableSlots().filter(
-      (slot) => {
-        const hour =
-          Number(
-            slot.time.split(':')[0]
-          );
+    this.availableSlots().filter((slot) => {
+      const hour = Number(
+        slot.time.split(':')[0]
+      );
 
-        return hour >= 12;
-      }
-    )
+      return hour >= 12;
+    })
   );
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient
-  ) {
-    this.detailsForm =
-      this.fb.group({
-        patientName: [
-          '',
+  constructor() {
+    this.detailsForm = this.fb.group({
+      patientName: [
+        '',
+        Validators.required,
+      ],
+
+      phone: [
+        '',
+        [
           Validators.required,
+          Validators.pattern(
+            /^01[0125][0-9]{8}$/
+          ),
         ],
+      ],
 
-        phone: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(
-              /^01[0125][0-9]{8}$/
-            ),
-          ],
-        ],
-
-        email: [
-          '',
-          [
-            Validators.required,
-            Validators.email,
-          ],
-        ],
-
-        date: [
-          '',
+      email: [
+        '',
+        [
           Validators.required,
+          Validators.email,
         ],
+      ],
 
-        time: [
-          '',
-          Validators.required,
-        ],
+      date: [
+        '',
+        Validators.required,
+      ],
 
-        appointmentType: [
-          'Check-up',
-          Validators.required,
-        ],
+      time: [
+        '',
+        Validators.required,
+      ],
 
-        notes: [''],
-      });
+      appointmentType: [
+        'Check-up',
+        Validators.required,
+      ],
+
+      notes: [''],
+    });
   }
+
+  // =====================================================
+  // Init
+  // =====================================================
 
   ngOnInit(): void {
     const today = new Date();
 
-    this.minDate =
-      this.formatDate(today);
+    this.minDate = this.formatDate(today);
+
+    const currentUser =
+      this.authService.getUser();
+
+    if (!currentUser) {
+      this.errorMessage.set(
+        'يجب تسجيل الدخول أولاً لحجز موعد.'
+      );
+
+      return;
+    }
+
+    // -------------------------------------------------
+    // Fill logged-in user information
+    // -------------------------------------------------
+
+    this.detailsForm.patchValue({
+      patientName:
+        (currentUser as any).name ||
+        (currentUser as any).fullName ||
+        '',
+
+      phone:
+        (currentUser as any).phone ||
+        '',
+
+      email:
+        (currentUser as any).email ||
+        '',
+    });
+
+    // -------------------------------------------------
+    // Date changes
+    // -------------------------------------------------
 
     this.detailsForm
       .get('date')
       ?.valueChanges
-      .subscribe((date) => {
-        if (date) {
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((date: string) => {
+        // Reset selected time
+        this.detailsForm.patchValue(
+          {
+            time: '',
+          },
+          {
+            emitEvent: false,
+          }
+        );
+
+        if (
+          date &&
+          date.length === 10
+        ) {
           this.loadSlots(date);
+        } else {
+          this.availableSlots.set([]);
         }
       });
   }
 
-  private formatDate(
-    date: Date
-  ): string {
+  // =====================================================
+  // Destroy
+  // =====================================================
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // =====================================================
+  // Format Date
+  // =====================================================
+
+  private formatDate(date: Date): string {
     const year =
       date.getFullYear();
 
@@ -191,15 +278,12 @@ export class BookingStepsComponent
   // Load Available Slots
   // =====================================================
 
-  loadSlots(
-    date: string
-  ): void {
+  loadSlots(date: string): void {
     if (
       !this.doctorId ||
       !date
     ) {
       this.availableSlots.set([]);
-
       return;
     }
 
@@ -209,25 +293,39 @@ export class BookingStepsComponent
 
     this.availableSlots.set([]);
 
-    const url =
-      'http://localhost:5000/api/appointments/available-slots';
-
-    const params = {
-      doctor: this.doctorId,
-      date,
-    };
+    const params =
+      new HttpParams()
+        .set(
+          'doctor',
+          this.doctorId
+        )
+        .set(
+          'date',
+          date
+        );
 
     this.http
-      .get<any>(url, { params })
+      .get<AvailableSlotsResponse>(
+        'http://localhost:5000/api/appointments/available-slots',
+        {
+          params,
+        }
+      )
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe({
         next: (res) => {
           console.log(
-            'Available slots:',
+            'Available slots response:',
             res
           );
 
           const availableTimes =
             res?.data?.availableTimes ??
+            res?.availableTimes ??
+            res?.availableSlots ??
+            res?.slots ??
             [];
 
           const slots: Slot[] =
@@ -242,16 +340,14 @@ export class BookingStepsComponent
             slots
           );
 
-          this.loadingSlots.set(
-            false
-          );
+          this.loadingSlots.set(false);
 
-          if (
-            availableTimes.length === 0
-          ) {
+          if (!slots.length) {
             this.errorMessage.set(
               'لا توجد مواعيد متاحة لهذا اليوم.'
             );
+          } else {
+            this.errorMessage.set('');
           }
         },
 
@@ -263,9 +359,7 @@ export class BookingStepsComponent
 
           this.availableSlots.set([]);
 
-          this.loadingSlots.set(
-            false
-          );
+          this.loadingSlots.set(false);
 
           this.errorMessage.set(
             error?.error?.message ||
@@ -276,12 +370,10 @@ export class BookingStepsComponent
   }
 
   // =====================================================
-  // Date
+  // Date Chosen
   // =====================================================
 
-  onDateChosen(
-    date: string
-  ): void {
+  onDateChosen(date: string): void {
     this.detailsForm.patchValue({
       date,
       time: '',
@@ -289,16 +381,14 @@ export class BookingStepsComponent
 
     this.step.set(2);
 
-    this.loadSlots(date);
+    // valueChanges will load slots
   }
 
   // =====================================================
   // Choose Time
   // =====================================================
 
-  chooseTime(
-    slot: Slot
-  ): void {
+  chooseTime(slot: Slot): void {
     if (slot.booked) {
       return;
     }
@@ -310,18 +400,25 @@ export class BookingStepsComponent
     this.step.set(3);
   }
 
-  slotTitle(
-    slot: Slot
-  ): string {
+  // =====================================================
+  // Slot Title
+  // =====================================================
+
+  slotTitle(slot: Slot): string {
     return slot.booked
       ? 'هذا الموعد محجوز'
       : 'اختيار هذا الموعد';
   }
 
+  // =====================================================
+  // Has Available Slot
+  // =====================================================
+
   hasAnyAvailableSlot(): boolean {
-    return this.availableSlots().some(
-      (slot) => !slot.booked
-    );
+    return this.availableSlots()
+      .some(
+        (slot) => !slot.booked
+      );
   }
 
   // =====================================================
@@ -334,10 +431,23 @@ export class BookingStepsComponent
         'appointmentType'
       );
 
+    const time =
+      this.detailsForm.get('time');
+
     if (
       appointmentType?.invalid
     ) {
       appointmentType.markAsTouched();
+      return;
+    }
+
+    if (time?.invalid) {
+      time.markAsTouched();
+
+      this.errorMessage.set(
+        'من فضلك اختر موعدًا.'
+      );
+
       return;
     }
 
@@ -357,11 +467,42 @@ export class BookingStepsComponent
   }
 
   // =====================================================
-  // Confirm
+  // Confirm Booking
   // =====================================================
 
   confirm(): void {
     this.errorMessage.set('');
+
+    const currentUser =
+      this.authService.getUser();
+
+    // -------------------------------------------------
+    // Authentication
+    // -------------------------------------------------
+
+    if (!currentUser) {
+      this.errorMessage.set(
+        'يجب تسجيل الدخول أولاً لحجز موعد.'
+      );
+
+      return;
+    }
+
+    // -------------------------------------------------
+    // Doctor
+    // -------------------------------------------------
+
+    if (!this.doctorId) {
+      this.errorMessage.set(
+        'بيانات الطبيب غير موجودة.'
+      );
+
+      return;
+    }
+
+    // -------------------------------------------------
+    // Form validation
+    // -------------------------------------------------
 
     if (
       this.detailsForm.invalid
@@ -375,36 +516,61 @@ export class BookingStepsComponent
       return;
     }
 
-    if (!this.doctorId) {
-      this.errorMessage.set(
-        'بيانات الطبيب غير موجودة.'
+    const formValue =
+      this.detailsForm.getRawValue();
+
+    // -------------------------------------------------
+    // Check selected slot
+    // -------------------------------------------------
+
+    const selectedSlot =
+      this.availableSlots().find(
+        (slot) =>
+          slot.time === formValue.time &&
+          !slot.booked
       );
 
+    if (!selectedSlot) {
+      this.errorMessage.set(
+        'هذا الموعد غير متاح. من فضلك اختر موعدًا آخر.'
+      );
+
+      if (formValue.date) {
+        this.loadSlots(
+          formValue.date
+        );
+      }
+
+      return;
+    }
+
+    // -------------------------------------------------
+    // Prevent double submit
+    // -------------------------------------------------
+
+    if (this.submitting()) {
       return;
     }
 
     this.submitting.set(true);
 
-    const formValue =
-      this.detailsForm.getRawValue();
+    // -------------------------------------------------
+    // Do NOT send patient id from frontend.
+    //
+    // Backend gets:
+    // req.user.userId
+    //       ↓
+    // Patient.user
+    //       ↓
+    // Patient._id
+    // -------------------------------------------------
 
     const payload = {
       doctor: this.doctorId,
 
-      patientName:
-        formValue.patientName,
+      date: formValue.date,
 
-      phone:
-        formValue.phone,
-
-      email:
-        formValue.email,
-
-      date:
-        formValue.date,
-
-      time:
-        formValue.time,
+      time: formValue.time,
 
       appointmentType:
         formValue.appointmentType,
@@ -413,13 +579,30 @@ export class BookingStepsComponent
         formValue.notes || '',
     };
 
+    console.log(
+      'Booking payload:',
+      payload
+    );
+
+    // -------------------------------------------------
+    // Create appointment
+    // -------------------------------------------------
+
     this.http
       .post<any>(
         'http://localhost:5000/api/appointments',
         payload
       )
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe({
         next: (res) => {
+          console.log(
+            'Appointment created:',
+            res
+          );
+
           this.submitting.set(false);
 
           const appointmentId =
@@ -427,6 +610,21 @@ export class BookingStepsComponent
             res?.appointment?._id ||
             res?._id ||
             '';
+
+          // Mark current slot as booked locally
+          this.availableSlots.update(
+            (slots) =>
+              slots.map(
+                (slot) =>
+                  slot.time ===
+                    formValue.time
+                    ? {
+                        ...slot,
+                        booked: true,
+                      }
+                    : slot
+              )
+          );
 
           this.booked.emit(
             appointmentId
@@ -441,10 +639,27 @@ export class BookingStepsComponent
 
           this.submitting.set(false);
 
-          this.errorMessage.set(
+          const message =
             error?.error?.message ||
-            'حدث خطأ أثناء حجز الموعد.'
+            'حدث خطأ أثناء حجز الموعد.';
+
+          this.errorMessage.set(
+            message
           );
+
+          // Reload slots if conflict
+          if (
+            error?.status === 400 ||
+            error?.status === 409
+          ) {
+            if (
+              formValue.date
+            ) {
+              this.loadSlots(
+                formValue.date
+              );
+            }
+          }
         },
       });
   }

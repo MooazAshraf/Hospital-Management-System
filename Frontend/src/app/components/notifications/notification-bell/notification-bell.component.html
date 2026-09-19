@@ -1,41 +1,337 @@
-<section class="relative inline-block">
-  <button type="button" (click)="toggleDropdown()"
-    class="relative w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0m6 0H9" />
+
+<section
+  #notificationContainer
+  class="relative inline-block"
+>
+  <!-- ==================== Notification Button ==================== -->
+  <button
+    type="button"
+    (click)="toggleDropdown($event)"
+    class="relative w-10 h-10 rounded-full border border-gray-100
+           bg-white flex items-center justify-center
+           hover:bg-gray-50 hover:shadow-sm
+           transition-all duration-200"
+    aria-label="Notifications"
+  >
+
+    <!-- Bell -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5 text-green-900"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="1.8"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0m6 0H9"
+      />
     </svg>
 
-    <span *ngIf="unreadCount > 0"
-      class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-mint text-green-900 text-[10px] font-semibold flex items-center justify-center">
-      {{ unreadCount }}
+    <!-- Unread Badge -->
+    <span
+      *ngIf="unreadCount > 0"
+      class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
+             rounded-full bg-mint text-green-900
+             text-[10px] font-bold
+             flex items-center justify-center"
+    >
+      {{ unreadCount > 99 ? '99+' : unreadCount }}
     </span>
+
   </button>
 
-  <div *ngIf="isOpen" class="absolute right-0 mt-2 w-80 border border-gray-100 rounded-xl bg-white shadow-lg z-10">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-      <h3 class="text-sm font-semibold text-green-900">Notifications</h3>
-      <button type="button" (click)="markAllAsRead()" *ngIf="unreadCount > 0"
-        class="text-xs text-green-700 font-semibold">
-        Mark all as read
-      </button>
+
+  <!-- ==================== Dropdown ==================== -->
+  <div
+    *ngIf="isOpen"
+    (click)="$event.stopPropagation()"
+    class="absolute right-0 mt-3 w-96 max-w-[90vw]
+           bg-white border border-gray-100
+           rounded-2xl shadow-xl
+           z-50 overflow-hidden"
+  >
+
+    <!-- ==================== Header ==================== -->
+    <div
+      class="flex items-center justify-between
+             px-4 py-3 border-b border-gray-100"
+    >
+
+      <div>
+        <h3 class="text-sm font-bold text-green-900">
+          Notifications
+        </h3>
+
+        <p
+          *ngIf="unreadCount > 0"
+          class="text-xs text-gray-500 mt-0.5"
+        >
+          {{ unreadCount }} unread notification{{ unreadCount > 1 ? 's' : '' }}
+        </p>
+
+        <p
+          *ngIf="unreadCount === 0"
+          class="text-xs text-gray-500 mt-0.5"
+        >
+          You're all caught up
+        </p>
+      </div>
+
+
+      <div class="flex items-center gap-2">
+
+        <!-- Refresh -->
+        <button
+          type="button"
+          (click)="refreshNotifications($event)"
+          [disabled]="isLoading"
+          class="w-8 h-8 rounded-lg
+                 flex items-center justify-center
+                 text-gray-500
+                 hover:text-green-900
+                 hover:bg-gray-50
+                 transition
+                 disabled:opacity-40"
+          title="Refresh notifications"
+        >
+          ↻
+        </button>
+
+        <!-- Mark All -->
+        <button
+          *ngIf="unreadCount > 0"
+          type="button"
+          (click)="markAllAsRead()"
+          [disabled]="isMarkingAll"
+          class="text-xs text-green-700
+                 font-semibold
+                 hover:text-green-900
+                 disabled:opacity-50"
+        >
+          {{ isMarkingAll ? 'Marking...' : 'Mark all as read' }}
+        </button>
+
+      </div>
+
     </div>
 
-    <div class="max-h-80 overflow-y-auto">
-      <p *ngIf="isLoading" class="text-sm text-gray-500 px-4 py-4">Loading...</p>
-      <p *ngIf="errorMessage" class="text-sm text-red-600 px-4 py-4">{{ errorMessage }}</p>
-      <p *ngIf="!isLoading && !errorMessage && notifications.length === 0" class="text-sm text-gray-500 px-4 py-4">
-        No notifications yet.
+
+    <!-- ==================== Loading ==================== -->
+    <div
+      *ngIf="isLoading"
+      class="px-4 py-10 text-center"
+    >
+
+      <div
+        class="inline-block w-6 h-6
+               border-2 border-gray-200
+               border-t-green-900
+               rounded-full animate-spin"
+      ></div>
+
+      <p class="text-sm text-gray-500 mt-3">
+        Loading notifications...
       </p>
 
-      <button type="button" *ngFor="let n of notifications" (click)="onNotificationClick(n)"
-        class="w-full text-left px-4 py-3 border-b border-gray-50 last:border-b-0"
-        [class.bg-mint]="!n.isRead">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold text-green-900">{{ n.title }}</span>
-          <span *ngIf="!n.isRead" class="w-2 h-2 rounded-full bg-green-700"></span>
-        </div>
-        <p class="text-xs text-gray-600 mt-1">{{ n.message }}</p>
-      </button>
     </div>
+
+
+    <!-- ==================== Error ==================== -->
+    <div
+      *ngIf="!isLoading && errorMessage"
+      class="px-4 py-8 text-center"
+    >
+
+      <div class="text-2xl mb-2">
+        ⚠️
+      </div>
+
+      <p class="text-sm text-red-600">
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="button"
+        (click)="loadNotifications()"
+        class="mt-3 text-xs
+               text-green-700
+               font-semibold
+               hover:text-green-900"
+      >
+        Try again
+      </button>
+
+    </div>
+
+
+    <!-- ==================== Empty ==================== -->
+    <div
+      *ngIf="
+        !isLoading &&
+        !errorMessage &&
+        notifications.length === 0
+      "
+      class="px-4 py-10 text-center"
+    >
+
+      <div class="text-3xl mb-2">
+        🔔
+      </div>
+
+      <p class="text-sm font-semibold text-gray-700">
+        No notifications yet
+      </p>
+
+      <p class="text-xs text-gray-400 mt-1">
+        We'll notify you when something happens.
+      </p>
+
+    </div>
+
+
+    <!-- ==================== Notifications ==================== -->
+    <div
+      *ngIf="
+        !isLoading &&
+        !errorMessage &&
+        notifications.length > 0
+      "
+      class="max-h-[420px] overflow-y-auto"
+    >
+
+      <div
+        *ngFor="let n of notifications; trackBy: trackByNotificationId"
+        class="group relative
+               border-b border-gray-50
+               last:border-b-0
+               transition-colors duration-150"
+        [class.bg-green-50]="!n.isRead"
+      >
+
+        <!-- Notification Button -->
+        <button
+          type="button"
+          (click)="onNotificationClick(n)"
+          class="w-full text-left
+                 px-4 py-3
+                 hover:bg-gray-50
+                 transition-colors duration-150"
+        >
+
+          <div class="flex gap-3">
+
+            <!-- Notification Icon -->
+            <div
+              class="w-10 h-10 rounded-full
+                     bg-white
+                     border border-gray-100
+                     flex items-center justify-center
+                     shrink-0 text-lg"
+            >
+              {{ getNotificationIcon(n.type) }}
+            </div>
+
+
+            <!-- Notification Content -->
+            <div class="flex-1 min-w-0 pr-6">
+
+              <!-- Title + Unread -->
+              <div
+                class="flex items-start
+                       justify-between
+                       gap-2"
+              >
+
+                <span
+                  class="text-sm text-green-900"
+                  [class.font-bold]="!n.isRead"
+                  [class.font-semibold]="n.isRead"
+                >
+                  {{ n.title }}
+                </span>
+
+                <!-- Unread Dot -->
+                <span
+                  *ngIf="!n.isRead"
+                  class="w-2 h-2
+                         rounded-full
+                         bg-green-700
+                         shrink-0
+                         mt-1.5"
+                ></span>
+
+              </div>
+
+
+              <!-- Message -->
+              <p
+                class="text-xs text-gray-600
+                       mt-1
+                       leading-relaxed"
+              >
+                {{ n.message }}
+              </p>
+
+
+              <!-- Type -->
+              <div class="mt-2 flex items-center gap-2">
+
+                <span
+                  class="text-[10px]
+                         px-2 py-0.5
+                         rounded-full
+                         bg-gray-100
+                         text-gray-500
+                         capitalize"
+                >
+                  {{ n.type }}
+                </span>
+
+                <!-- Date -->
+                <span
+                  class="text-[10px]
+                         text-gray-400"
+                >
+                  {{ formatDate(n.createdAt) }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </button>
+
+
+        <!-- Delete Button -->
+        <button
+          type="button"
+          (click)="deleteNotification(n, $event)"
+          class="absolute
+                 right-3 bottom-3
+                 w-7 h-7
+                 rounded-md
+                 flex items-center justify-center
+                 text-gray-300
+                 opacity-0
+                 group-hover:opacity-100
+                 hover:text-red-600
+                 hover:bg-red-50
+                 transition-all duration-150"
+          title="Delete notification"
+        >
+          ×
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
+
 </section>
+

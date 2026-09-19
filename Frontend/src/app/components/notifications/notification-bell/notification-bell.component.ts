@@ -1,12 +1,14 @@
 import {
   Component,
-  Input,
+  ElementRef,
+  HostListener,
   OnInit,
   inject
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { NotificationService } from '../../../services/notification.service';
 
@@ -24,9 +26,8 @@ import {
 export class NotificationBellComponent implements OnInit {
 
   private notificationService = inject(NotificationService);
-
-  @Input({ required: true })
-  userId!: string;
+  private router = inject(Router);
+  private elementRef = inject(ElementRef);
 
   notifications: AppNotification[] = [];
 
@@ -36,28 +37,41 @@ export class NotificationBellComponent implements OnInit {
 
   errorMessage: string | null = null;
 
+  // Prevent unnecessary first/repeated requests
+  private hasLoadedNotifications = false;
 
+  // =========================
+  // Unread Notifications Count
+  // =========================
   get unreadCount(): number {
     return this.notifications.filter(
       notification => !notification.isRead
     ).length;
   }
 
-
+  // =========================
+  // Init
+  // =========================
   ngOnInit(): void {
-
-    if (!this.userId) {
-      this.errorMessage = 'User ID is required.';
-      return;
-    }
-
     this.loadNotifications();
   }
 
+  // =========================
+  // Load Notifications
+  // =========================
+  loadNotifications(force = false): void {
 
-  loadNotifications(): void {
+    // Don't send another request while one is already running
+    if (this.isLoading) {
+      return;
+    }
 
-    if (!this.userId) {
+    // Don't reload if notifications were already loaded
+    // unless force=true
+    if (
+      this.hasLoadedNotifications &&
+      !force
+    ) {
       return;
     }
 
@@ -70,8 +84,15 @@ export class NotificationBellComponent implements OnInit {
 
         next: (response) => {
 
+          console.log(
+            'Notifications response:',
+            response
+          );
+
           this.notifications =
             response.notifications || [];
+
+          this.hasLoadedNotifications = true;
 
           this.isLoading = false;
         },
@@ -83,6 +104,8 @@ export class NotificationBellComponent implements OnInit {
             err
           );
 
+          this.notifications = [];
+
           this.errorMessage =
             err.error?.message ||
             'Failed to load notifications.';
@@ -93,20 +116,72 @@ export class NotificationBellComponent implements OnInit {
       });
   }
 
+  // =========================
+  // Toggle Dropdown
+  // =========================
+  toggleDropdown(event?: Event): void {
 
-  toggleDropdown(): void {
+    event?.stopPropagation();
+
     this.isOpen = !this.isOpen;
+
+    /*
+     * IMPORTANT:
+     * We DO NOT call loadNotifications() here.
+     *
+     * Notifications are loaded once in ngOnInit().
+     * The refresh button can be used to reload them.
+     */
   }
 
+  // =========================
+  // Close When Click Outside
+  // =========================
+  @HostListener(
+    'document:click',
+    ['$event']
+  )
+  onDocumentClick(event: MouseEvent): void {
 
+    const clickedInside =
+      this.elementRef.nativeElement.contains(
+        event.target
+      );
+
+    if (!clickedInside) {
+      this.isOpen = false;
+    }
+  }
+
+  // =========================
+  // Close With Escape
+  // =========================
+  @HostListener(
+    'document:keydown.escape'
+  )
+  onEscape(): void {
+
+    this.isOpen = false;
+  }
+
+  // =========================
+  // Click Notification
+  // =========================
   onNotificationClick(
     notification: AppNotification
   ): void {
 
+    // Already read
     if (notification.isRead) {
+
+      this.navigateFromNotification(
+        notification
+      );
+
       return;
     }
 
+    // Mark as read first
     this.notificationService
       .markAsRead(notification._id)
       .subscribe({
@@ -114,6 +189,10 @@ export class NotificationBellComponent implements OnInit {
         next: () => {
 
           notification.isRead = true;
+
+          this.navigateFromNotification(
+            notification
+          );
         },
 
         error: (err: HttpErrorResponse) => {
@@ -127,7 +206,55 @@ export class NotificationBellComponent implements OnInit {
       });
   }
 
+  // =========================
+  // Navigate Based On Type
+  // =========================
+  private navigateFromNotification(
+    notification: AppNotification
+  ): void {
 
+    // Appointment
+    if (
+      notification.type === 'appointment' &&
+      notification.relatedAppointment
+    ) {
+
+      const appointmentId =
+        notification.relatedAppointment;
+
+      this.isOpen = false;
+
+      this.router.navigate([
+        '/appointments',
+        appointmentId
+      ]);
+
+      return;
+    }
+
+    // Medical Report
+    if (
+      notification.type === 'medical-report' &&
+      notification.relatedMedicalReport
+    ) {
+
+      const medicalReportId =
+        notification.relatedMedicalReport;
+
+      this.isOpen = false;
+
+      this.router.navigate([
+        '/medical-reports',
+        medicalReportId
+      ]);
+
+      return;
+    }
+  }
+
+  // =========================
+  // Mark All As Read
+  // =========================
   markAllAsRead(): void {
 
     if (
@@ -167,7 +294,9 @@ export class NotificationBellComponent implements OnInit {
       });
   }
 
-
+  // =========================
+  // Delete Notification
+  // =========================
   deleteNotification(
     notification: AppNotification,
     event: Event
@@ -199,17 +328,29 @@ export class NotificationBellComponent implements OnInit {
       });
   }
 
-
+  // =========================
+  // Refresh
+  // =========================
   refreshNotifications(
     event?: Event
   ): void {
 
     event?.stopPropagation();
 
-    this.loadNotifications();
+    this.loadNotifications(true);
   }
 
+  // =========================
+  // Try Again
+  // =========================
+  retryNotifications(): void {
 
+    this.loadNotifications(true);
+  }
+
+  // =========================
+  // Notification Icon
+  // =========================
   getNotificationIcon(
     type: NotificationType
   ): string {
@@ -233,8 +374,12 @@ export class NotificationBellComponent implements OnInit {
     }
   }
 
-
-  formatDate(date: string): string {
+  // =========================
+  // Format Date
+  // =========================
+  formatDate(
+    date: string
+  ): string {
 
     if (!date) {
       return '';
@@ -247,5 +392,16 @@ export class NotificationBellComponent implements OnInit {
         timeStyle: 'short'
       }
     );
+  }
+
+  // =========================
+  // Track Notifications
+  // =========================
+  trackByNotificationId(
+    index: number,
+    notification: AppNotification
+  ): string {
+
+    return notification._id;
   }
 }

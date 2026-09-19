@@ -1,84 +1,137 @@
-<article class="appointment-card" [attr.data-status]="appointment.status">
-  <header>
-    <span class="queue">#{{ appointment.queueNumber }}</span>
-    <span class="status-badge">{{ statusLabel }}</span>
-  </header>
+<div
+  class="bg-white border border-gray-200/80 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow"
+>
 
-  <div class="body">
-    <p class="doctor">{{ doctorLabel }}</p>
-    <p class="datetime">{{ appointment.date }} — {{ appointment.time }}</p>
-    <p class="type">{{ appointmentTypeLabel }}</p>
-    @if (appointment.notes) {
-      <p class="notes">{{ appointment.notes }}</p>
-    }
+  <!-- ====================================== -->
+  <!-- Header -->
+  <!-- ====================================== -->
+
+  <div
+    class="flex items-start justify-between gap-4"
+  >
+
+    <div>
+
+      <!-- Queue -->
+      <div
+        *ngIf="queueNumber"
+        class="text-sm text-gray-400 mb-2"
+      >
+        {{ queueNumber }}
+      </div>
+
+      <!-- Doctor -->
+      <div
+        class="text-xs text-gray-400 mb-1"
+      >
+        Doctor
+      </div>
+
+      <h3
+        class="text-lg md:text-xl font-bold text-[#1B3B2B]"
+      >
+        {{ doctorName }}
+      </h3>
+
+    </div>
+
+    <!-- Status -->
+    <span
+      *ngIf="statusLabel"
+      class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap"
+      [ngClass]="statusClass"
+    >
+      {{ statusLabel }}
+    </span>
+
   </div>
 
-  @if (canCancel && appointment.status !== 'Cancelled' && appointment.status !== 'Completed') {
-    <footer>
-      <button type="button" class="btn-cancel" (click)="onCancel()">إلغاء الموعد</button>
-    </footer>
-  }
-</article>
 
-<style>
-  .appointment-card {
-    border: 1px solid #e2e7e4;
-    border-radius: 12px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    background: #fff;
-  }
+  <!-- ====================================== -->
+  <!-- Appointment Info -->
+  <!-- ====================================== -->
 
-  .appointment-card[data-status='Cancelled'] {
-    opacity: 0.6;
-  }
+  <div
+    class="mt-5 space-y-3"
+  >
 
-  .appointment-card header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    <!-- Date + Time -->
 
-  .appointment-card .queue {
-    font-size: 0.8rem;
-    color: #7a8b83;
-  }
+    <div
+      class="flex items-center gap-3 text-gray-700"
+    >
 
-  .appointment-card .status-badge {
-    font-size: 0.78rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    background: #eef2f0;
-    color: #1f6f5c;
-  }
+      <svg
+        class="w-5 h-5 text-[#1B3B2B] shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        ></path>
+      </svg>
 
-  .appointment-card .doctor {
-    font-weight: 600;
-    margin: 0;
-  }
+      <span class="font-medium">
+        {{ formattedDate }}
+      </span>
 
-  .appointment-card .datetime,
-  .appointment-card .type,
-  .appointment-card .notes {
-    margin: 0;
-    font-size: 0.88rem;
-    color: #4b564f;
-  }
+      <span class="text-gray-400">
+        —
+      </span>
 
-  .appointment-card footer {
-    display: flex;
-    justify-content: flex-end;
-  }
+      <span class="font-medium">
+        {{ formattedTime }}
+      </span>
 
-  .appointment-card .btn-cancel {
-    background: transparent;
-    border: 1px solid #b3261e;
-    color: #b3261e;
-    padding: 0.4rem 0.9rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.85rem;
-  }
-</style>
+    </div>
+
+
+    <!-- Appointment Type -->
+
+    <div
+      *ngIf="appointmentType"
+      class="text-sm text-gray-500"
+    >
+      {{ appointmentType }}
+    </div>
+
+
+    <!-- Notes -->
+
+    <div
+      *ngIf="appointment?.notes"
+      class="text-sm text-gray-500"
+    >
+      {{ appointment.notes }}
+    </div>
+
+  </div>
+
+
+  <!-- ====================================== -->
+  <!-- Cancel -->
+  <!-- ====================================== -->
+
+  <div
+    *ngIf="
+      appointment?.status !== 'Cancelled' &&
+      appointment?.status !== 'Completed'
+    "
+    class="mt-5 pt-4 border-t border-gray-100 flex justify-end"
+  >
+
+    <button
+      type="button"
+      (click)="cancelAppointment()"
+      class="px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+    >
+      Cancel Appointment
+    </button>
+
+  </div>
+
+</div>

@@ -1,17 +1,28 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
 const User = require("../models/users.model");
 const Patient = require("../models/patient.model");
 
+// Remove password before sending user data to frontend
 const publicUser = (user) => {
   const value = user.toObject ? user.toObject() : { ...user };
+
   delete value.password;
+
   return value;
 };
 
+// ======================================================
+// GET ALL USERS
+// ======================================================
+
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    const users = await User.find()
+      .select("-password")
+      .sort({ createdAt: -1 });
+
     res.status(200).json({
       success: true,
       message: "Users fetched successfully",
@@ -19,19 +30,24 @@ const getUsers = async (req, res) => {
       users,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
-// Lightweight directory endpoint: id + name + role only.
-// Used by non-admin roles (e.g. patients viewing their own medical reports)
-// to resolve who a patient/doctor is without exposing email/phone/etc.
-// Full user records (getUsers) stay restricted to doctor/admin.
+// ======================================================
+// GET BASIC USERS
+// ======================================================
+
 const getUsersBasic = async (req, res) => {
   try {
-    const users = await User.find().select("name role").sort({ name: 1 });
+    const users = await User.find()
+      .select("name role")
+      .sort({ name: 1 });
+
     res.status(200).json({
       success: true,
       message: "Users fetched successfully",
@@ -39,97 +55,158 @@ const getUsersBasic = async (req, res) => {
       users,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
+
+// ======================================================
+// GET USER BY ID
+// ======================================================
 
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     const isOwner = String(user._id) === String(req.user.userId);
-    if (!isOwner && req.user.role !== "admin") {
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: "You are not allowed to view this account",
       });
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: "User fetched successfully", user });
+    res.status(200).json({
+      success: true,
+      message: "User fetched successfully",
+      user,
+    });
   } catch (error) {
-    if (error.name === "CastError")
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid user id" });
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user id",
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
+
+// ======================================================
+// ADD USER
+// ======================================================
 
 const addUser = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
 
-    const existingUser = await User.findOne({
-      email: String(email).toLowerCase(),
-    });
-    if (existingUser)
-      return res
-        .status(409)
-        .json({ success: false, message: "Email already exists" });
+    // Validate required fields
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, password and phone are required",
+      });
+    }
 
+    // Normalize email
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    // Check if email already exists
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create User
     const user = await User.create({
-      name,
-      email,
+      name: String(name).trim(),
+      email: normalizedEmail,
       password: hashedPassword,
       phone,
       role: "user",
     });
 
-    // Every "user" role account needs a matching Patient profile — medical
-    // reports, appointments, etc. are keyed off it. If this fails, roll the
-    // User creation back rather than leaving an account with no profile
-    // (which silently breaks "my medical reports" for that account).
+    // Create matching Patient profile
     try {
-      await Patient.create({ user: user._id, name, email, phone });
+      await Patient.create({
+        user: user._id,
+        name: String(name).trim(),
+        email: normalizedEmail,
+        phone,
+      });
     } catch (patientError) {
+      // Roll back User if Patient creation fails
       await User.findByIdAndDelete(user._id);
+
       throw patientError;
     }
 
     res.status(201).json({
       success: true,
-      message: "User created successfully",
+      message: "User and patient profile created successfully",
       user: publicUser(user),
     });
   } catch (error) {
-    if (error.code === 11000)
-      return res
-        .status(409)
-        .json({ success: false, message: "Email already exists" });
-    if (error.name === "ValidationError")
+    // Duplicate key
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+
+    // Mongoose validation
+    if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
         message: "Validation failed",
         error: error.message,
       });
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
+// ======================================================
+// UPDATE USER
+// ======================================================
+
 const updateUserData = async (req, res) => {
   try {
-    const isOwner = String(req.params.id) === String(req.user.userId);
+    const isOwner =
+      String(req.params.id) === String(req.user.userId);
+
     const isAdmin = req.user.role === "admin";
 
     if (!isOwner && !isAdmin) {
@@ -139,67 +216,111 @@ const updateUserData = async (req, res) => {
       });
     }
 
-    const { password, role, isActive, ...otherData } = req.body;
+    const {
+      password,
+      role,
+      isActive,
+      ...otherData
+    } = req.body;
 
+    // Only admin can change role
     if (role !== undefined) {
-      if (!isAdmin)
-        return res
-          .status(403)
-          .json({ success: false, message: "Only an admin can change roles" });
-      if (!["user", "doctor", "admin"].includes(role)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid role" });
+      if (!isAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: "Only an admin can change roles",
+        });
       }
+
+      if (!["user", "doctor", "admin"].includes(role)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid role",
+        });
+      }
+
       otherData.role = role;
     }
 
+    // Only admin can change account status
     if (isActive !== undefined) {
-      if (!isAdmin)
+      if (!isAdmin) {
         return res.status(403).json({
           success: false,
           message: "Only an admin can change account status",
         });
+      }
+
       otherData.isActive = isActive;
     }
 
-    if (otherData.email)
-      otherData.email = String(otherData.email).toLowerCase();
-    if (password) otherData.password = await bcrypt.hash(password, 12);
+    // Normalize email
+    if (otherData.email) {
+      otherData.email = String(otherData.email)
+        .trim()
+        .toLowerCase();
+    }
 
-    const user = await User.findByIdAndUpdate(req.params.id, otherData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
+    // Hash new password
+    if (password) {
+      otherData.password = await bcrypt.hash(password, 12);
+    }
 
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      otherData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
 
-    res
-      .status(200)
-      .json({ success: true, message: "User updated successfully", user });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user,
+    });
   } catch (error) {
-    if (error.code === 11000)
-      return res
-        .status(409)
-        .json({ success: false, message: "Email already exists" });
-    if (error.name === "ValidationError")
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+
+    if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
         message: "Validation failed",
         error: error.message,
       });
-    if (error.name === "CastError")
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid user id" });
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user id",
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
+
+// ======================================================
+// DELETE USER
+// ======================================================
 
 const deleteUser = async (req, res) => {
   try {
@@ -211,62 +332,94 @@ const deleteUser = async (req, res) => {
     }
 
     const user = await User.findByIdAndDelete(req.params.id);
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
 
-    res
-      .status(200)
-      .json({ success: true, message: "User deleted successfully" });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+    });
   } catch (error) {
-    if (error.name === "CastError")
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid user id" });
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user id",
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
+
+// ======================================================
+// USER LOGIN
+// ======================================================
 
 const userLogin = async (req, res) => {
   try {
     const email = String(req.body.email || "")
       .trim()
       .toLowerCase();
+
     const password = req.body.password;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email and password are required" });
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
     }
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
 
-    const passwordCorrect = await bcrypt.compare(password, user.password);
-    if (!passwordCorrect)
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
 
-    if (!user.isActive)
-      return res
-        .status(403)
-        .json({ success: false, message: "Your account is inactive" });
+    const passwordCorrect = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!passwordCorrect) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is inactive",
+      });
+    }
 
     user.lastLoginDate = new Date();
+
     await user.save();
 
     const token = jwt.sign(
-      { userId: String(user._id), role: user.role },
+      {
+        userId: String(user._id),
+        role: user.role,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
+      {
+        expiresIn: "1d",
+      }
     );
 
     res.status(200).json({
@@ -276,15 +429,27 @@ const userLogin = async (req, res) => {
       user: publicUser(user),
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
+// ======================================================
+// CREATE STAFF ACCOUNT
+// ======================================================
+
 const createStaffAccount = async (req, res) => {
   try {
-    const { name, email, password, phone, role } = req.body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      role,
+    } = req.body;
 
     if (!["doctor", "admin"].includes(role)) {
       return res.status(400).json({
@@ -293,18 +458,36 @@ const createStaffAccount = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({
-      email: String(email || "").toLowerCase(),
-    });
-    if (existingUser)
-      return res
-        .status(409)
-        .json({ success: false, message: "Email already exists" });
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, password and phone are required",
+      });
+    }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const normalizedEmail = String(email)
+      .trim()
+      .toLowerCase();
+
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      password,
+      12
+    );
+
     const user = await User.create({
-      name,
-      email,
+      name: String(name).trim(),
+      email: normalizedEmail,
       password: hashedPassword,
       phone,
       role,
@@ -316,21 +499,32 @@ const createStaffAccount = async (req, res) => {
       user: publicUser(user),
     });
   } catch (error) {
-    if (error.code === 11000)
-      return res
-        .status(409)
-        .json({ success: false, message: "Email already exists" });
-    if (error.name === "ValidationError")
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
+    }
+
+    if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
         message: "Validation failed",
         error: error.message,
       });
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
+
+// ======================================================
+// EXPORTS
+// ======================================================
 
 module.exports = {
   getUsers,

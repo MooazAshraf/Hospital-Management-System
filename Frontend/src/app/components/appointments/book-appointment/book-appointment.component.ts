@@ -8,7 +8,11 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink,
+} from '@angular/router';
 
 import { DoctorService } from '../../../services/doctor.service';
 import { Doctor } from '../../../models/doctor.model';
@@ -19,11 +23,13 @@ import { ImagePathPipe } from '../../../pipes/image-path.pipe';
 
 @Component({
   selector: 'app-book-appointment',
+
   standalone: true,
 
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     BookingStepsComponent,
     ImagePathPipe,
   ],
@@ -32,126 +38,332 @@ import { ImagePathPipe } from '../../../pipes/image-path.pipe';
 })
 export class BookAppointmentComponent implements OnInit {
 
-  private readonly doctorService = inject(DoctorService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
+  private readonly doctorService =
+    inject(DoctorService);
 
-  readonly doctors = signal<Doctor[]>([]);
+  private readonly route =
+    inject(ActivatedRoute);
 
-  readonly isLoading = signal(false);
+  private readonly router =
+    inject(Router);
 
-  readonly errorMessage = signal('');
 
-  readonly selectedDoctor = signal<Doctor | null>(null);
+  readonly doctors =
+    signal<Doctor[]>([]);
 
-  readonly searchTerm = signal('');
+  readonly isLoading =
+    signal(false);
 
+  readonly errorMessage =
+    signal('');
+
+  readonly selectedDoctor =
+    signal<Doctor | null>(null);
+
+  readonly searchTerm =
+    signal('');
+
+  readonly selectedDepartment =
+    signal('');
+
+
+  readonly failedImages =
+    signal<Set<string>>(new Set());
+
+
+  /* =========================================
+     DEPARTMENTS
+  ========================================= */
+
+  readonly departments = computed(() => {
+
+    const names = this.doctors()
+      .map((doctor) =>
+        this.departmentName(doctor)
+      )
+      .filter(
+        (name) =>
+          name &&
+          name !== 'N/A'
+      );
+
+    return Array.from(
+      new Set(names)
+    ).sort();
+  });
+
+
+  /* =========================================
+     FILTERED DOCTORS
+  ========================================= */
 
   readonly filteredDoctors = computed(() => {
 
-    const term = this.searchTerm()
-      .trim()
-      .toLowerCase();
+    const term =
+      this.searchTerm()
+        .trim()
+        .toLowerCase();
 
-    const list = this.doctors();
+    const department =
+      this.selectedDepartment();
+
+    let list =
+      this.doctors();
+
+
+    if (department) {
+
+      list = list.filter(
+        (doctor) =>
+          this.departmentName(doctor) ===
+          department
+      );
+    }
+
 
     if (!term) {
       return list;
     }
 
-    return list.filter((doctor) =>
-      doctor.name.toLowerCase().includes(term) ||
-      doctor.specialty.toLowerCase().includes(term)
-    );
+
+    return list.filter((doctor) => {
+
+      const doctorName =
+        doctor.name?.toLowerCase() || '';
+
+      const specialty =
+        doctor.specialty?.toLowerCase() || '';
+
+      const departmentName =
+        this.departmentName(doctor)
+          .toLowerCase();
+
+      return (
+        doctorName.includes(term) ||
+        specialty.includes(term) ||
+        departmentName.includes(term)
+      );
+    });
+
   });
 
+
+  /* =========================================
+     INIT
+  ========================================= */
 
   ngOnInit(): void {
 
     const preselectedId =
-      this.route.snapshot.queryParamMap.get('doctorId');
+      this.route.snapshot
+        .queryParamMap
+        .get('doctorId');
 
-    this.fetchDoctors(preselectedId);
+    this.fetchDoctors(
+      preselectedId
+    );
   }
 
 
-  fetchDoctors(preselectedId: string | null = null): void {
+  /* =========================================
+     FETCH DOCTORS
+  ========================================= */
+
+  fetchDoctors(
+    preselectedId: string | null = null
+  ): void {
 
     this.isLoading.set(true);
 
     this.errorMessage.set('');
 
-    this.doctorService.getDoctors().subscribe({
 
-      next: (doctors) => {
+    this.doctorService
+      .getDoctors()
+      .subscribe({
 
-        this.doctors.set(doctors);
+        next: (doctors) => {
 
-        this.isLoading.set(false);
+          this.doctors.set(doctors);
+
+          this.isLoading.set(false);
 
 
-        if (preselectedId) {
-
-          const doctor = doctors.find(
-            (item) => item._id === preselectedId
-          );
-
-          if (doctor) {
-            this.selectedDoctor.set(doctor);
+          if (!preselectedId) {
             return;
           }
 
+
+          const doctor =
+            doctors.find(
+              (item) =>
+                item._id ===
+                preselectedId
+            );
+
+
+          if (doctor) {
+
+            this.selectedDoctor.set(
+              doctor
+            );
+
+            return;
+          }
+
+
           this.doctorService
-            .getDoctorById(preselectedId)
+            .getDoctorById(
+              preselectedId
+            )
             .subscribe({
 
               next: (doctor) => {
-                this.selectedDoctor.set(doctor);
+
+                this.selectedDoctor.set(
+                  doctor
+                );
               },
 
               error: () => {
+
                 this.errorMessage.set(
                   'Doctor not found.'
                 );
               },
 
             });
-        }
-      },
 
-      error: (err) => {
+        },
 
-        this.isLoading.set(false);
 
-        this.errorMessage.set(
-          err?.error?.message ||
-          'Failed to load doctors. Please try again.'
-        );
-      },
+        error: (err) => {
 
-    });
+          this.isLoading.set(false);
+
+          this.errorMessage.set(
+            err?.error?.message ||
+            'Failed to load doctors. Please try again.'
+          );
+
+        },
+
+      });
   }
 
 
-  selectDoctor(doctor: Doctor): void {
+  /* =========================================
+     SELECT DOCTOR
+  ========================================= */
 
-    this.selectedDoctor.set(doctor);
+  selectDoctor(
+    doctor: Doctor
+  ): void {
+
+    this.selectedDoctor.set(
+      doctor
+    );
   }
 
+
+  /* =========================================
+     CHANGE DOCTOR
+  ========================================= */
 
   changeDoctor(): void {
 
     this.selectedDoctor.set(null);
 
-    this.router.navigate(
-      ['/book-appointment']
+    this.router.navigate([
+      '/book-appointment',
+    ]);
+
+  }
+
+
+  /* =========================================
+     BOOKED
+  ========================================= */
+
+  onBooked(
+    appointmentId: string
+  ): void {
+
+    this.router.navigate([
+      '/patient-dashboard',
+    ]);
+
+  }
+
+
+  /* =========================================
+     IMAGE ERROR
+  ========================================= */
+
+  onImageError(
+    doctorId: string
+  ): void {
+
+    const current =
+      new Set(
+        this.failedImages()
+      );
+
+    current.add(doctorId);
+
+    this.failedImages.set(
+      current
     );
   }
 
 
-  onBooked(appointmentId: string): void {
+  /* =========================================
+     ARABIC NAME
+  ========================================= */
 
-    this.router.navigate(['/patient-dashboard']);
+  isArabicName(
+    name: string
+  ): boolean {
+
+    return /[\u0600-\u06FF]/.test(
+      name || ''
+    );
+  }
+
+
+  /* =========================================
+     DEPARTMENT NAME
+  ========================================= */
+
+  departmentName(
+    doctor: Doctor
+  ): string {
+
+    const department =
+      doctor?.department;
+
+
+    if (
+      department &&
+      typeof department === 'object'
+    ) {
+
+      return (
+        (department as any).name ||
+        'N/A'
+      );
+    }
+
+
+    if (
+      typeof department === 'string'
+    ) {
+
+      return department;
+    }
+
+
+    return 'N/A';
   }
 
 }

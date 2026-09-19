@@ -7,33 +7,40 @@ export type NotificationType =
 export interface NotificationUser {
   _id: string;
   name?: string;
-  email?: string;
   role?: string;
 }
 
 export interface AppNotification {
   _id: string;
-  recipient: string | NotificationUser;
-  sender?: string | NotificationUser | null;
+  recipient: string;
+  sender: NotificationUser | null;
+
   title: string;
   message: string;
   type: NotificationType;
-  relatedAppointment?: string | unknown | null;
-  relatedMedicalReport?: string | unknown | null;
+
   isRead: boolean;
+
+  relatedAppointment?: string | null;
+  relatedMedicalReport?: string | null;
+
   createdAt: string;
   updatedAt?: string;
 }
 
 export interface NotificationsListResponse {
-  success?: boolean;
-  message?: string;
+  success: boolean;
   count: number;
   notifications: AppNotification[];
 }
 
 export interface NotificationResponse {
-  success?: boolean;
-  message: string;
+  success: boolean;
+  message?: string;
   notification: AppNotification;
+}
+
+export interface SimpleMessageResponse {
+  success: boolean;
+  message: string;
 }

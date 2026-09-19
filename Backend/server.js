@@ -15,6 +15,7 @@ const reviewRouter = require("./routes/review.route");
 const paymentRouter = require("./routes/payment.route");
 const auditLogRouter = require("./routes/auditlog.route");
 const departmentRouter = require("./routes/department.route");
+const contactRouter = require("./routes/contact.route");
 
 const app = express();
 

@@ -2,7 +2,10 @@
 
   <div class="booking-card">
 
+    <!-- ================================================= -->
     <!-- Doctor Header -->
+    <!-- ================================================= -->
+
     <div class="doctor-header">
 
       <div class="doctor-avatar">
@@ -47,7 +50,9 @@
     <div class="divider"></div>
 
 
-    <!-- FORM -->
+    <!-- ================================================= -->
+    <!-- Booking Form -->
+    <!-- ================================================= -->
 
     <form
       [formGroup]="detailsForm"
@@ -65,7 +70,9 @@
       </p>
 
 
+      <!-- ================================================= -->
       <!-- Patient Information -->
+      <!-- ================================================= -->
 
       <div class="section-title">
 
@@ -77,7 +84,6 @@
 
 
       <div class="form-grid">
-
 
         <!-- Name -->
 
@@ -92,6 +98,7 @@
             type="text"
             formControlName="patientName"
             placeholder="Enter your full name"
+            readonly
           />
 
           @if (
@@ -121,6 +128,7 @@
             type="tel"
             formControlName="phone"
             placeholder="01xxxxxxxxx"
+            readonly
           />
 
           @if (
@@ -151,6 +159,7 @@
             type="email"
             formControlName="email"
             placeholder="example@email.com"
+            readonly
           />
 
           @if (
@@ -169,7 +178,9 @@
       </div>
 
 
+      <!-- ================================================= -->
       <!-- Appointment Information -->
+      <!-- ================================================= -->
 
       <div class="section-title">
 
@@ -183,7 +194,9 @@
       <div class="form-grid">
 
 
+        <!-- ================================================= -->
         <!-- Date -->
+        <!-- ================================================= -->
 
         <div class="form-group">
 
@@ -201,7 +214,9 @@
         </div>
 
 
+        <!-- ================================================= -->
         <!-- Time -->
+        <!-- ================================================= -->
 
         <div class="form-group">
 
@@ -209,17 +224,40 @@
             Appointment Time
           </label>
 
+
           <select
             id="time"
             formControlName="time"
+            [disabled]="
+              loadingSlots() ||
+              !hasAnyAvailableSlot()
+            "
           >
 
+            <!-- Default -->
+
             <option value="">
-              Select a time
+
+              @if (loadingSlots()) {
+
+                Loading times...
+
+              } @else {
+
+                Select a time
+
+              }
+
             </option>
 
 
-            @if (morningSlots().length) {
+            <!-- ================================================= -->
+            <!-- Morning -->
+            <!-- ================================================= -->
+
+            @if (
+              morningSlots().length > 0
+            ) {
 
               <optgroup label="Morning">
 
@@ -248,7 +286,13 @@
             }
 
 
-            @if (afternoonSlots().length) {
+            <!-- ================================================= -->
+            <!-- Afternoon -->
+            <!-- ================================================= -->
+
+            @if (
+              afternoonSlots().length > 0
+            ) {
 
               <optgroup label="Afternoon">
 
@@ -279,6 +323,8 @@
           </select>
 
 
+          <!-- Loading -->
+
           @if (loadingSlots()) {
 
             <small class="hint">
@@ -286,6 +332,9 @@
             </small>
 
           }
+
+
+          <!-- No Slots -->
 
           @if (
             !loadingSlots() &&
@@ -302,7 +351,9 @@
         </div>
 
 
+        <!-- ================================================= -->
         <!-- Visit Type -->
+        <!-- ================================================= -->
 
         <div class="form-group full">
 
@@ -332,7 +383,9 @@
         </div>
 
 
+        <!-- ================================================= -->
         <!-- Notes -->
+        <!-- ================================================= -->
 
         <div class="form-group full">
 
@@ -358,7 +411,9 @@
       </div>
 
 
+      <!-- ================================================= -->
       <!-- Error -->
+      <!-- ================================================= -->
 
       @if (errorMessage()) {
 
@@ -371,13 +426,15 @@
       }
 
 
+      <!-- ================================================= -->
       <!-- Footer -->
+      <!-- ================================================= -->
 
       <div class="form-footer">
 
         <div class="secure-text">
 
-           Your information is kept private.
+          Your information is kept private.
 
         </div>
 
@@ -385,7 +442,10 @@
         <button
           type="submit"
           class="book-button"
-          [disabled]="submitting()"
+          [disabled]="
+            submitting() ||
+            loadingSlots()
+          "
         >
 
           @if (submitting()) {
@@ -421,21 +481,30 @@
 .booking-card {
   width: min(760px, 100%);
   margin: 0 auto;
+
   background: #ffffff;
+
   border: 1px solid #e4e9e6;
+
   border-radius: 18px;
+
   box-shadow:
     0 8px 30px rgba(20, 83, 45, 0.08);
+
   overflow: hidden;
 }
 
 
+/* ================================================= */
 /* Doctor */
+/* ================================================= */
 
 .doctor-header {
   display: flex;
   align-items: center;
+
   gap: 18px;
+
   padding: 28px 32px;
 }
 
@@ -443,9 +512,13 @@
 .doctor-avatar {
   width: 76px;
   height: 76px;
+
   flex-shrink: 0;
+
   border-radius: 50%;
+
   overflow: hidden;
+
   background: #eaf4ee;
 
   display: flex;
@@ -459,6 +532,7 @@
 .doctor-avatar img {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
 }
 
@@ -470,34 +544,45 @@
 
 .doctor-info h2 {
   margin: 0 0 6px;
+
   color: #163d28;
+
   font-size: 22px;
 }
 
 
 .doctor-info p {
   margin: 0 0 7px;
+
   color: #39745b;
+
   font-size: 15px;
 }
 
 
 .doctor-info span {
   color: #555;
+
   font-size: 14px;
+
   font-weight: 600;
 }
 
 
+/* ================================================= */
 /* Divider */
+/* ================================================= */
 
 .divider {
   height: 1px;
+
   background: #e8ecea;
 }
 
 
+/* ================================================= */
 /* Form */
+/* ================================================= */
 
 .booking-form {
   padding: 32px;
@@ -506,29 +591,38 @@
 
 .booking-form h1 {
   margin: 0;
+
   color: #163d28;
+
   font-size: 26px;
 }
 
 
 .form-subtitle {
   margin: 8px 0 30px;
+
   color: #7a8580;
+
   font-size: 14px;
 }
 
 
+/* ================================================= */
 /* Section */
+/* ================================================= */
 
 .section-title {
   display: flex;
   align-items: center;
+
   gap: 10px;
 
   margin: 28px 0 18px;
 
   color: #163d28;
+
   font-size: 16px;
+
   font-weight: 700;
 }
 
@@ -540,6 +634,7 @@
   border-radius: 50%;
 
   background: #1f6f5c;
+
   color: white;
 
   display: flex;
@@ -550,18 +645,25 @@
 }
 
 
+/* ================================================= */
 /* Grid */
+/* ================================================= */
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap: 18px;
 }
 
 
 .form-group {
   display: flex;
+
   flex-direction: column;
+
   gap: 7px;
 }
 
@@ -573,32 +675,45 @@
 
 .form-group label {
   color: #34423a;
+
   font-size: 14px;
+
   font-weight: 600;
 }
 
 
 .form-group label span {
   color: #929a96;
+
   font-weight: 400;
 }
 
 
+/* ================================================= */
+/* Inputs */
+/* ================================================= */
+
 .form-group input,
 .form-group select,
 .form-group textarea {
+
   width: 100%;
+
   box-sizing: border-box;
 
-  border: 1px solid #d9e0dc;
+  border:
+    1px solid #d9e0dc;
+
   border-radius: 9px;
 
   padding: 12px 13px;
 
   background: #fff;
+
   color: #26352d;
 
   font-family: inherit;
+
   font-size: 14px;
 
   outline: none;
@@ -610,10 +725,12 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
+
   border-color: #1f6f5c;
 
   box-shadow:
-    0 0 0 3px rgba(31, 111, 92, .08);
+    0 0 0 3px
+    rgba(31, 111, 92, .08);
 }
 
 
@@ -628,15 +745,34 @@
 }
 
 
+/* ================================================= */
+/* Disabled */
+/* ================================================= */
+
+.form-group select:disabled {
+  background: #f5f7f6;
+
+  color: #89948e;
+
+  cursor: not-allowed;
+
+  opacity: 1;
+}
+
+
+/* ================================================= */
 /* Errors */
+/* ================================================= */
 
 .error {
   color: #c0392b;
+
   font-size: 12px;
 }
 
 
 .error-box {
+
   margin-top: 20px;
 
   padding: 12px 15px;
@@ -644,7 +780,9 @@
   border-radius: 9px;
 
   background: #fff0ef;
-  border: 1px solid #ffd3d0;
+
+  border:
+    1px solid #ffd3d0;
 
   color: #b3261e;
 
@@ -654,27 +792,35 @@
 
 .hint {
   color: #89948e;
+
   font-size: 12px;
 }
 
 
 .no-slots {
   color: #c0392b;
+
   font-size: 12px;
 }
 
 
+/* ================================================= */
 /* Footer */
+/* ================================================= */
 
 .form-footer {
+
   margin-top: 30px;
 
   padding-top: 22px;
 
-  border-top: 1px solid #e8ecea;
+  border-top:
+    1px solid #e8ecea;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 20px;
@@ -683,20 +829,25 @@
 
 .secure-text {
   color: #7a8580;
+
   font-size: 13px;
 }
 
 
 .book-button {
+
   border: none;
+
   border-radius: 9px;
 
   padding: 13px 25px;
 
   background: #1d432b;
+
   color: #fff;
 
   font-size: 14px;
+
   font-weight: 700;
 
   cursor: pointer;
@@ -706,23 +857,34 @@
 
 
 .book-button:hover:not(:disabled) {
+
   background: #163722;
-  transform: translateY(-1px);
+
+  transform:
+    translateY(-1px);
 }
 
 
 .book-button:disabled {
+
   opacity: .6;
+
   cursor: not-allowed;
 }
 
 
+/* ================================================= */
 /* Mobile */
+/* ================================================= */
 
 @media (max-width: 650px) {
 
   .booking-page {
-    padding: 25px 12px 40px;
+
+    padding:
+      25px
+      12px
+      40px;
   }
 
 
@@ -737,7 +899,9 @@
 
 
   .form-grid {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
   }
 
 
@@ -747,8 +911,12 @@
 
 
   .form-footer {
-    flex-direction: column;
-    align-items: stretch;
+
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
   }
 
 
@@ -758,4 +926,4 @@
 
 }
 
-</style>
+</style>  

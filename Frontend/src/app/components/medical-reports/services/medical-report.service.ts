@@ -8,7 +8,7 @@ interface MutationResponse {
   data: MedicalReport;
 }
 
-// Minimal shape we need from /api/users — kept local so this partition
+// Minimal shape we need from /api/users/basic — kept local so this partition
 // doesn't depend on the (currently inconsistent) shared user models.
 export interface SimpleUser {
   _id: string;
@@ -27,7 +27,10 @@ interface UsersResponse {
 export class MedicalReportService {
 
   private apiUrl = 'http://localhost:5000/api/medicalReports';
-  private usersUrl = 'http://localhost:5000/api/users';
+  // Scoped, read-only directory endpoint (id + name + role only).
+  // Open to every authenticated role, unlike /api/users which stays
+  // doctor/admin-only since it returns full user records.
+  private usersUrl = 'http://localhost:5000/api/users/basic';
 
   constructor(private http: HttpClient) {}
 
